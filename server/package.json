@@ -2,7 +2,7 @@
   "name": "smdb-server",
   "version": "0.0.1",
   "description": "SMDB TypeScript+Express Server",
-  "main": "server.ts",
+  "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,6 +28,7 @@
     "@types/node": "^20.14.11",
     "eslint": "^9.7.0",
     "nodemon": "^3.1.4",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^7.16.1"
