@@ -1,22 +1,11 @@
 {
-  "name": "smdb-server",
+  "name": "@smdb/server",
   "version": "0.0.1",
-  "description": "SMDB TypeScript+Express Server",
+  "description": "SMDB Server",
   "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/rjray/smdb.git"
-  },
-  "author": "Randy J. Ray <rjray@blackperl.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/rjray/smdb/issues"
-  },
-  "homepage": "https://github.com/rjray/smdb#readme",
-  "packageManager": "yarn@4.3.1+sha512.af78262d7d125afbfeed740602ace8c5e4405cd7f4735c08feb327286b2fdb2390fbca01589bfd1f50b1240548b74806767f5a063c94b67e431aabd0d86f7774",
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -28,9 +17,7 @@
     "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.11",
-    "eslint": "^9.7.0",
     "nodemon": "^3.1.4",
-    "prettier": "^3.3.3",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
