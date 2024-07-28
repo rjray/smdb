@@ -14,10 +14,12 @@
   },
   "homepage": "https://github.com/rjray/smdb",
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
     "eslint": "^9.7.0",
     "husky": "^9.1.3",
     "lint-staged": "^15.2.7",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "typescript-eslint": "^7.17.0"
   },
   "scripts": {
     "prepare": "husky"
