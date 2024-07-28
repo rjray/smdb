@@ -13,7 +13,6 @@
     "url": "https://github.com/rjray/smdb/issues"
   },
   "homepage": "https://github.com/rjray/smdb",
-  "packageManager": "pnpm@8.15.4+sha256.cea6d0bdf2de3a0549582da3983c70c92ffc577ff4410cbf190817ddc35137c2",
   "devDependencies": {
     "eslint": "^9.7.0",
     "husky": "^9.1.3",
@@ -22,5 +21,6 @@
   },
   "scripts": {
     "prepare": "husky"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
