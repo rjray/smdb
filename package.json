@@ -1,0 +1,23 @@
+{
+  "name": "@smdb/root",
+  "version": "0.0.1",
+  "description": "Scale Modeling Database Project",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/rjray/smdb.git"
+  },
+  "author": "Randy J. Ray <rjray@blackperl.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rjray/smdb/issues"
+  },
+  "homepage": "https://github.com/rjray/smdb",
+  "packageManager": "pnpm@8.15.4+sha256.cea6d0bdf2de3a0549582da3983c70c92ffc577ff4410cbf190817ddc35137c2",
+  "devDependencies": {
+    "husky": "^9.1.3"
+  },
+  "scripts": {
+    "prepare": "husky"
+  }
+}
