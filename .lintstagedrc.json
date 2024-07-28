@@ -1,0 +1,5 @@
+{
+  "*.{ts,tsx}": "eslint",
+  "*.{ts,tsx,html,css}": "prettier -c",
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"]
+}
