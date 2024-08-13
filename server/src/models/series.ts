@@ -29,7 +29,7 @@ class Series extends Model {
   notes?: string | null;
 
   @ForeignKey(() => Publisher)
-  @Column
+  @Column(DataType.INTEGER)
   publisherId?: number;
 
   @BelongsTo(() => Publisher)

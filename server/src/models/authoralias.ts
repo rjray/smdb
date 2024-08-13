@@ -22,6 +22,7 @@ class AuthorAlias extends Model {
   name!: string;
 
   @ForeignKey(() => Author)
+  @Column(DataType.INTEGER)
   authorId!: number;
 
   @BelongsTo(() => Author, { onDelete: "CASCADE" })

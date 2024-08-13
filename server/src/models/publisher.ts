@@ -19,10 +19,7 @@ import Series from "./series";
 }))
 @Table({ timestamps: false })
 class Publisher extends Model {
-  @Column({
-    allowNull: false,
-    unique: true,
-  })
+  @Column({ allowNull: false, unique: true })
   name!: string;
 
   @Column(DataType.STRING)

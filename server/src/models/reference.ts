@@ -35,7 +35,7 @@ class Reference extends Model {
   language?: string | null;
 
   @ForeignKey(() => ReferenceType)
-  @Column
+  @Column(DataType.INTEGER)
   referenceTypeId!: number;
 
   @BelongsTo(() => ReferenceType)

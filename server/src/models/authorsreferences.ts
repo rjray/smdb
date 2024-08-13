@@ -2,7 +2,13 @@
   AuthorsReferences relational model definition.
  */
 
-import { Table, Column, Model, ForeignKey } from "sequelize-typescript";
+import {
+  DataType,
+  Table,
+  Column,
+  Model,
+  ForeignKey,
+} from "sequelize-typescript";
 
 import Author from "./author";
 import Reference from "./reference";
@@ -10,11 +16,11 @@ import Reference from "./reference";
 @Table({ timestamps: false })
 class AuthorsReferences extends Model {
   @ForeignKey(() => Author)
-  @Column
+  @Column(DataType.INTEGER)
   authorId!: number;
 
   @ForeignKey(() => Reference)
-  @Column
+  @Column(DataType.INTEGER)
   referenceId!: number;
 }
 

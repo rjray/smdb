@@ -38,14 +38,14 @@ class Book extends Model {
   seriesNumber?: string | null;
 
   @ForeignKey(() => Publisher)
-  @Column
+  @Column(DataType.INTEGER)
   publisherId?: number;
 
   @BelongsTo(() => Publisher)
   publisher?: Publisher;
 
   @ForeignKey(() => Series)
-  @Column
+  @Column(DataType.INTEGER)
   seriesId?: number;
 
   @BelongsTo(() => Series)
