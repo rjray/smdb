@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Scale Modeling Database Project",
   "private": true,
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/rjray/smdb.git"
