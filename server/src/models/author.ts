@@ -3,6 +3,8 @@
  */
 
 import {
+  AllowNull,
+  DataType,
   DefaultScope,
   Scopes,
   Table,
@@ -25,7 +27,8 @@ import Reference from "./reference";
 }))
 @Table
 class Author extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @HasMany(() => AuthorAlias)

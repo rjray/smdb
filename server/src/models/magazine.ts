@@ -10,6 +10,7 @@ import {
   Column,
   Model,
   HasMany,
+  AllowNull,
 } from "sequelize-typescript";
 
 import MagazineIssue from "./magazineissue";
@@ -30,7 +31,8 @@ import MagazineIssue from "./magazineissue";
 }))
 @Table
 class Magazine extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @Column(DataType.STRING)

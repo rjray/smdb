@@ -9,6 +9,8 @@ import {
   Column,
   Model,
   HasMany,
+  AllowNull,
+  Unique,
 } from "sequelize-typescript";
 
 import Book from "./book";
@@ -19,7 +21,9 @@ import Series from "./series";
 }))
 @Table({ timestamps: false })
 class Publisher extends Model {
-  @Column({ allowNull: false, unique: true })
+  @AllowNull(false)
+  @Unique(true)
+  @Column(DataType.STRING)
   name!: string;
 
   @Column(DataType.STRING)

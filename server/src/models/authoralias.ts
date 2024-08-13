@@ -9,8 +9,8 @@ import {
   Column,
   Model,
   BelongsTo,
-  HasOne,
   ForeignKey,
+  AllowNull,
 } from "sequelize-typescript";
 
 import Author from "./author";
@@ -18,7 +18,8 @@ import Author from "./author";
 @DefaultScope(() => ({ attributes: ["id", "name"] }))
 @Table({ timestamps: false })
 class AuthorAlias extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @ForeignKey(() => Author)

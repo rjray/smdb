@@ -3,6 +3,7 @@
  */
 
 import {
+  AllowNull,
   DataType,
   DefaultScope,
   Table,
@@ -28,7 +29,8 @@ import TagsReferences from "./tagsreferences";
 }))
 @Table
 class Reference extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @Column(DataType.STRING)

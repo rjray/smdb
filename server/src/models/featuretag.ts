@@ -10,6 +10,7 @@ import {
   Column,
   Model,
   BelongsToMany,
+  AllowNull,
 } from "sequelize-typescript";
 
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
@@ -23,7 +24,8 @@ import MagazineFeature from "./magazinefeature";
 }))
 @Table({ timestamps: false })
 class FeatureTag extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @Column(DataType.STRING)

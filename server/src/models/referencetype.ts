@@ -2,16 +2,27 @@
   ReferenceType model definition.
  */
 
-import { DataType, Table, Column, Model, HasMany } from "sequelize-typescript";
+import {
+  DataType,
+  Table,
+  Column,
+  Model,
+  HasMany,
+  AllowNull,
+  Unique,
+} from "sequelize-typescript";
 
 import Reference from "./reference";
 
 @Table({ timestamps: false })
 class ReferenceType extends Model {
-  @Column({ allowNull: false, unique: true })
+  @AllowNull(false)
+  @Unique(true)
+  @Column(DataType.STRING)
   name!: string;
 
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   description!: string;
 
   @Column(DataType.STRING)

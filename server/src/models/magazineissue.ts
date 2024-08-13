@@ -12,6 +12,7 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  AllowNull,
 } from "sequelize-typescript";
 
 import Magazine from "./magazine";
@@ -25,7 +26,8 @@ import MagazineFeature from "./magazinefeature";
 }))
 @Table
 class MagazineIssue extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   issue!: string;
 
   @ForeignKey(() => Magazine)

@@ -11,6 +11,7 @@ import {
   HasMany,
   BelongsTo,
   ForeignKey,
+  AllowNull,
 } from "sequelize-typescript";
 
 import Book from "./book";
@@ -22,7 +23,8 @@ import Publisher from "./publisher";
 }))
 @Table({ timestamps: false })
 class Series extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @Column(DataType.STRING)

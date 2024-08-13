@@ -10,6 +10,7 @@ import {
   Column,
   Model,
   BelongsToMany,
+  AllowNull,
 } from "sequelize-typescript";
 
 import Reference from "./reference";
@@ -23,7 +24,8 @@ import TagsReferences from "./tagsreferences";
 }))
 @Table({ timestamps: false })
 class Tag extends Model {
-  @Column({ allowNull: false })
+  @AllowNull(false)
+  @Column(DataType.STRING)
   name!: string;
 
   @Column(DataType.STRING)
