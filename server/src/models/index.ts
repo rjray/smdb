@@ -24,6 +24,7 @@ import ReferenceType from "./referencetype";
 import Series from "./series";
 import Tag from "./tag";
 import TagsReferences from "./tagsreferences";
+import User from "./user";
 
 export const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -46,5 +47,6 @@ export const sequelize = new Sequelize({
     Series,
     Tag,
     TagsReferences,
+    User,
   ],
 });
