@@ -19,10 +19,8 @@ import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
 import MagazineIssue from "./magazineissue";
 import Reference from "./reference";
 
-@DefaultScope(() => ({
-  attributes: ["createdAt", "updatedAt"],
-}))
-@Table
+@DefaultScope(() => ({ include: [MagazineIssue, FeatureTag] }))
+@Table({ timestamps: false })
 class MagazineFeature extends Model {
   @PrimaryKey
   @ForeignKey(() => Reference)
