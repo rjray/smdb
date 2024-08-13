@@ -12,6 +12,11 @@ import Author from "./author";
 import AuthorAlias from "./authoralias";
 import AuthorsReferences from "./authorsreferences";
 import Book from "./book";
+import FeatureTag from "./featuretag";
+import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
+import Magazine from "./magazine";
+import MagazineFeature from "./magazinefeature";
+import MagazineIssue from "./magazineissue";
 import PhotoCollection from "./photocollection";
 import Publisher from "./publisher";
 import Reference from "./reference";
@@ -29,6 +34,11 @@ export const sequelize = new Sequelize({
     AuthorAlias,
     AuthorsReferences,
     Book,
+    FeatureTag,
+    FeatureTagsMagazineFeatures,
+    Magazine,
+    MagazineFeature,
+    MagazineIssue,
     PhotoCollection,
     Publisher,
     ReferenceType,
