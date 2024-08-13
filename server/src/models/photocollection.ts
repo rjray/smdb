@@ -26,10 +26,10 @@ class PhotoCollection extends Model {
   @BelongsTo(() => Reference)
   reference?: Reference;
 
-  @Column
+  @Column(DataType.STRING)
   location!: string;
 
-  @Column
+  @Column(DataType.STRING)
   media!: string;
 }
 
