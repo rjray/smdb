@@ -18,6 +18,7 @@ import {
 import Author from "./author";
 import AuthorsReferences from "./authorsreferences";
 import Book from "./book";
+import MagazineFeature from "./magazinefeature";
 import PhotoCollection from "./photocollection";
 import ReferenceType from "./referencetype";
 import Tag from "./tag";
@@ -25,7 +26,7 @@ import TagsReferences from "./tagsreferences";
 
 @DefaultScope(() => ({
   attributes: ["id", "name", "language", "createdAt", "updatedAt"],
-  include: [ReferenceType, Author, Tag, Book, PhotoCollection],
+  include: [ReferenceType, Author, Tag, Book, MagazineFeature, PhotoCollection],
 }))
 @Table
 class Reference extends Model {
@@ -51,6 +52,9 @@ class Reference extends Model {
 
   @HasOne(() => Book)
   book?: Book;
+
+  @HasOne(() => MagazineFeature)
+  magazineFeature?: MagazineFeature;
 
   @HasOne(() => PhotoCollection)
   photoCollection?: PhotoCollection;
