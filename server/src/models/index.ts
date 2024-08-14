@@ -1,12 +1,12 @@
 /*
-  This is the master file for the models directory.
+  This is the master file for the `models` directory.
 
-  It loads all model classes and creates a `Sequelize` instance around all
-  classes. It exports this instance object, but the real purpose is to load
-  all the models and initialize them.
+  It loads all model classes and uses the `connection` object from the
+  `database` directory to initialize the models. It then exports all of them
+  as though it were a typical "barrel file".
  */
 
-import { Sequelize } from "sequelize-typescript";
+import { connection } from "database";
 
 import Author from "./author";
 import AuthorAlias from "./authoralias";
@@ -26,34 +26,27 @@ import Tag from "./tag";
 import TagsReferences from "./tagsreferences";
 import User from "./user";
 
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "smdb.db",
-  logging: false,
-  models: [
-    Author,
-    AuthorAlias,
-    AuthorsReferences,
-    Book,
-    FeatureTag,
-    FeatureTagsMagazineFeatures,
-    Magazine,
-    MagazineFeature,
-    MagazineIssue,
-    PhotoCollection,
-    Publisher,
-    ReferenceType,
-    Reference,
-    Series,
-    Tag,
-    TagsReferences,
-    User,
-  ],
-});
+connection.addModels([
+  Author,
+  AuthorAlias,
+  AuthorsReferences,
+  Book,
+  FeatureTag,
+  FeatureTagsMagazineFeatures,
+  Magazine,
+  MagazineFeature,
+  MagazineIssue,
+  PhotoCollection,
+  Publisher,
+  ReferenceType,
+  Reference,
+  Series,
+  Tag,
+  TagsReferences,
+  User,
+]);
 
 export {
-  Sequelize,
-  sequelize,
   Author,
   AuthorAlias,
   AuthorsReferences,
