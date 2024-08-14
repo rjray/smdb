@@ -26,7 +26,7 @@ import Tag from "./tag";
 import TagsReferences from "./tagsreferences";
 import User from "./user";
 
-export const sequelize = new Sequelize({
+const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "smdb.db",
   logging: false,
@@ -50,3 +50,25 @@ export const sequelize = new Sequelize({
     User,
   ],
 });
+
+export {
+  Sequelize,
+  sequelize,
+  Author,
+  AuthorAlias,
+  AuthorsReferences,
+  Book,
+  FeatureTag,
+  FeatureTagsMagazineFeatures,
+  Magazine,
+  MagazineFeature,
+  MagazineIssue,
+  PhotoCollection,
+  Publisher,
+  ReferenceType,
+  Reference,
+  Series,
+  Tag,
+  TagsReferences,
+  User,
+};
