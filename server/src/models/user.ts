@@ -26,12 +26,12 @@ class User extends Model {
   name!: string;
 
   @AllowNull(false)
-  @Unique(true)
+  @Unique
   @Column(DataType.STRING)
   email!: string;
 
   @AllowNull(false)
-  @Unique(true)
+  @Unique
   @Column(DataType.STRING)
   username!: string;
 

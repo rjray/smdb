@@ -22,7 +22,7 @@ import Series from "./series";
 @Table({ timestamps: false })
 class Publisher extends Model {
   @AllowNull(false)
-  @Unique(true)
+  @Unique
   @Column(DataType.STRING)
   name!: string;
 

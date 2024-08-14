@@ -17,7 +17,7 @@ import Reference from "./reference";
 @Table({ timestamps: false })
 class ReferenceType extends Model {
   @AllowNull(false)
-  @Unique(true)
+  @Unique
   @Column(DataType.STRING)
   name!: string;
 
