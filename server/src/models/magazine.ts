@@ -26,9 +26,7 @@ import MagazineIssue from "./magazineissue";
     "updatedAt",
   ],
 }))
-@Scopes(() => ({
-  withIssues: { include: [MagazineIssue] },
-}))
+@Scopes(() => ({ issues: { include: [MagazineIssue] } }))
 @Table
 class Magazine extends Model {
   @AllowNull(false)

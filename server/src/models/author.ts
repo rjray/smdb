@@ -23,7 +23,7 @@ import Reference from "./reference";
 }))
 @Scopes(() => ({
   full: { include: [AuthorAlias, Reference] },
-  withAliases: { include: [AuthorAlias] },
+  aliases: { include: [AuthorAlias] },
 }))
 @Table
 class Author extends Model {

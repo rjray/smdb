@@ -22,9 +22,7 @@ import MagazineFeature from "./magazinefeature";
   attributes: ["id", "issue", "createdAt", "updatedAt"],
   include: [Magazine],
 }))
-@Scopes(() => ({
-  full: { include: [MagazineFeature] },
-}))
+@Scopes(() => ({ full: { include: [MagazineFeature] } }))
 @Table
 class MagazineIssue extends Model {
   @AllowNull(false)

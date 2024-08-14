@@ -19,9 +19,7 @@ import TagsReferences from "./tagsreferences";
 @DefaultScope(() => ({
   attributes: ["id", "name", "type", "description"],
 }))
-@Scopes(() => ({
-  references: { include: [Reference] },
-}))
+@Scopes(() => ({ references: { include: [Reference] } }))
 @Table({ timestamps: false })
 class Tag extends Model {
   @AllowNull(false)
