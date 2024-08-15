@@ -50,6 +50,17 @@ class Book extends Model {
 
   @BelongsTo(() => Series)
   series?: Series;
+
+  clean() {
+    const result = this.get();
+
+    if (result.publisher)
+      result.publisher = result.publisher.map((p: Publisher) => p.clean());
+    if (result.series)
+      result.series = result.series.map((s: Series) => s.clean());
+
+    return result;
+  }
 }
 
 export default Book;

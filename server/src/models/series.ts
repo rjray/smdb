@@ -39,6 +39,16 @@ class Series extends Model {
 
   @HasMany(() => Book)
   books?: Book[];
+
+  clean() {
+    const result = this.get();
+
+    if (result.publisher) result.publisher = result.publisher.clean();
+
+    if (result.books) result.books = result.books.map((b: Book) => b.clean());
+
+    return result;
+  }
 }
 
 export default Series;

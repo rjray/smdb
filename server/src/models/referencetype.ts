@@ -30,6 +30,15 @@ class ReferenceType extends Model {
 
   @HasMany(() => Reference)
   references?: Reference[];
+
+  clean() {
+    const result = this.get();
+
+    if (result.references)
+      result.references = result.references.map((r: Reference) => r.clean());
+
+    return result;
+  }
 }
 
 export default ReferenceType;

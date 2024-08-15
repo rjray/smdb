@@ -38,6 +38,10 @@ class User extends Model {
   @AllowNull(false)
   @Column(DataType.STRING)
   password!: string;
+
+  clean() {
+    return this.get();
+  }
 }
 
 export default User;

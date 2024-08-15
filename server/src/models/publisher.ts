@@ -32,6 +32,16 @@ class Publisher extends Model {
 
   @HasMany(() => Series)
   series?: Series[];
+
+  clean() {
+    const result = this.get();
+
+    if (result.books) result.books = result.books.map((b: Book) => b.clean());
+    if (result.series)
+      result.series = result.series.map((s: Series) => s.clean());
+
+    return result;
+  }
 }
 
 export default Publisher;

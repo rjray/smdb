@@ -42,7 +42,7 @@ class Reference extends Model {
   referenceTypeId!: number;
 
   @BelongsTo(() => ReferenceType)
-  referenceType?: ReferenceType;
+  referenceType!: ReferenceType;
 
   @BelongsToMany(() => Author, () => AuthorsReferences)
   authors?: Author[];
@@ -58,6 +58,40 @@ class Reference extends Model {
 
   @HasOne(() => PhotoCollection)
   photoCollection?: PhotoCollection;
+
+  clean() {
+    const result = this.get();
+    delete result.AuthorsReferences;
+
+    switch (result.referenceType.id) {
+      case 1:
+        // Book
+        delete result.magazineFeature;
+        delete result.photoCollection;
+        result.book = result.book.clean();
+        break;
+      case 2:
+        // Magazine Feature
+        delete result.book;
+        delete result.photoCollection;
+        result.magazineFeature = result.magazineFeature.clean();
+        break;
+      case 3:
+        // Photo Collection
+        delete result.book;
+        delete result.magazineFeature;
+        result.photoCollection = result.photoCollection.clean();
+        break;
+      default:
+        break;
+    }
+
+    if (result.authors)
+      result.authors = result.authors.map((a: Author) => a.clean());
+    if (result.tags) result.tags = result.tags.map((t: Tag) => t.clean());
+
+    return result;
+  }
 }
 
 export default Reference;

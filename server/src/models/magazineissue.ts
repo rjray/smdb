@@ -38,6 +38,17 @@ class MagazineIssue extends Model {
 
   @HasMany(() => MagazineFeature)
   magazineFeatures?: MagazineFeature[];
+
+  clean() {
+    const result = this.get();
+
+    if (result.magazineFeatures)
+      result.magazineFeatures = result.magazineFeatures.map(
+        (mf: MagazineFeature) => mf.clean()
+      );
+
+    return result;
+  }
 }
 
 export default MagazineIssue;

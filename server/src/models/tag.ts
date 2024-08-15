@@ -30,6 +30,16 @@ class Tag extends Model {
 
   @BelongsToMany(() => Reference, () => TagsReferences)
   references?: Reference[];
+
+  clean() {
+    const result = this.get();
+    delete result.TagsReferences;
+
+    if (result.references)
+      result.references = result.references.map((r: Reference) => r.clean());
+
+    return result;
+  }
 }
 
 export default Tag;

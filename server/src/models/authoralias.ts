@@ -28,6 +28,10 @@ class AuthorAlias extends Model {
 
   @BelongsTo(() => Author, { onDelete: "CASCADE" })
   author?: Author;
+
+  clean() {
+    return this.get();
+  }
 }
 
 export default AuthorAlias;

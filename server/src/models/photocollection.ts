@@ -31,6 +31,10 @@ class PhotoCollection extends Model {
 
   @Column(DataType.STRING)
   media!: string;
+
+  clean() {
+    return this.get();
+  }
 }
 
 export default PhotoCollection;

@@ -42,6 +42,22 @@ class MagazineFeature extends Model {
 
   @BelongsToMany(() => FeatureTag, () => FeatureTagsMagazineFeatures)
   featureTags?: FeatureTag[];
+
+  clean() {
+    const result = this.get();
+    delete result.magazineIssueId;
+
+    for (const field of ["reference", "magazineIssue"]) {
+      if (result[field]) result[field] = result[field].clean();
+    }
+
+    if (result.featureTags)
+      result.featureTags = result.featureTags.map((ft: FeatureTag) =>
+        ft.clean()
+      );
+
+    return result;
+  }
 }
 
 export default MagazineFeature;

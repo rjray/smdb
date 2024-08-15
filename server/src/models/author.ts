@@ -32,6 +32,21 @@ class Author extends Model {
 
   @BelongsToMany(() => Reference, () => AuthorsReferences)
   references?: Reference[];
+
+  clean() {
+    const result = this.get();
+
+    // The two dates are Date objects, convert them to ISO strings so that
+    // they don't stringify automatically.
+    for (const date of ["createdAt", "updatedAt"]) {
+      if (result[date]) result[date] = result[date].toISOString();
+    }
+
+    if (result.aliases)
+      result.aliases = result.aliases.map((a: AuthorAlias) => a.clean());
+
+    return result;
+  }
 }
 
 export default Author;

@@ -32,6 +32,15 @@ class Magazine extends Model {
 
   @HasMany(() => MagazineIssue)
   issues?: MagazineIssue[];
+
+  clean() {
+    const result = this.get();
+
+    if (result.issues)
+      result.issues = result.issues.map((mi: MagazineIssue) => mi.clean());
+
+    return result;
+  }
 }
 
 export default Magazine;
