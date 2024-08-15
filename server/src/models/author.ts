@@ -5,7 +5,6 @@
 import {
   AllowNull,
   DataType,
-  DefaultScope,
   Scopes,
   Table,
   Column,
@@ -18,9 +17,6 @@ import AuthorAlias from "./authoralias";
 import AuthorsReferences from "./authorsreferences";
 import Reference from "./reference";
 
-@DefaultScope(() => ({
-  attributes: ["id", "name", "createdAt", "updatedAt"],
-}))
 @Scopes(() => ({
   full: { include: [AuthorAlias, Reference] },
   aliases: { include: [AuthorAlias] },

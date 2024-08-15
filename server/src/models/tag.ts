@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Scopes,
   Table,
   Column,
@@ -16,9 +15,6 @@ import {
 import Reference from "./reference";
 import TagsReferences from "./tagsreferences";
 
-@DefaultScope(() => ({
-  attributes: ["id", "name", "type", "description"],
-}))
 @Scopes(() => ({ references: { include: [Reference] } }))
 @Table({ timestamps: false })
 class Tag extends Model {

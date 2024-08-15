@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Scopes,
   Table,
   Column,
@@ -15,17 +14,6 @@ import {
 
 import MagazineIssue from "./magazineissue";
 
-@DefaultScope(() => ({
-  attributes: [
-    "id",
-    "name",
-    "language",
-    "aliases",
-    "notes",
-    "createdAt",
-    "updatedAt",
-  ],
-}))
 @Scopes(() => ({ issues: { include: [MagazineIssue] } }))
 @Table
 class Magazine extends Model {

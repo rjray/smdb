@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Scopes,
   Table,
   Column,
@@ -16,9 +15,6 @@ import {
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
 import MagazineFeature from "./magazinefeature";
 
-@DefaultScope(() => ({
-  attributes: ["id", "name", "description"],
-}))
 @Scopes(() => ({
   references: { include: [MagazineFeature] },
 }))

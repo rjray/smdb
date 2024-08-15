@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Scopes,
   Table,
   Column,
@@ -17,7 +16,6 @@ import {
 import Book from "./book";
 import Series from "./series";
 
-@DefaultScope(() => ({ attributes: ["id", "name", "notes"] }))
 @Scopes(() => ({ series: { include: [Series] } }))
 @Table({ timestamps: false })
 class Publisher extends Model {
