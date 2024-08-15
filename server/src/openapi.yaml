@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: SMDB Server API
+  version: "0.1.0"
+servers:
+  - url: /api
+components:
+  schemas:
+    idType:
+      type: integer
+      format: int64
+      minimum: 1
+    dateTimeType:
+      type: string
+      format: date-time
+    authorNameOrAliasType:
+      type: string
+    authorType:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        name:
+          $ref: "#/components/schemas/authorNameOrAliasType"
+        createdAt:
+          $ref: "#/components/schemas/dateTimeType"
+        updatedAt:
+          $ref: "#/components/schemas/dateTimeType"
+    errorObjectType:
+      type: object
+      required:
+        - summary
+        - description
+      properties:
+        code:
+          $ref: "#/components/schemas/idType"
+        summary:
+          type: string
+        description:
+          type: string
+        reference:
+          type: string
+  responses:
+    generalErrorResponse:
+      description: An error has occurred
+      content:
+        "application/json":
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                $ref: "#/components/schemas/errorObjectType"
+    generalError404Response:
+      description: Not found
+      content:
+        "application/json":
+          schema:
+            type: object
+            required:
+              - error
+            properties:
+              error:
+                $ref: "#/components/schemas/errorObjectType"
+paths:
+  "/authors":
+    x-exegesis-controller: authorsController
+    get:
+      summary: Fetch all authors
+      description: Fetch all authors as an array.
+      operationId: getAllAuthors
+      responses:
+        "200":
+          description: All authors
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/authorType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Authors
