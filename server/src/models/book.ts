@@ -54,10 +54,8 @@ class Book extends Model {
   clean() {
     const result = this.get();
 
-    if (result.publisher)
-      result.publisher = result.publisher.map((p: Publisher) => p.clean());
-    if (result.series)
-      result.series = result.series.map((s: Series) => s.clean());
+    if (result.publisher) result.publisher = result.publisher.clean();
+    if (result.series) result.series = result.series.clean();
 
     return result;
   }
