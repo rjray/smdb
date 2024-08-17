@@ -41,7 +41,7 @@ export function getAllAuthors(context: ExegesisContext) {
 /*
   GET /authors/{id}
 
-  Return a single author based on the value of `id`. Return valus is a single
+  Return a single author based on the value of `id`. Return value is a single
   `Author` object.
  */
 export function getAuthorById(context: ExegesisContext) {
