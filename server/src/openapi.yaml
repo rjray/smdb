@@ -13,14 +13,14 @@ components:
       required: false
       schema:
         type: boolean
-    authorsReferencesParam:
+    referencesParam:
       name: references
       in: query
       description: Boolean, whether to include references in an author query
       required: false
       schema:
         type: boolean
-    authorsReferenceCountParam:
+    referenceCountParam:
       name: referenceCount
       in: query
       description: Boolean, whether to include reference count in author query
@@ -111,6 +111,30 @@ components:
           type: string
         reference:
           type: string
+    newTagType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+    tagType:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/idType"
+            referenceCount:
+              $ref: "#/components/schemas/countType"
+        - $ref: "#/components/schemas/newTagType"
   responses:
     generalErrorResponse:
       description: An error has occurred
@@ -135,8 +159,8 @@ paths:
       operationId: getAllAuthors
       parameters:
         - $ref: "#/components/parameters/authorsAliasesParam"
-        - $ref: "#/components/parameters/authorsReferencesParam"
-        - $ref: "#/components/parameters/authorsReferenceCountParam"
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
       responses:
         "200":
           description: All authors
@@ -161,8 +185,8 @@ paths:
       operationId: getAuthorById
       parameters:
         - $ref: "#/components/parameters/authorsAliasesParam"
-        - $ref: "#/components/parameters/authorsReferencesParam"
-        - $ref: "#/components/parameters/authorsReferenceCountParam"
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
       responses:
         "200":
           description: Author data
@@ -192,3 +216,65 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Authors
+  "/tags":
+    x-exegesis-controller: tagsController
+    get:
+      summary: Fetch all tags
+      description: Fetch tags as an array. Includes a count of all tags.
+      operationId: getAllTags
+      parameters:
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: All tags
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/tagType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+  "/tags/{id}":
+    x-exegesis-controller: tagsController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single tag by ID
+      description: Retrieve a single tag by the ID. Includes full tag
+        information.
+      operationId: getTagById
+      parameters:
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: Tag data
+          content:
+            "application/json":
+              schema:
+                type: object
+                $ref: "#/components/schemas/tagType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+    delete:
+      summary: Delete a tag by ID
+      description: Delete the specified tag. Removes all relational links
+        between the tag and any references.
+      operationId: deleteTagById
+      responses:
+        "200":
+          description: Tag deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
