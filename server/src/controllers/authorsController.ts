@@ -1,7 +1,26 @@
-import { ExegesisContext } from "exegesis-express";
+/*
+  Exegesis controller for all operations under /api/authors.
+ */
+
+import { ExegesisContext, ParametersMap } from "exegesis-express";
 
 import * as Authors from "db/authors";
 import { Author } from "models";
+import { AuthorFetchOpts } from "types/author";
+
+// Convert query parameters into a `AuthorFetchOpts` instance.
+function queryToFetchOpts(query: ParametersMap<boolean>) {
+  const opts: AuthorFetchOpts = {
+    aliases: false,
+    references: false,
+    referenceCount: false,
+  };
+  if (query.aliases) opts.aliases = true;
+  if (query.references) opts.references = true;
+  if (query.referenceCount) opts.referenceCount = true;
+
+  return opts;
+}
 
 /*
   GET /authors
@@ -9,9 +28,31 @@ import { Author } from "models";
   Return all authors. Return value is a list of `Author` objects.
  */
 export function getAllAuthors(context: ExegesisContext) {
+  const { query } = context.params;
   const { res } = context;
 
-  return Authors.fetchAllAuthors().then((results: Author[]) =>
+  const opts = queryToFetchOpts(query);
+
+  return Authors.fetchAllAuthors(opts).then((results: Author[]) =>
     res.status(200).pureJson(results.map((author) => author.clean()))
   );
+}
+
+/*
+  GET /authors/{id}
+
+  Return a single author based on the value of `id`. Return valus is a single
+  `Author` object.
+ */
+export function getAuthorById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { query } = context.params;
+  const { res } = context;
+
+  const opts = queryToFetchOpts(query);
+
+  return Authors.fetchOneAuthor(id, opts).then((author) => {
+    if (author) return res.status(200).pureJson(author.clean());
+    else return res.status(404).end();
+  });
 }

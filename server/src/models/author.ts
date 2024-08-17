@@ -16,9 +16,11 @@ import {
 import AuthorAlias from "./authoralias";
 import AuthorsReferences from "./authorsreferences";
 import Reference from "./reference";
+import { AuthorRecord } from "types/author";
 
 @Scopes(() => ({
   full: { include: [AuthorAlias, Reference] },
+  references: { include: [Reference] },
   aliases: { include: [AuthorAlias] },
 }))
 @Table
@@ -33,7 +35,7 @@ class Author extends Model {
   @BelongsToMany(() => Reference, () => AuthorsReferences)
   references?: Reference[];
 
-  clean() {
+  clean(): AuthorRecord {
     const result = this.get();
 
     // The two dates are Date objects, convert them to ISO strings so that
@@ -44,6 +46,8 @@ class Author extends Model {
 
     if (result.aliases)
       result.aliases = result.aliases.map((a: AuthorAlias) => a.clean());
+    if (result.references)
+      result.references = result.references.map((r: Reference) => r.clean());
 
     return result;
   }

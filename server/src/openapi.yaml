@@ -5,16 +5,76 @@ info:
 servers:
   - url: /api
 components:
+  parameters:
+    authorsAliasesParam:
+      name: aliases
+      in: query
+      description: Boolean, whether to include aliases in an author query
+      required: false
+      schema:
+        type: boolean
+    authorsReferencesParam:
+      name: references
+      in: query
+      description: Boolean, whether to include references in an author query
+      required: false
+      schema:
+        type: boolean
+    authorsReferenceCountParam:
+      name: referenceCount
+      in: query
+      description: Boolean, whether to include reference count in author query
+      required: false
+      schema:
+        type: boolean
+    idParam:
+      name: id
+      in: path
+      description: Entity ID
+      required: true
+      schema:
+        $ref: "#/components/schemas/idType"
   schemas:
     idType:
       type: integer
       format: int64
       minimum: 1
+    countType:
+      type: integer
+      format: int64
+      minimum: 0
     dateTimeType:
       type: string
       format: date-time
     authorNameOrAliasType:
       type: string
+    newAuthorAliasType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          $ref: "#/components/schemas/authorNameOrAliasType"
+    authorAliasType:
+      allOf:
+        - $ref: "#/components/schemas/newAuthorAliasType"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/idType"
+    newAuthorType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          $ref: "#/components/schemas/authorNameOrAliasType"
+        aliases:
+          type: array
+          items:
+            $ref: "#/components/schemas/newAuthorAliasType"
     authorType:
       type: object
       required:
@@ -31,6 +91,12 @@ components:
           $ref: "#/components/schemas/dateTimeType"
         updatedAt:
           $ref: "#/components/schemas/dateTimeType"
+        aliases:
+          type: array
+          items:
+            $ref: "#/components/schemas/authorAliasType"
+        referenceCount:
+          $ref: "#/components/schemas/countType"
     errorObjectType:
       type: object
       required:
@@ -59,22 +125,18 @@ components:
                 $ref: "#/components/schemas/errorObjectType"
     generalError404Response:
       description: Not found
-      content:
-        "application/json":
-          schema:
-            type: object
-            required:
-              - error
-            properties:
-              error:
-                $ref: "#/components/schemas/errorObjectType"
 paths:
   "/authors":
     x-exegesis-controller: authorsController
     get:
       summary: Fetch all authors
-      description: Fetch all authors as an array.
+      description: Fetch all authors as an array. Can return optional alias
+        information, reference count, or references.
       operationId: getAllAuthors
+      parameters:
+        - $ref: "#/components/parameters/authorsAliasesParam"
+        - $ref: "#/components/parameters/authorsReferencesParam"
+        - $ref: "#/components/parameters/authorsReferenceCountParam"
       responses:
         "200":
           description: All authors
@@ -84,6 +146,33 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/authorType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Authors
+  "/authors/{id}":
+    x-exegesis-controller: authorsController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single author by ID
+      description: Retrieve a single author by ID. Returns author and
+        optional alias information, reference count, or references.
+      operationId: getAuthorById
+      parameters:
+        - $ref: "#/components/parameters/authorsAliasesParam"
+        - $ref: "#/components/parameters/authorsReferencesParam"
+        - $ref: "#/components/parameters/authorsReferenceCountParam"
+      responses:
+        "200":
+          description: Author data
+          content:
+            "application/json":
+              schema:
+                type: object
+                $ref: "#/components/schemas/authorType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
