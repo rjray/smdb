@@ -34,7 +34,7 @@ class Series extends Model {
   @Column(DataType.INTEGER)
   publisherId?: number;
 
-  @BelongsTo(() => Publisher)
+  @BelongsTo(() => Publisher, { onDelete: "CASCADE" })
   publisher?: Publisher;
 
   @HasMany(() => Book)

@@ -33,7 +33,7 @@ class MagazineIssue extends Model {
   @Column(DataType.INTEGER)
   magazineId!: number;
 
-  @BelongsTo(() => Magazine)
+  @BelongsTo(() => Magazine, { onDelete: "CASCADE" })
   magazine?: Magazine;
 
   @HasMany(() => MagazineFeature)

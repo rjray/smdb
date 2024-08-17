@@ -28,7 +28,7 @@ class Book extends Model {
   @Column(DataType.INTEGER)
   referenceId!: number;
 
-  @BelongsTo(() => Reference)
+  @BelongsTo(() => Reference, { onDelete: "CASCADE" })
   reference?: Reference;
 
   @Column(DataType.STRING)
@@ -41,14 +41,14 @@ class Book extends Model {
   @Column(DataType.INTEGER)
   publisherId?: number;
 
-  @BelongsTo(() => Publisher)
+  @BelongsTo(() => Publisher, { onDelete: "SET NULL" })
   publisher?: Publisher;
 
   @ForeignKey(() => Series)
   @Column(DataType.INTEGER)
   seriesId?: number;
 
-  @BelongsTo(() => Series)
+  @BelongsTo(() => Series, { onDelete: "SET NULL" })
   series?: Series;
 
   clean() {

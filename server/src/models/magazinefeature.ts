@@ -30,14 +30,14 @@ class MagazineFeature extends Model {
   @Column(DataType.INTEGER)
   referenceId!: number;
 
-  @BelongsTo(() => Reference)
+  @BelongsTo(() => Reference, { onDelete: "CASCADE" })
   reference?: Reference;
 
   @ForeignKey(() => MagazineIssue)
   @Column(DataType.INTEGER)
   magazineIssueId!: number;
 
-  @BelongsTo(() => MagazineIssue)
+  @BelongsTo(() => MagazineIssue, { onDelete: "CASCADE" })
   magazineIssue?: MagazineIssue;
 
   @BelongsToMany(() => FeatureTag, () => FeatureTagsMagazineFeatures)

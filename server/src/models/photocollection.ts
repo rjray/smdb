@@ -23,7 +23,7 @@ class PhotoCollection extends Model {
   @Column(DataType.INTEGER)
   referenceId!: number;
 
-  @BelongsTo(() => Reference)
+  @BelongsTo(() => Reference, { onDelete: "CASCADE" })
   reference?: Reference;
 
   @Column(DataType.STRING)
