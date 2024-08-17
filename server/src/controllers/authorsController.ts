@@ -56,3 +56,18 @@ export function getAuthorById(context: ExegesisContext) {
     else return res.status(404).end();
   });
 }
+
+/*
+  DELETE /authors/{id}
+
+  Delete a single author based on the value of `id`.
+ */
+export function deleteAuthorById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res } = context;
+
+  return Authors.deleteAuthor(id).then((count: number) => {
+    if (count) return res.status(200).end();
+    else return res.status(404).end();
+  });
+}

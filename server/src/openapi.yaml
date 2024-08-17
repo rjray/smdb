@@ -177,3 +177,18 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Authors
+    delete:
+      summary: Delete an author by ID
+      description: Delete the specified author. Removes the author from
+        associated reference records and removes any associated aliases. Does
+        not delete any reference records.
+      operationId: deleteAuthorById
+      responses:
+        "200":
+          description: Author deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Authors
