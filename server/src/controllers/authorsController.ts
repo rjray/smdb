@@ -4,7 +4,7 @@
 
 import { ExegesisContext, ParametersMap } from "exegesis-express";
 
-import * as Authors from "db/authors";
+import { Authors } from "db";
 import { Author } from "models";
 import { AuthorFetchOpts } from "types/author";
 

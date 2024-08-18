@@ -4,7 +4,7 @@
 
 import { ExegesisContext, ParametersMap } from "exegesis-express";
 
-import * as Tags from "db/tags";
+import { Tags } from "db";
 import { Tag } from "models";
 import { TagFetchOpts } from "types/tag";
 
