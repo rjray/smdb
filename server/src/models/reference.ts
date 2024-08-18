@@ -15,17 +15,29 @@ import {
   ForeignKey,
 } from "sequelize-typescript";
 
-import Author from "./author";
+import Author, { AuthorRecord } from "./author";
 import AuthorsReferences from "./authorsreferences";
-import Book from "./book";
-import MagazineFeature from "./magazinefeature";
-import PhotoCollection from "./photocollection";
-import ReferenceType from "./referencetype";
-import Tag from "./tag";
+import Book, { BookRecord } from "./book";
+import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
+import PhotoCollection, { PhotoCollectionRecord } from "./photocollection";
+import ReferenceType, { ReferenceTypeRecord } from "./referencetype";
+import Tag, { TagRecord } from "./tag";
 import TagsReferences from "./tagsreferences";
 
+export type ReferenceRecord = {
+  id: number;
+  name: string;
+  language?: string | null;
+  referenceTypeId: number;
+  referenceType: ReferenceTypeRecord;
+  authors?: Array<AuthorRecord>;
+  tags?: Array<TagRecord>;
+  book?: BookRecord;
+  magazineFeature?: MagazineFeatureRecord;
+  photoCollection?: PhotoCollectionRecord;
+};
+
 @DefaultScope(() => ({
-  attributes: ["id", "name", "language", "createdAt", "updatedAt"],
   include: [ReferenceType, Author, Tag, Book, MagazineFeature, PhotoCollection],
 }))
 @Table
@@ -59,7 +71,7 @@ class Reference extends Model {
   @HasOne(() => PhotoCollection)
   photoCollection?: PhotoCollection;
 
-  clean() {
+  clean(): ReferenceRecord {
     const result = this.get();
     delete result.AuthorsReferences;
     delete result.TagsReferences;

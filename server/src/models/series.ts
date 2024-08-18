@@ -14,13 +14,19 @@ import {
   AllowNull,
 } from "sequelize-typescript";
 
-import Book from "./book";
-import Publisher from "./publisher";
+import Book, { BookRecord } from "./book";
+import Publisher, { PublisherRecord } from "./publisher";
 
-@DefaultScope(() => ({
-  attributes: ["id", "name", "notes"],
-  include: [Publisher],
-}))
+export type SeriesRecord = {
+  id: number;
+  name: string;
+  notes?: string | null;
+  publisherId?: number | null;
+  publisher?: PublisherRecord;
+  books?: Array<BookRecord>;
+};
+
+@DefaultScope(() => ({ include: [Publisher] }))
 @Table({ timestamps: false })
 class Series extends Model {
   @AllowNull(false)
@@ -40,7 +46,7 @@ class Series extends Model {
   @HasMany(() => Book)
   books?: Book[];
 
-  clean() {
+  clean(): SeriesRecord {
     const result = this.get();
 
     if (result.publisher) result.publisher = result.publisher.clean();

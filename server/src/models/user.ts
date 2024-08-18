@@ -13,6 +13,14 @@ import {
   DataType,
 } from "sequelize-typescript";
 
+export type UserRecord = {
+  id: number;
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+};
+
 @Table
 class User extends Model {
   @PrimaryKey
@@ -39,7 +47,7 @@ class User extends Model {
   @Column(DataType.STRING)
   password!: string;
 
-  clean() {
+  clean(): UserRecord {
     return this.get();
   }
 }

@@ -13,10 +13,19 @@ import {
   BelongsToMany,
 } from "sequelize-typescript";
 
-import AuthorAlias from "./authoralias";
+import AuthorAlias, { AuthorAliasRecord } from "./authoralias";
 import AuthorsReferences from "./authorsreferences";
-import Reference from "./reference";
-import { AuthorRecord } from "types/author";
+import Reference, { ReferenceRecord } from "./reference";
+
+export type AuthorRecord = {
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  referenceCount?: number;
+  aliases?: Array<AuthorAliasRecord>;
+  references?: Array<ReferenceRecord>;
+};
 
 @Scopes(() => ({
   full: { include: [AuthorAlias, Reference] },

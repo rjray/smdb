@@ -12,8 +12,17 @@ import {
   AllowNull,
 } from "sequelize-typescript";
 
-import Reference from "./reference";
+import Reference, { ReferenceRecord } from "./reference";
 import TagsReferences from "./tagsreferences";
+
+export type TagRecord = {
+  id: number;
+  name: string;
+  type?: string;
+  description?: string;
+  referenceCount?: number;
+  references?: Array<ReferenceRecord>;
+};
 
 @Scopes(() => ({ references: { include: [Reference] } }))
 @Table({ timestamps: false })
@@ -31,7 +40,7 @@ class Tag extends Model {
   @BelongsToMany(() => Reference, () => TagsReferences)
   references?: Reference[];
 
-  clean() {
+  clean(): TagRecord {
     const result = this.get();
     delete result.TagsReferences;
 

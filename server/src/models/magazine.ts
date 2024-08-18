@@ -12,7 +12,18 @@ import {
   AllowNull,
 } from "sequelize-typescript";
 
-import MagazineIssue from "./magazineissue";
+import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
+
+export type MagazineRecord = {
+  id: number;
+  name: string;
+  language?: string | null;
+  aliases?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  issues?: Array<MagazineIssueRecord>;
+};
 
 @Scopes(() => ({ issues: { include: [MagazineIssue] } }))
 @Table
@@ -33,7 +44,7 @@ class Magazine extends Model {
   @HasMany(() => MagazineIssue)
   issues?: MagazineIssue[];
 
-  clean() {
+  clean(): MagazineRecord {
     const result = this.get();
 
     if (result.issues)

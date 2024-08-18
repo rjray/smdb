@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Table,
   Column,
   Model,
@@ -15,7 +14,12 @@ import {
 
 import Author from "./author";
 
-@DefaultScope(() => ({ attributes: ["id", "name"] }))
+export type AuthorAliasRecord = {
+  id: number;
+  name: string;
+  authorId: number;
+};
+
 @Table({ timestamps: false })
 class AuthorAlias extends Model {
   @AllowNull(false)
@@ -29,7 +33,7 @@ class AuthorAlias extends Model {
   @BelongsTo(() => Author, { onDelete: "CASCADE" })
   author?: Author;
 
-  clean() {
+  clean(): AuthorAliasRecord {
     return this.get();
   }
 }

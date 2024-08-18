@@ -13,11 +13,17 @@ import {
 } from "sequelize-typescript";
 
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
-import MagazineFeature from "./magazinefeature";
+import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
 
-@Scopes(() => ({
-  references: { include: [MagazineFeature] },
-}))
+export type FeatureTagRecord = {
+  id: number;
+  name: string;
+  description?: string;
+  referenceCount?: number;
+  magazineFeatures?: Array<MagazineFeatureRecord>;
+};
+
+@Scopes(() => ({ references: { include: [MagazineFeature] } }))
 @Table({ timestamps: false })
 class FeatureTag extends Model {
   @AllowNull(false)
@@ -30,7 +36,7 @@ class FeatureTag extends Model {
   @BelongsToMany(() => MagazineFeature, () => FeatureTagsMagazineFeatures)
   magazineFeatures?: MagazineFeature[];
 
-  clean() {
+  clean(): FeatureTagRecord {
     const result = this.get();
     delete result.FeatureTagsMagazineFeatures;
 

@@ -13,8 +13,16 @@ import {
   Unique,
 } from "sequelize-typescript";
 
-import Book from "./book";
-import Series from "./series";
+import Book, { BookRecord } from "./book";
+import Series, { SeriesRecord } from "./series";
+
+export type PublisherRecord = {
+  id: number;
+  name: string;
+  notes?: string | null;
+  books?: Array<BookRecord>;
+  series?: Array<SeriesRecord>;
+};
 
 @Scopes(() => ({ series: { include: [Series] } }))
 @Table({ timestamps: false })
@@ -33,7 +41,7 @@ class Publisher extends Model {
   @HasMany(() => Series)
   series?: Series[];
 
-  clean() {
+  clean(): PublisherRecord {
     const result = this.get();
 
     if (result.books) result.books = result.books.map((b: Book) => b.clean());

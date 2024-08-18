@@ -12,7 +12,15 @@ import {
   Unique,
 } from "sequelize-typescript";
 
-import Reference from "./reference";
+import Reference, { ReferenceRecord } from "./reference";
+
+export type ReferenceTypeRecord = {
+  id: number;
+  name: string;
+  description: string;
+  notes?: string | null;
+  references?: Array<ReferenceRecord>;
+};
 
 @Table({ timestamps: false })
 class ReferenceType extends Model {
@@ -31,7 +39,7 @@ class ReferenceType extends Model {
   @HasMany(() => Reference)
   references?: Reference[];
 
-  clean() {
+  clean(): ReferenceTypeRecord {
     const result = this.get();
 
     if (result.references)

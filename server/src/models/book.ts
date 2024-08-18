@@ -13,9 +13,20 @@ import {
   PrimaryKey,
 } from "sequelize-typescript";
 
-import Publisher from "./publisher";
-import Reference from "./reference";
-import Series from "./series";
+import Publisher, { PublisherRecord } from "./publisher";
+import Reference, { ReferenceRecord } from "./reference";
+import Series, { SeriesRecord } from "./series";
+
+export type BookRecord = {
+  referenceId: number;
+  isbn?: string | null;
+  seriesNumber?: string | null;
+  publisherId?: number | null;
+  seriesId?: number | null;
+  reference?: ReferenceRecord;
+  publisher?: PublisherRecord;
+  series?: SeriesRecord;
+};
 
 @DefaultScope(() => ({ include: [Publisher, Series] }))
 @Table({ timestamps: false })
@@ -48,11 +59,12 @@ class Book extends Model {
   @BelongsTo(() => Series, { onDelete: "SET NULL" })
   series?: Series;
 
-  clean() {
+  clean(): BookRecord {
     const result = this.get();
 
     if (result.publisher) result.publisher = result.publisher.clean();
     if (result.series) result.series = result.series.clean();
+    if (result.reference) result.reference = result.reference.clean();
 
     return result;
   }

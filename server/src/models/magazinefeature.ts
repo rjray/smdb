@@ -14,10 +14,18 @@ import {
   BelongsToMany,
 } from "sequelize-typescript";
 
-import FeatureTag from "./featuretag";
+import FeatureTag, { FeatureTagRecord } from "./featuretag";
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
-import MagazineIssue from "./magazineissue";
-import Reference from "./reference";
+import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
+import Reference, { ReferenceRecord } from "./reference";
+
+export type MagazineFeatureRecord = {
+  referenceId: number;
+  magazineIssueId: number;
+  magazineIssue?: MagazineIssueRecord;
+  reference?: ReferenceRecord;
+  featureTags?: Array<FeatureTagRecord>;
+};
 
 @DefaultScope(() => ({ include: [MagazineIssue, FeatureTag] }))
 @Table({ timestamps: false })
@@ -40,14 +48,13 @@ class MagazineFeature extends Model {
   @BelongsToMany(() => FeatureTag, () => FeatureTagsMagazineFeatures)
   featureTags?: FeatureTag[];
 
-  clean() {
+  clean(): MagazineFeatureRecord {
     const result = this.get();
     delete result.FeatureTagsMagazineFeatures;
 
-    for (const field of ["reference", "magazineIssue"]) {
-      if (result[field]) result[field] = result[field].clean();
-    }
-
+    if (result.reference) result.reference = result.reference.clean();
+    if (result.magazineIssue)
+      result.magazineIssue = result.magazineIssue.clean();
     if (result.featureTags)
       result.featureTags = result.featureTags.map((ft: FeatureTag) =>
         ft.clean()

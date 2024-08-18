@@ -15,13 +15,20 @@ import {
   AllowNull,
 } from "sequelize-typescript";
 
-import Magazine from "./magazine";
-import MagazineFeature from "./magazinefeature";
+import Magazine, { MagazineRecord } from "./magazine";
+import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
 
-@DefaultScope(() => ({
-  attributes: ["id", "issue", "createdAt", "updatedAt"],
-  include: [Magazine],
-}))
+export type MagazineIssueRecord = {
+  id: number;
+  issue: string;
+  magazineId: number;
+  createdAt: string;
+  updatedAt: string;
+  magazine?: MagazineRecord;
+  magazineFeatures?: Array<MagazineFeatureRecord>;
+};
+
+@DefaultScope(() => ({ include: [Magazine] }))
 @Scopes(() => ({ full: { include: [MagazineFeature] } }))
 @Table
 class MagazineIssue extends Model {
@@ -39,7 +46,7 @@ class MagazineIssue extends Model {
   @HasMany(() => MagazineFeature)
   magazineFeatures?: MagazineFeature[];
 
-  clean() {
+  clean(): MagazineIssueRecord {
     const result = this.get();
 
     if (result.magazineFeatures)

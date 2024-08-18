@@ -12,7 +12,14 @@ import {
   PrimaryKey,
 } from "sequelize-typescript";
 
-import Reference from "./reference";
+import Reference, { ReferenceRecord } from "./reference";
+
+export type PhotoCollectionRecord = {
+  referenceId: number;
+  location: string;
+  media: string;
+  reference?: ReferenceRecord;
+};
 
 @Table({ timestamps: false })
 class PhotoCollection extends Model {
@@ -30,8 +37,12 @@ class PhotoCollection extends Model {
   @Column(DataType.STRING)
   media!: string;
 
-  clean() {
-    return this.get();
+  clean(): PhotoCollectionRecord {
+    const result = this.get();
+
+    if (result.reference) result.reference = result.reference.clean();
+
+    return result;
   }
 }
 
