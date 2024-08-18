@@ -46,6 +46,9 @@ components:
     dateTimeType:
       type: string
       format: date-time
+    nullableStringType:
+      type: string
+      nullable: true
     authorNameOrAliasType:
       type: string
     newAuthorAliasType:
@@ -111,6 +114,26 @@ components:
           type: string
         reference:
           type: string
+    newFeatureTagType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          $ref: "#/components/schemas/nullableStringType"
+    featureTagType:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/idType"
+            referenceCount:
+              $ref: "#/components/schemas/countType"
+        - $ref: "#/components/schemas/newFeatureTagType"
     newTagType:
       type: object
       required:
@@ -119,11 +142,9 @@ components:
         name:
           type: string
         description:
-          type: string
-          nullable: true
+          $ref: "#/components/schemas/nullableStringType"
         type:
-          type: string
-          nullable: true
+          $ref: "#/components/schemas/nullableStringType"
     tagType:
       allOf:
         - type: object
@@ -193,7 +214,6 @@ paths:
           content:
             "application/json":
               schema:
-                type: object
                 $ref: "#/components/schemas/authorType"
         "404":
           $ref: "#/components/responses/generalError404Response"
@@ -220,7 +240,7 @@ paths:
     x-exegesis-controller: tagsController
     get:
       summary: Fetch all tags
-      description: Fetch tags as an array. Includes a count of all tags.
+      description: Fetch tags as an array.
       operationId: getAllTags
       parameters:
         - $ref: "#/components/parameters/referencesParam"
@@ -256,7 +276,6 @@ paths:
           content:
             "application/json":
               schema:
-                type: object
                 $ref: "#/components/schemas/tagType"
         "404":
           $ref: "#/components/responses/generalError404Response"
@@ -272,6 +291,67 @@ paths:
       responses:
         "200":
           description: Tag deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+  "/featuretags":
+    x-exegesis-controller: featuretagsController
+    get:
+      summary: Fetch all feature tags
+      description: Fetch feature tags as an array.
+      operationId: getAllFeatureTags
+      parameters:
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: All feature tags
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/featureTagType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - FeatureTags
+  "/featuretags/{id}":
+    x-exegesis-controller: featuretagsController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single feature tag by ID
+      description: Retrieve a single feature tag by the ID. Includes full tag
+        information.
+      operationId: getFeatureTagById
+      parameters:
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: Feature tag data
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/featureTagType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+    delete:
+      summary: Delete a feature tag by ID
+      description: Delete the specified feature tag. Removes all relational
+        links between the tag and any references.
+      operationId: deleteFeatureTagById
+      responses:
+        "200":
+          description: Feature tag deleted
         "404":
           $ref: "#/components/responses/generalError404Response"
         default:

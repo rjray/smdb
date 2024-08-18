@@ -4,6 +4,7 @@
  */
 
 import * as Authors from "./authors";
+import * as FeatureTags from "./featuretags";
 import * as Tags from "./tags";
 
-export { Authors, Tags };
+export { Authors, FeatureTags, Tags };
