@@ -134,6 +134,24 @@ components:
             referenceCount:
               $ref: "#/components/schemas/countType"
         - $ref: "#/components/schemas/newFeatureTagType"
+    referenceTypeType:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - notes
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        name:
+          type: string
+        description:
+          type: string
+        notes:
+          $ref: "#/components/schemas/nullableStringType"
+        referenceCount:
+          $ref: "#/components/schemas/countType"
     newTagType:
       type: object
       required:
@@ -352,6 +370,51 @@ paths:
       responses:
         "200":
           description: Feature tag deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+  "/referencetypes":
+    x-exegesis-controller: referencetypesController
+    get:
+      summary: Fetch all reference types
+      description: Fetch an array of all reference types.
+      operationId: getAllReferenceTypes
+      parameters:
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: All reference type data
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/referenceTypeType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - ReferenceTypes
+  "/referencetypes/{id}":
+    x-exegesis-controller: referencetypesController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single reference type by ID
+      description: Retrieve a single reference type by the ID. Includes full
+        information.
+      operationId: getReferenceTypeById
+      parameters:
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: Reference type data
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/referenceTypeType"
         "404":
           $ref: "#/components/responses/generalError404Response"
         default:
