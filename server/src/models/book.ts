@@ -17,10 +17,7 @@ import Publisher from "./publisher";
 import Reference from "./reference";
 import Series from "./series";
 
-@DefaultScope(() => ({
-  attributes: ["isbn", "seriesNumber"],
-  include: [Publisher, Series],
-}))
+@DefaultScope(() => ({ include: [Publisher, Series] }))
 @Table({ timestamps: false })
 class Book extends Model {
   @PrimaryKey

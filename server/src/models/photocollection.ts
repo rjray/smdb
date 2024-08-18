@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Table,
   Column,
   Model,
@@ -15,7 +14,6 @@ import {
 
 import Reference from "./reference";
 
-@DefaultScope(() => ({ attributes: ["location", "media"] }))
 @Table({ timestamps: false })
 class PhotoCollection extends Model {
   @PrimaryKey
