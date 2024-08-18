@@ -8,7 +8,7 @@ import { Publishers } from "db";
 import { Publisher } from "models";
 import { PublisherFetchOpts } from "types/publisher";
 
-// Convert query parameters into a `TagFetchOpts` instance.
+// Convert query parameters into a `PublisherFetchOpts` instance.
 function queryToFetchOpts(query: ParametersMap<boolean>) {
   const opts: PublisherFetchOpts = {
     series: false,
@@ -21,7 +21,7 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 /*
   GET /publishers
 
-  Return all publishers. Return value is a list of `Tag` objects.
+  Return all publishers. Return value is a list of `Publisher` objects.
  */
 export function getAllPublishers(context: ExegesisContext) {
   const { query } = context.params;
