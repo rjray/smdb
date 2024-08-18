@@ -62,6 +62,7 @@ class Reference extends Model {
   clean() {
     const result = this.get();
     delete result.AuthorsReferences;
+    delete result.TagsReferences;
 
     switch (result.referenceType.id) {
       case 1:

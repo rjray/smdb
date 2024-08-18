@@ -43,6 +43,7 @@ class MagazineFeature extends Model {
   clean() {
     const result = this.get();
     delete result.magazineIssueId;
+    delete result.FeatureTagsMagazineFeatures;
 
     for (const field of ["reference", "magazineIssue"]) {
       if (result[field]) result[field] = result[field].clean();
