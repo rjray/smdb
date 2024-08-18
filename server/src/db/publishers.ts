@@ -13,7 +13,7 @@ function getScopeFromParams(params: PublisherFetchOpts): string {
 }
 
 /*
-  Fetch all feature tags. Uses query parameters to opt-in on references and/or
+  Fetch all publishers. Uses query parameters to opt-in on references and/or
   reference count.
  */
 export function fetchAllPublishers(
@@ -29,7 +29,7 @@ export function fetchAllPublishers(
 }
 
 /*
-  Fetch a single feature tag by ID. Uses query parameters to opt-in on
+  Fetch a single publisher by ID. Uses query parameters to opt-in on
   references and/or reference count.
  */
 export function fetchOnePublisher(
@@ -47,7 +47,7 @@ export function fetchOnePublisher(
 }
 
 /*
-  Delete a single feature tag from the database (indicated by ID).
+  Delete a single publisher from the database (indicated by ID).
  */
 export function deletePublisher(id: number) {
   return Publisher.destroy({ where: { id } });
