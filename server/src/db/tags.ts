@@ -1,5 +1,5 @@
 /*
-  Database operations focused on the Author model.
+  Database operations focused on the Tag model.
  */
 
 import { BaseError, FindOptions } from "sequelize";
@@ -43,7 +43,7 @@ export function fetchAllTags(opts: TagFetchOpts): Promise<Tag[]> {
 }
 
 /*
-  Fetch a single tag by ID. Uses query parameters to opt-in on  references
+  Fetch a single tag by ID. Uses query parameters to opt-in on references
   and/or reference count.
  */
 export function fetchOneTag(
