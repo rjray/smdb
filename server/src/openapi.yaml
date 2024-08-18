@@ -16,14 +16,21 @@ components:
     referencesParam:
       name: references
       in: query
-      description: Boolean, whether to include references in an author query
+      description: Boolean, whether to include references in an a query
       required: false
       schema:
         type: boolean
     referenceCountParam:
       name: referenceCount
       in: query
-      description: Boolean, whether to include reference count in author query
+      description: Boolean, whether to include reference count in a query
+      required: false
+      schema:
+        type: boolean
+    publisherSeriesParam:
+      name: series
+      in: query
+      description: Boolean, whether to include series data with publishers
       required: false
       schema:
         type: boolean
@@ -134,6 +141,35 @@ components:
             referenceCount:
               $ref: "#/components/schemas/countType"
         - $ref: "#/components/schemas/newFeatureTagType"
+    newPublisherType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+    publisherType:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        name:
+          type: string
+        notes:
+          $ref: "#/components/schemas/nullableStringType"
+        # references:
+        #   type: array
+        #   items:
+        #     $ref: "#/components/schemas/referenceType"
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/seriesType"
     referenceTypeType:
       type: object
       required:
@@ -152,6 +188,36 @@ components:
           $ref: "#/components/schemas/nullableStringType"
         referenceCount:
           $ref: "#/components/schemas/countType"
+    newSeriesType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        notes:
+          type: string
+        publisherId:
+          $ref: "#/components/schemas/idType"
+    seriesType:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        name:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        # references:
+        #   type: array
+        #   items:
+        #     $ref: "#/components/schemas/referenceType"
+        publisher:
+          $ref: "#/components/schemas/publisherType"
     newTagType:
       type: object
       required:
@@ -213,6 +279,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Authors
+        - References
   "/authors/{id}":
     x-exegesis-controller: authorsController
     parameters:
@@ -254,6 +321,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Authors
+        - References
   "/tags":
     x-exegesis-controller: tagsController
     get:
@@ -276,6 +344,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Tags
+        - References
   "/tags/{id}":
     x-exegesis-controller: tagsController
     parameters:
@@ -315,6 +384,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Tags
+        - References
   "/featuretags":
     x-exegesis-controller: featuretagsController
     get:
@@ -337,6 +407,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - FeatureTags
+        - MagazineFeatures
   "/featuretags/{id}":
     x-exegesis-controller: featuretagsController
     parameters:
@@ -376,6 +447,73 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Tags
+        - MagazineFeatures
+  "/publishers":
+    x-exegesis-controller: publishersController
+    get:
+      summary: Fetch all publishers
+      description: Fetch all publishers as an array. Includes publishers' data
+        optionally with series information filled in.
+      operationId: getAllPublishers
+      parameters:
+        - $ref: "#/components/parameters/publisherSeriesParam"
+      responses:
+        "200":
+          description: All publishers
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/publisherType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Publishers
+        - Series
+  "/publishers/{id}":
+    x-exegesis-controller: publishersController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single publisher by ID
+      description: Retrieve a single publisher by the ID. Includes full
+        publisher information.
+      operationId: getPublisherById
+      parameters:
+        - $ref: "#/components/parameters/publisherSeriesParam"
+      responses:
+        "200":
+          description: Publisher data
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - publisher
+                properties:
+                  publisher:
+                    $ref: "#/components/schemas/publisherType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Publishers
+        - Series
+    delete:
+      summary: Delete a publisher by ID
+      description: Delete a specific publisher by ID.
+      operationId: deletePublisherById
+      responses:
+        "200":
+          description: Publisher deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Publishers
   "/referencetypes":
     x-exegesis-controller: referencetypesController
     get:
