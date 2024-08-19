@@ -17,6 +17,17 @@ import {
 import Book, { BookRecord } from "./book";
 import Publisher, { PublisherRecord } from "./publisher";
 
+/**
+ * JSON representation of a series record.
+ *
+ * @property {number} id - The ID of the series.
+ * @property {string} name - The name of the series.
+ * @property {string|null} [notes] - Additional notes about the series
+ * (optional).
+ * @property {number|null} [publisherId] - The ID of the publisher (optional).
+ * @property {PublisherRecord} [publisher] - The publisher record (optional).
+ * @property {BookRecord[]} [books] - An array of book records (optional).
+ */
 export type SeriesRecord = {
   id: number;
   name: string;

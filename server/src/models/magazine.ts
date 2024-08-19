@@ -14,6 +14,23 @@ import {
 
 import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
 
+/**
+ * JSON representation of a magazine record.
+ *
+ * @property {number} id - The unique identifier of the magazine.
+ * @property {string} name - The name of the magazine.
+ * @property {string | null} [language] - The language of the magazine
+ * (optional).
+ * @property {string | null} [aliases] - The aliases of the magazine (optional).
+ * @property {string | null} [notes] - Additional notes about the magazine
+ * (optional).
+ * @property {string} createdAt - The timestamp when the magazine record was
+ * created.
+ * @property {string} updatedAt - The timestamp when the magazine record was
+ * last updated.
+ * @property {Array<MagazineIssueRecord>} [issues] - An array of magazine issue
+ * records (optional).
+ */
 export type MagazineRecord = {
   id: number;
   name: string;

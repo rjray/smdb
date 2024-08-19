@@ -18,6 +18,18 @@ import {
 import Magazine, { MagazineRecord } from "./magazine";
 import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
 
+/**
+ * JSON representation of a magazine issue record.
+ *
+ * @property {number} id - The ID of the magazine issue.
+ * @property {string} issue - The issue of the magazine.
+ * @property {number} magazineId - The ID of the magazine.
+ * @property {string} createdAt - The creation date of the magazine issue.
+ * @property {string} updatedAt - The last update date of the magazine issue.
+ * @property {MagazineRecord} [magazine] - The magazine record (optional).
+ * @property {MagazineFeatureRecord[]} [magazineFeatures] - An array of magazine
+ * feature records (optional).
+ */
 export type MagazineIssueRecord = {
   id: number;
   issue: string;

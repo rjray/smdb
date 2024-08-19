@@ -15,6 +15,19 @@ import {
 import Reference, { ReferenceRecord } from "./reference";
 import TagsReferences from "./tagsreferences";
 
+/**
+ * JSON representation of a tag record.
+ *
+ * @property {number} id - The ID of the tag.
+ * @property {string} name - The name of the tag.
+ * @property {string|null} [type] - The type of the tag (optional).
+ * @property {string|null} [description] - The description of the tag
+ * (optional).
+ * @property {number|null} [referenceCount] - The count of references to the tag
+ * (optional).
+ * @property {ReferenceRecord[]} [references] - An array of reference records
+ * (optional).
+ */
 export type TagRecord = {
   id: number;
   name: string;

@@ -19,6 +19,17 @@ import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
 import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
 import Reference, { ReferenceRecord } from "./reference";
 
+/**
+ * JSON representation of a magazine feature record.
+ *
+ * @property {number} referenceId - The ID of the reference.
+ * @property {number} magazineIssueId - The ID of the magazine issue.
+ * @property {MagazineIssueRecord} [magazineIssue] - The magazine issue record
+ * (optional).
+ * @property {ReferenceRecord} [reference] - The reference record (optional).
+ * @property {FeatureTagRecord[]} [featureTags] - An array of feature tag
+ * records (optional).
+ */
 export type MagazineFeatureRecord = {
   referenceId: number;
   magazineIssueId: number;

@@ -24,6 +24,23 @@ import ReferenceType, { ReferenceTypeRecord } from "./referencetype";
 import Tag, { TagRecord } from "./tag";
 import TagsReferences from "./tagsreferences";
 
+/**
+ * JSON representation of a reference record.
+ *
+ * @property {number} id - The ID of the reference.
+ * @property {string} name - The name of the reference.
+ * @property {string|null} [language] - The language of the reference
+ * (optional).
+ * @property {number} referenceTypeId - The ID of the reference type.
+ * @property {ReferenceTypeRecord} referenceType - The reference type record.
+ * @property {AuthorRecord[]} [authors] - An array of author records (optional).
+ * @property {TagRecord[]} [tags] - An array of tag records (optional).
+ * @property {BookRecord} [book] - The book record (optional).
+ * @property {MagazineFeatureRecord} [magazineFeature] - The magazine feature
+ * record (optional).
+ * @property {PhotoCollectionRecord} [photoCollection] - The photo collection
+ * record (optional).
+ */
 export type ReferenceRecord = {
   id: number;
   name: string;
