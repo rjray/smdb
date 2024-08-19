@@ -20,6 +20,14 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/idType"
+    magazineIssueMagazineParam:
+      name: magazine
+      in: query
+      description: Boolean, whether to include magazine data with magazine
+        issues
+      required: false
+      schema:
+        type: boolean
     magazineIssuesParam:
       name: issues
       in: query
@@ -74,6 +82,8 @@ components:
     dateTimeType:
       type: string
       format: date-time
+    magazineIssueNumberType:
+      type: string
     nullableStringType:
       type: string
       nullable: true
@@ -190,6 +200,69 @@ components:
             updatedAt:
               $ref: "#/components/schemas/dateTimeType"
         - $ref: "#/components/schemas/newMagazineType"
+    newMagazineFeatureType:
+      type: object
+      required:
+        - referenceId
+        - magazineIssueId
+      properties:
+        referenceId:
+          $ref: "#/components/schemas/idType"
+        magazineIssueId:
+          $ref: "#/components/schemas/idType"
+    magazineFeatureType:
+      type: object
+      required:
+        - referenceId
+        - magazineIssueId
+      properties:
+        referenceId:
+          $ref: "#/components/schemas/idType"
+        magazineIssueId:
+          $ref: "#/components/schemas/idType"
+        # reference:
+        #   $ref: "#/components/schemas/referenceType"
+        magazineIssue:
+          $ref: "#/components/schemas/magazineIssueType"
+        featureTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/featureTagType"
+    newMagazineIssueType:
+      type: object
+      required:
+        - issue
+        - magazineId
+      properties:
+        issue:
+          $ref: "#/components/schemas/magazineIssueNumberType"
+        magazineId:
+          $ref: "#/components/schemas/idType"
+    magazineIssueType:
+      type: object
+      required:
+        - id
+        - issue
+        - magazineId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        issue:
+          $ref: "#/components/schemas/magazineIssueNumberType"
+        magazineId:
+          $ref: "#/components/schemas/idType"
+        createdAt:
+          $ref: "#/components/schemas/dateTimeType"
+        updatedAt:
+          $ref: "#/components/schemas/dateTimeType"
+        magazine:
+          $ref: "#/components/schemas/magazineType"
+        magazineFeatures:
+          type: array
+          items:
+            $ref: "#/components/schemas/magazineFeatureType"
     newPublisherType:
       type: object
       required:
@@ -520,6 +593,49 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Magazines
+  "/magazineissues/{id}":
+    x-exegesis-controller: magazineissuesController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Get a full magazine issue
+      description: Get a full magazine issue with magazine and reference
+        information.
+      operationId: getMagazineIssueById
+      parameters:
+        - $ref: "#/components/parameters/magazineIssueMagazineParam"
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: Issue data
+          content:
+            "application/json":
+              schema:
+                type: object
+                $ref: "#/components/schemas/magazineIssueType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazine Issues
+        - Magazines
+        - References
+    delete:
+      summary: Delete a magazine issue
+      description: Delete a magazine issues. Deletes all references associated
+        with it.
+      operationId: deleteMagazineIssueById
+      responses:
+        "200":
+          description: Magazine issue deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazine Issues
   "/publishers":
     x-exegesis-controller: publishersController
     get:

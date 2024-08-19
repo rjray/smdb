@@ -5,6 +5,7 @@
 
 import * as Authors from "./authors";
 import * as FeatureTags from "./featuretags";
+import * as MagazineIssues from "./magazineissues";
 import * as Magazines from "./magazines";
 import * as Publishers from "./publishers";
 import * as ReferenceTypes from "./referencetypes";
@@ -15,6 +16,7 @@ import * as Users from "./users";
 export {
   Authors,
   FeatureTags,
+  MagazineIssues,
   Magazines,
   Publishers,
   ReferenceTypes,

@@ -4,7 +4,6 @@
 
 import {
   DataType,
-  DefaultScope,
   Scopes,
   Table,
   Column,
@@ -40,8 +39,11 @@ export type MagazineIssueRecord = {
   magazineFeatures?: Array<MagazineFeatureRecord>;
 };
 
-@DefaultScope(() => ({ include: [Magazine] }))
-@Scopes(() => ({ full: { include: [MagazineFeature] } }))
+@Scopes(() => ({
+  magazine: { include: [Magazine] },
+  references: { include: [MagazineFeature] },
+  full: { include: [Magazine, MagazineFeature] },
+}))
 @Table
 class MagazineIssue extends Model {
   @AllowNull(false)
@@ -61,6 +63,13 @@ class MagazineIssue extends Model {
   clean(): MagazineIssueRecord {
     const result = this.get();
 
+    // The two dates are Date objects, convert them to ISO strings so that
+    // they don't stringify automatically.
+    for (const date of ["createdAt", "updatedAt"]) {
+      if (result[date]) result[date] = result[date].toISOString();
+    }
+
+    if (result.magazine) result.magazine = result.magazine.clean();
     if (result.magazineFeatures)
       result.magazineFeatures = result.magazineFeatures.map(
         (mf: MagazineFeature) => mf.clean()
