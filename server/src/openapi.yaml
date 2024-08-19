@@ -20,6 +20,20 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/idType"
+    magazineIssuesParam:
+      name: issues
+      in: query
+      description: Boolean, whether to include issues data with magazines
+      required: false
+      schema:
+        type: boolean
+    magazineIssueCountParam:
+      name: issueCount
+      in: query
+      description: Boolean, whether to include issue counts with magazines
+      required: false
+      schema:
+        type: boolean
     publisherSeriesParam:
       name: series
       in: query
@@ -30,7 +44,7 @@ components:
     referencesParam:
       name: references
       in: query
-      description: Boolean, whether to include references in an a query
+      description: Boolean, whether to include references in a query
       required: false
       schema:
         type: boolean
@@ -148,6 +162,34 @@ components:
             referenceCount:
               $ref: "#/components/schemas/countType"
         - $ref: "#/components/schemas/newFeatureTagType"
+    newMagazineType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        language:
+          $ref: "#/components/schemas/nullableStringType"
+        aliases:
+          $ref: "#/components/schemas/nullableStringType"
+        notes:
+          $ref: "#/components/schemas/nullableStringType"
+    magazineType:
+      allOf:
+        - type: object
+          required:
+            - id
+            - createdAt
+            - updatedAt
+          properties:
+            id:
+              $ref: "#/components/schemas/idType"
+            createdAt:
+              $ref: "#/components/schemas/dateTimeType"
+            updatedAt:
+              $ref: "#/components/schemas/dateTimeType"
+        - $ref: "#/components/schemas/newMagazineType"
     newPublisherType:
       type: object
       required:
@@ -329,69 +371,6 @@ paths:
       tags:
         - Authors
         - References
-  "/tags":
-    x-exegesis-controller: tagsController
-    get:
-      summary: Fetch all tags
-      description: Fetch tags as an array.
-      operationId: getAllTags
-      parameters:
-        - $ref: "#/components/parameters/referencesParam"
-        - $ref: "#/components/parameters/referenceCountParam"
-      responses:
-        "200":
-          description: All tags
-          content:
-            "application/json":
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/tagType"
-        default:
-          $ref: "#/components/responses/generalErrorResponse"
-      tags:
-        - Tags
-        - References
-  "/tags/{id}":
-    x-exegesis-controller: tagsController
-    parameters:
-      - $ref: "#/components/parameters/idParam"
-    get:
-      summary: Fetch a single tag by ID
-      description: Retrieve a single tag by the ID. Includes full tag
-        information.
-      operationId: getTagById
-      parameters:
-        - $ref: "#/components/parameters/referencesParam"
-        - $ref: "#/components/parameters/referenceCountParam"
-      responses:
-        "200":
-          description: Tag data
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/tagType"
-        "404":
-          $ref: "#/components/responses/generalError404Response"
-        default:
-          $ref: "#/components/responses/generalErrorResponse"
-      tags:
-        - Tags
-    delete:
-      summary: Delete a tag by ID
-      description: Delete the specified tag. Removes all relational links
-        between the tag and any references.
-      operationId: deleteTagById
-      responses:
-        "200":
-          description: Tag deleted
-        "404":
-          $ref: "#/components/responses/generalError404Response"
-        default:
-          $ref: "#/components/responses/generalErrorResponse"
-      tags:
-        - Tags
-        - References
   "/featuretags":
     x-exegesis-controller: featuretagsController
     get:
@@ -455,6 +434,92 @@ paths:
       tags:
         - Tags
         - MagazineFeatures
+  "/magazines":
+    x-exegesis-controller: magazinesController
+    get:
+      summary: Fetch all magazines
+      description: Fetch all magazines as an array.
+      operationId: getAllMagazines
+      parameters:
+        - $ref: "#/components/parameters/magazineIssuesParam"
+        - $ref: "#/components/parameters/magazineIssueCountParam"
+      responses:
+        "200":
+          description: All magazines
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/magazineType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazines
+        - MagazineIssues
+  # "/magazines/mostRecentlyUpdated":
+  #   x-exegesis-controller: magazinesController
+  #   get:
+  #     summary: Fetch the most-recently-added-to magazines
+  #     description: Fetch a number of magazines that have been most-recently
+  #       added to.
+  #     operationId: getMostRecentUpdatedMagazines
+  #     parameters:
+  #       - $ref: "#/components/parameters/countParam"
+  #     responses:
+  #       "200":
+  #         description: Most-recently-added-to magazines in descending order
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: "#/components/schemas/magazineType"
+  #       default:
+  #         $ref: "#/components/responses/generalErrorResponse"
+  #     tags:
+  #       - Magazines
+  "/magazines/{id}":
+    x-exegesis-controller: magazinesController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single magazine by ID
+      description: Retrieve a single magazine by the ID. Does not include issue
+        information.
+      operationId: getMagazineById
+      parameters:
+        - $ref: "#/components/parameters/magazineIssuesParam"
+        - $ref: "#/components/parameters/magazineIssueCountParam"
+      responses:
+        "200":
+          description: Magazine data
+          content:
+            "application/json":
+              schema:
+                type: object
+                $ref: "#/components/schemas/magazineType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazines
+        - MagazineIssues
+    delete:
+      summary: Delete a magazine by ID
+      description: Delete a specific magazine by ID. Deletes all issues of the
+        magazine and their references.
+      operationId: deleteMagazineById
+      responses:
+        "200":
+          description: Magazine deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazines
   "/publishers":
     x-exegesis-controller: publishersController
     get:
@@ -627,3 +692,66 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Series
+  "/tags":
+    x-exegesis-controller: tagsController
+    get:
+      summary: Fetch all tags
+      description: Fetch tags as an array.
+      operationId: getAllTags
+      parameters:
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: All tags
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/tagType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+        - References
+  "/tags/{id}":
+    x-exegesis-controller: tagsController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single tag by ID
+      description: Retrieve a single tag by the ID. Includes full tag
+        information.
+      operationId: getTagById
+      parameters:
+        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/referenceCountParam"
+      responses:
+        "200":
+          description: Tag data
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/tagType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+    delete:
+      summary: Delete a tag by ID
+      description: Delete the specified tag. Removes all relational links
+        between the tag and any references.
+      operationId: deleteTagById
+      responses:
+        "200":
+          description: Tag deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
+        - References

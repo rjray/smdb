@@ -47,6 +47,12 @@ class Magazine extends Model {
   clean(): MagazineRecord {
     const result = this.get();
 
+    // The two dates are Date objects, convert them to ISO strings so that
+    // they don't stringify automatically.
+    for (const date of ["createdAt", "updatedAt"]) {
+      if (result[date]) result[date] = result[date].toISOString();
+    }
+
     if (result.issues)
       result.issues = result.issues.map((mi: MagazineIssue) => mi.clean());
 
