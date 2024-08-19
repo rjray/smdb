@@ -515,12 +515,14 @@ components:
           type: string
         notes:
           $ref: "#/components/schemas/nullableStringType"
+        publisherId:
+          $ref: "#/components/schemas/nullableIdType"
+        publisher:
+          $ref: "#/components/schemas/publisherType"
         references:
           type: array
           items:
             $ref: "#/components/schemas/referenceType"
-        publisher:
-          $ref: "#/components/schemas/publisherType"
     newTagType:
       type: object
       required:
