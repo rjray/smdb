@@ -75,6 +75,11 @@ components:
       type: integer
       format: int64
       minimum: 1
+    nullableIdType:
+      type: integer
+      format: int64
+      minimum: 1
+      nullable: true
     countType:
       type: integer
       format: int64
@@ -116,6 +121,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/newAuthorAliasType"
+    selectedAuthorType:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        name:
+          $ref: "#/components/schemas/authorNameOrAliasType"
     authorType:
       type: object
       required:
@@ -138,6 +152,10 @@ components:
             $ref: "#/components/schemas/authorAliasType"
         referenceCount:
           $ref: "#/components/schemas/countType"
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/referenceType"
     errorObjectType:
       type: object
       required:
@@ -285,14 +303,176 @@ components:
           type: string
         notes:
           $ref: "#/components/schemas/nullableStringType"
-        # references:
-        #   type: array
-        #   items:
-        #     $ref: "#/components/schemas/referenceType"
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/referenceType"
         series:
           type: array
           items:
             $ref: "#/components/schemas/seriesType"
+    newReferenceType:
+      type: object
+      required:
+        - name
+        - ReferenceTypeId
+        - tags
+      properties:
+        name:
+          type: string
+        isbn:
+          $ref: "#/components/schemas/nullableStringType"
+        language:
+          $ref: "#/components/schemas/nullableStringType"
+        referenceTypeId:
+          $ref: "#/components/schemas/idType"
+        magazineIssueId:
+          $ref: "#/components/schemas/idType"
+        magazineIssueNumber:
+          $ref: "#/components/schemas/magazineIssueNumberType"
+        magazineId:
+          $ref: "#/components/schemas/idType"
+        photosLocation:
+          type: string
+        photosMedia:
+          type: string
+        authors:
+          type: array
+          items:
+            $ref: "#/components/schemas/selectedAuthorType"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tagType"
+    updateReferenceType:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/idType"
+        - $ref: "#/components/schemas/newReferenceType"
+    referenceCoreElements:
+      type: object
+      required:
+        - id
+        - name
+        - referenceTypeId
+        - referenceType
+        - createdAt
+        - updatedAt
+        - authors
+        - tags
+      properties:
+        id:
+          $ref: "#/components/schemas/idType"
+        name:
+          type: string
+        language:
+          $ref: "#/components/schemas/nullableStringType"
+        referenceTypeId:
+          $ref: "#/components/schemas/idType"
+        referenceType:
+          $ref: "#/components/schemas/referenceTypeType"
+        createdAt:
+          $ref: "#/components/schemas/dateTimeType"
+        updatedAt:
+          $ref: "#/components/schemas/dateTimeType"
+        authors:
+          type: array
+          items:
+            $ref: "#/components/schemas/authorType"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tagType"
+    referenceBookElements:
+      type: object
+      required:
+        - book
+      properties:
+        book:
+          type: object
+          required:
+            - referenceId
+            - isbn
+            - seriesNumber
+          properties:
+            referenceId:
+              $ref: "#/components/schemas/idType"
+            isbn:
+              $ref: "#/components/schemas/nullableStringType"
+            seriesNumber:
+              $ref: "#/components/schemas/nullableStringType"
+            publisherId:
+              $ref: "#/components/schemas/nullableIdType"
+            publisher:
+              $ref: "#/components/schemas/publisherType"
+            seriesId:
+              $ref: "#/components/schemas/nullableIdType"
+            series:
+              $ref: "#/components/schemas/seriesType"
+    referenceBookType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreElements"
+        - $ref: "#/components/schemas/referenceBookElements"
+    referenceMagazineFeatureElements:
+      type: object
+      required:
+        - magazineFeature
+      properties:
+        magazineFeature:
+          type: object
+          required:
+            - referenceId
+            - magazineIssueId
+          properties:
+            referenceId:
+              $ref: "#/components/schemas/idType"
+            magazineIssueId:
+              $ref: "#/components/schemas/idType"
+            reference:
+              $ref: "#/components/schemas/referenceType"
+            magazineIssue:
+              $ref: "#/components/schemas/magazineIssueType"
+            featureTags:
+              type: array
+              items:
+                $ref: "#/components/schemas/featureTagType"
+    referenceMagazineFeatureType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreElements"
+        - $ref: "#/components/schemas/referenceMagazineFeatureElements"
+    referencePhotoCollectionElements:
+      type: object
+      required:
+        - photoCollection
+      properties:
+        photoCollection:
+          type: object
+          required:
+            - referenceId
+            - location
+            - media
+          properties:
+            referenceId:
+              $ref: "#/components/schemas/idType"
+            reference:
+              $ref: "#/components/schemas/referenceType"
+            location:
+              type: string
+            media:
+              type: string
+    referencePhotoCollectionType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreElements"
+        - $ref: "#/components/schemas/referencePhotoCollectionElements"
+    referenceType:
+      oneOf:
+        - $ref: "#/components/schemas/referenceBookType"
+        - $ref: "#/components/schemas/referenceMagazineFeatureType"
+        - $ref: "#/components/schemas/referencePhotoCollectionType"
     referenceTypeType:
       type: object
       required:
@@ -324,6 +504,7 @@ components:
           $ref: "#/components/schemas/idType"
     seriesType:
       type: object
+      nullable: true
       required:
         - id
         - name
@@ -334,10 +515,10 @@ components:
           type: string
         notes:
           $ref: "#/components/schemas/nullableStringType"
-        # references:
-        #   type: array
-        #   items:
-        #     $ref: "#/components/schemas/referenceType"
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/referenceType"
         publisher:
           $ref: "#/components/schemas/publisherType"
     newTagType:
@@ -361,6 +542,10 @@ components:
               $ref: "#/components/schemas/idType"
             referenceCount:
               $ref: "#/components/schemas/countType"
+            references:
+              type: array
+              items:
+                $ref: "#/components/schemas/referenceType"
         - $ref: "#/components/schemas/newTagType"
   responses:
     generalErrorResponse:
@@ -702,6 +887,64 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Publishers
+  "/references":
+    x-exegesis-controller: referencesController
+    get:
+      summary: Fetch all references
+      description: Fetch all references as an array. Includes author, record
+        type and sub-type information.
+      operationId: getAllReferences
+      responses:
+        "200":
+          description: All references
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/referenceType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - References
+        - Authors
+  "/references/{id}":
+    x-exegesis-controller: referencesController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single reference by ID
+      description: Retrieve a single reference by the ID. Includes author,
+        record type and sub-type information.
+      operationId: getReferenceById
+      responses:
+        "200":
+          description: Reference data
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/referenceType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - References
+        - Authors
+    delete:
+      summary: Delete a single reference by ID
+      description: Delete a single reference by the ID. Removes any author
+        associations, but does not affect any other related records.
+      operationId: deleteReferenceById
+      responses:
+        "200":
+          description: Reference deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - References
   "/referencetypes":
     x-exegesis-controller: referencetypesController
     get:

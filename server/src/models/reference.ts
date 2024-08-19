@@ -93,7 +93,7 @@ class Reference extends Model {
     delete result.AuthorsReferences;
     delete result.TagsReferences;
 
-    switch (result.referenceType.id) {
+    switch (result.referenceTypeId) {
       case 1:
         // Book
         delete result.magazineFeature;
@@ -116,6 +116,13 @@ class Reference extends Model {
         break;
     }
 
+    // The two dates are Date objects, convert them to ISO strings so that
+    // they don't stringify automatically.
+    for (const date of ["createdAt", "updatedAt"]) {
+      if (result[date]) result[date] = result[date].toISOString();
+    }
+
+    result.referenceType = result.referenceType.clean();
     if (result.authors)
       result.authors = result.authors.map((a: Author) => a.clean());
     if (result.tags) result.tags = result.tags.map((t: Tag) => t.clean());

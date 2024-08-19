@@ -8,6 +8,7 @@ import * as FeatureTags from "./featuretags";
 import * as MagazineIssues from "./magazineissues";
 import * as Magazines from "./magazines";
 import * as Publishers from "./publishers";
+import * as References from "./references";
 import * as ReferenceTypes from "./referencetypes";
 import * as Series from "./series";
 import * as Tags from "./tags";
@@ -19,6 +20,7 @@ export {
   MagazineIssues,
   Magazines,
   Publishers,
+  References,
   ReferenceTypes,
   Series,
   Tags,
