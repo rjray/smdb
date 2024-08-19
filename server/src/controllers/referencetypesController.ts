@@ -8,7 +8,7 @@ import { ReferenceTypes } from "db";
 import { ReferenceType } from "models";
 import { ReferenceTypeFetchOpts } from "types/referencetype";
 
-// Convert query parameters into a `TagFetchOpts` instance.
+// Convert query parameters into a `ReferenceTypeFetchOpts` instance.
 function queryToFetchOpts(query: ParametersMap<boolean>) {
   const opts: ReferenceTypeFetchOpts = {
     referenceCount: false,
@@ -36,7 +36,7 @@ export function getAllReferenceTypes(context: ExegesisContext) {
 }
 
 /*
-  GET /referencetypess/{id}
+  GET /referencetypes/{id}
 
   Return a single reference type based on the value of `id`. Return value is a
   Promise of a single `ReferenceTypeRecord` object or `null`.
