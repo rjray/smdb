@@ -7,6 +7,7 @@ import * as Authors from "./authors";
 import * as FeatureTags from "./featuretags";
 import * as Publishers from "./publishers";
 import * as ReferenceTypes from "./referencetypes";
+import * as Series from "./series";
 import * as Tags from "./tags";
 
-export { Authors, FeatureTags, Publishers, ReferenceTypes, Tags };
+export { Authors, FeatureTags, Publishers, ReferenceTypes, Series, Tags };

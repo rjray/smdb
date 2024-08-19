@@ -4,7 +4,7 @@
 
 import {
   DataType,
-  DefaultScope,
+  Scopes,
   Table,
   Column,
   Model,
@@ -26,7 +26,7 @@ export type SeriesRecord = {
   books?: Array<BookRecord>;
 };
 
-@DefaultScope(() => ({ include: [Publisher] }))
+@Scopes(() => ({ publisher: { include: [Publisher] } }))
 @Table({ timestamps: false })
 class Series extends Model {
   @AllowNull(false)

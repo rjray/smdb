@@ -13,6 +13,20 @@ components:
       required: false
       schema:
         type: boolean
+    idParam:
+      name: id
+      in: path
+      description: Entity ID
+      required: true
+      schema:
+        $ref: "#/components/schemas/idType"
+    publisherSeriesParam:
+      name: series
+      in: query
+      description: Boolean, whether to include series data with publishers
+      required: false
+      schema:
+        type: boolean
     referencesParam:
       name: references
       in: query
@@ -27,20 +41,13 @@ components:
       required: false
       schema:
         type: boolean
-    publisherSeriesParam:
-      name: series
+    seriesPublisherParam:
+      name: publisher
       in: query
-      description: Boolean, whether to include series data with publishers
+      description: Boolean, whether to include publisher data with series
       required: false
       schema:
         type: boolean
-    idParam:
-      name: id
-      in: path
-      description: Entity ID
-      required: true
-      schema:
-        $ref: "#/components/schemas/idType"
   schemas:
     idType:
       type: integer
@@ -149,9 +156,10 @@ components:
         name:
           type: string
         notes:
-          type: string
+          $ref: "#/components/schemas/nullableStringType"
     publisherType:
       type: object
+      nullable: true
       required:
         - id
         - name
@@ -196,7 +204,7 @@ components:
         name:
           type: string
         notes:
-          type: string
+          $ref: "#/components/schemas/nullableStringType"
         publisherId:
           $ref: "#/components/schemas/idType"
     seriesType:
@@ -210,8 +218,7 @@ components:
         name:
           type: string
         notes:
-          type: string
-          nullable: true
+          $ref: "#/components/schemas/nullableStringType"
         # references:
         #   type: array
         #   items:
@@ -559,3 +566,64 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Tags
+  "/series":
+    x-exegesis-controller: seriesController
+    get:
+      summary: Fetch all series
+      description: Fetch all series as an array. Includes series data with
+        publisher information filled in.
+      operationId: getAllSeries
+      parameters:
+        - $ref: "#/components/parameters/seriesPublisherParam"
+      responses:
+        "200":
+          description: All series
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/seriesType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Series
+        - Publishers
+  "/series/{id}":
+    x-exegesis-controller: seriesController
+    parameters:
+      - $ref: "#/components/parameters/idParam"
+    get:
+      summary: Fetch a single series by ID
+      description: Retrieve a single series by the ID. Includes full series
+        information.
+      operationId: getSeriesById
+      parameters:
+        - $ref: "#/components/parameters/seriesPublisherParam"
+      responses:
+        "200":
+          description: Series data
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/seriesType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Series
+        - Publishers
+    delete:
+      summary: Delete a series by ID
+      description: Delete a specific series by ID.
+      operationId: deleteSeriesById
+      responses:
+        "200":
+          description: Series deleted
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Series
