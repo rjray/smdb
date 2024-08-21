@@ -20,9 +20,31 @@ function getScopeFromParams(params: MagazineIssueFetchOpts): string {
     .run();
 }
 
-/*
-  Fetch a single magazine issue by ID. Uses query parameters to opt-in on
-  magazine data, references, and/or reference count.
+type MagazineIssueData = {
+  issue: string;
+  magazineId: number;
+};
+
+/**
+ * Adds a magazine issue to the database.
+ *
+ * @param data - The magazine issue data to be added.
+ * @returns A promise that resolves to the created magazine issue.
+ */
+export function addMagazineIssue(
+  data: MagazineIssueData
+): Promise<MagazineIssue> {
+  return MagazineIssue.create(data);
+}
+
+/**
+ * Fetches a single magazine issue by ID based on the provided options.
+ *
+ * @param id - The ID of the magazine issue to fetch.
+ * @param opts - The options for fetching the magazine issue.
+ * @returns A promise that resolves to the fetched magazine issue or null if
+ * not found.
+ * @throws If there is an error while fetching the magazine issue.
  */
 export function fetchOneMagazineIssue(
   id: number,
@@ -53,8 +75,11 @@ export function fetchOneMagazineIssue(
     });
 }
 
-/*
-  Delete a single magazine issue from the database (indicated by ID).
+/**
+ * Deletes a single magazine issue from the database based on the provided ID.
+ *
+ * @param id - The ID of the magazine issue to delete.
+ * @returns A promise that resolves to the number of deleted magazine issues.
  */
 export function deleteMagazineIssue(id: number) {
   return MagazineIssue.destroy({ where: { id } });

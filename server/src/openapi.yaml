@@ -820,6 +820,29 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Magazines
+  "/magazineissues":
+    x-exegesis-controller: magazineissuesController
+    post:
+      summary: Create a new magazine issue
+      description: Create a new magazine issue.
+      operationId: createMagazineIssue
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newMagazineIssueType"
+      responses:
+        "201":
+          description: Magazine issue created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/magazineIssueType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazine Issues
   "/magazineissues/{id}":
     x-exegesis-controller: magazineissuesController
     parameters:

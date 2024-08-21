@@ -21,6 +21,20 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
+/**
+ * Creates a new magazine issue.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the created magazine issue.
+ */
+export function createMagazineIssue(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
+
+  return MagazineIssues.addMagazineIssue(body).then((issue) =>
+    res.status(201).pureJson(issue.clean())
+  );
+}
+
 /*
   GET /magazineissues/{id}
 
