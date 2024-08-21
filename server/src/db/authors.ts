@@ -6,7 +6,7 @@ import { match } from "ts-pattern";
 import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
-import { Author } from "models";
+import { Author, AuthorAlias } from "models";
 import { AuthorFetchOpts } from "types/author";
 
 // Derive a `scope` value based on the Boolean query parameters
@@ -20,9 +20,33 @@ function getScopeFromParams(params: AuthorFetchOpts): string {
     .run();
 }
 
-/*
-  Fetch all authors. Uses query parameters to opt-in on aliases, references,
-  and/or reference count.
+type AuthorData = {
+  name: string;
+  aliases?: { name: string }[];
+};
+
+/**
+ * Adds an author to the database.
+ *
+ * @param data - The author data to be added.
+ * @returns A promise that resolves to the created author.
+ */
+export function addAuthor(data: AuthorData): Promise<Author> {
+  if (data.aliases) {
+    return Author.create(data, {
+      include: [AuthorAlias],
+    });
+  } else {
+    return Author.create(data);
+  }
+}
+
+/**
+ * Fetches all authors based on the provided options.
+ *
+ * @param opts - The options for fetching authors.
+ * @returns A promise that resolves to an array of authors.
+ * @throws If there is an error while fetching authors.
  */
 export function fetchAllAuthors(opts: AuthorFetchOpts): Promise<Author[]> {
   const scope = getScopeFromParams(opts);
@@ -49,9 +73,13 @@ export function fetchAllAuthors(opts: AuthorFetchOpts): Promise<Author[]> {
     });
 }
 
-/*
-  Fetch a single author by ID. Uses query parameters to opt-in on aliases,
-  references, and/or reference count.
+/**
+ * Fetches a single author by ID.
+ *
+ * @param id - The ID of the author to fetch.
+ * @param opts - The options for fetching the author.
+ * @returns A Promise that resolves to the fetched author or null if not found.
+ * @throws An error if there was an issue fetching the author.
  */
 export function fetchOneAuthor(
   id: number,
@@ -82,9 +110,11 @@ export function fetchOneAuthor(
     });
 }
 
-/*
-  Delete a single author from the database (indicated by ID). Will delete
-  aliases and author-reference relations, but not references themselves.
+/**
+ * Deletes a single author from the database based on the provided ID.
+ *
+ * @param id - The ID of the author to be deleted.
+ * @returns A promise that resolves when the author is successfully deleted.
  */
 export function deleteAuthor(id: number) {
   return Author.destroy({ where: { id } });

@@ -92,15 +92,13 @@ components:
     nullableStringType:
       type: string
       nullable: true
-    authorNameOrAliasType:
-      type: string
     newAuthorAliasType:
       type: object
       required:
         - name
       properties:
         name:
-          $ref: "#/components/schemas/authorNameOrAliasType"
+          type: string
     authorAliasType:
       allOf:
         - $ref: "#/components/schemas/newAuthorAliasType"
@@ -116,7 +114,7 @@ components:
         - name
       properties:
         name:
-          $ref: "#/components/schemas/authorNameOrAliasType"
+          type: string
         aliases:
           type: array
           items:
@@ -129,7 +127,7 @@ components:
         id:
           $ref: "#/components/schemas/idType"
         name:
-          $ref: "#/components/schemas/authorNameOrAliasType"
+          type: string
     authorType:
       type: object
       required:
@@ -141,7 +139,7 @@ components:
         id:
           $ref: "#/components/schemas/idType"
         name:
-          $ref: "#/components/schemas/authorNameOrAliasType"
+          type: string
         createdAt:
           $ref: "#/components/schemas/dateTimeType"
         updatedAt:
@@ -238,8 +236,8 @@ components:
           $ref: "#/components/schemas/idType"
         magazineIssueId:
           $ref: "#/components/schemas/idType"
-        # reference:
-        #   $ref: "#/components/schemas/referenceType"
+        reference:
+          $ref: "#/components/schemas/referenceType"
         magazineIssue:
           $ref: "#/components/schemas/magazineIssueType"
         featureTags:
@@ -566,6 +564,27 @@ components:
 paths:
   "/authors":
     x-exegesis-controller: authorsController
+    post:
+      summary: Create a new author
+      description: Create a new author. Optionally include aliases.
+      operationId: createAuthor
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newAuthorType"
+      responses:
+        "201":
+          description: Author created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/authorType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Authors
     get:
       summary: Fetch all authors
       description: Fetch all authors as an array. Can return optional alias

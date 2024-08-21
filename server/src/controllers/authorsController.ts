@@ -23,6 +23,22 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 }
 
 /*
+  POST /authors
+
+  Create a new author. The request body should be a JSON object with the name
+  of the author. The response body will be the created author object. If the
+  request data includes an `aliases` array, the author's aliases will also be
+  created.
+ */
+export function createAuthor(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
+
+  return Authors.addAuthor(body).then((author) =>
+    res.status(201).pureJson(author.clean())
+  );
+}
+
+/*
   GET /authors
 
   Return all authors. Return value is a list of `Author` objects.
