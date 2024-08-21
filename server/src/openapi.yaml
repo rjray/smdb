@@ -888,6 +888,27 @@ paths:
         - Magazine Issues
   "/publishers":
     x-exegesis-controller: publishersController
+    post:
+      summary: Create a new publisher
+      description: Create a new publisher.
+      operationId: createPublisher
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newPublisherType"
+      responses:
+        "201":
+          description: Publisher created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/publisherType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Publishers
     get:
       summary: Fetch all publishers
       description: Fetch all publishers as an array. Includes publishers' data

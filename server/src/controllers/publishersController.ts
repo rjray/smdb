@@ -18,6 +18,22 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
+/**
+  POST /publishers
+
+  Creates a new publisher.
+
+  @param context - The Exegesis context object.
+  @returns A promise that resolves to the created publisher.
+ */
+export function createPublisher(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
+
+  return Publishers.addPublisher(body).then((publisher) =>
+    res.status(201).pureJson(publisher.clean())
+  );
+}
+
 /*
   GET /publishers
 
