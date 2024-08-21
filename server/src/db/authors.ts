@@ -42,9 +42,9 @@ export function addAuthor(data: AuthorData): Promise<Author> {
 }
 
 /**
- * Fetches all authors based on the provided options.
+ * Fetches all authors with additional data based on the provided options.
  *
- * @param opts - The options for fetching authors.
+ * @param opts - The options for fetching authors' additional data.
  * @returns A promise that resolves to an array of authors.
  * @throws If there is an error while fetching authors.
  */
@@ -74,10 +74,11 @@ export function fetchAllAuthors(opts: AuthorFetchOpts): Promise<Author[]> {
 }
 
 /**
- * Fetches a single author by ID.
+ * Fetches a single author by ID with additional data based on the provided
+ * options.
  *
  * @param id - The ID of the author to fetch.
- * @param opts - The options for fetching the author.
+ * @param opts - The options for fetching the author's additional data.
  * @returns A Promise that resolves to the fetched author or null if not found.
  * @throws An error if there was an issue fetching the author.
  */

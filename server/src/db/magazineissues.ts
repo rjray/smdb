@@ -38,10 +38,11 @@ export function addMagazineIssue(
 }
 
 /**
- * Fetches a single magazine issue by ID based on the provided options.
+ * Fetches a single magazine issue by ID with additional data based on the
+ * provided options.
  *
  * @param id - The ID of the magazine issue to fetch.
- * @param opts - The options for fetching the magazine issue.
+ * @param opts - The options for fetching the additional magazine issue data.
  * @returns A promise that resolves to the fetched magazine issue or null if
  * not found.
  * @throws If there is an error while fetching the magazine issue.

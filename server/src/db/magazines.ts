@@ -31,9 +31,9 @@ export function addMagazine(data: MagazineData): Promise<Magazine> {
 }
 
 /**
- * Fetches all magazines based on the provided options.
+ * Fetches all magazines with additional data based on the provided options.
  *
- * @param opts - The options for fetching magazines.
+ * @param opts - The options for fetching magazines' additional data.
  * @returns A promise that resolves to an array of magazines.
  * @throws If there is an error while fetching the magazines.
  */
@@ -65,10 +65,11 @@ export function fetchAllMagazines(
 }
 
 /**
- * Fetches a single magazine by ID based on the provided options.
+ * Fetches a single magazine by ID with additional data based on the provided
+ * options.
  *
  * @param id - The ID of the magazine to fetch.
- * @param opts - The options for fetching the magazine.
+ * @param opts - The options for fetching the magazine's additional data.
  * @returns A promise that resolves to the fetched magazine or null if not
  * found.
  * @throws If there is an error while fetching the magazine.
