@@ -715,6 +715,27 @@ paths:
         - MagazineFeatures
   "/magazines":
     x-exegesis-controller: magazinesController
+    post:
+      summary: Create a new magazine
+      description: Create a new magazine.
+      operationId: createMagazine
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newMagazineType"
+      responses:
+        "201":
+          description: Magazine created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/magazineType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazines
     get:
       summary: Fetch all magazines
       description: Fetch all magazines as an array.

@@ -21,6 +21,20 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 }
 
 /*
+  POST /magazines
+
+  Create a new magazine. The request body should be a JSON object with the name
+  of the magazine. The response body will be the created magazine object.
+ */
+export function createMagazine(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
+
+  return Magazines.addMagazine(body).then((magazine) =>
+    res.status(201).pureJson(magazine.clean())
+  );
+}
+
+/*
   GET /magazines
 
   Return all magazines. Return value is a list of `Magazine` objects.
