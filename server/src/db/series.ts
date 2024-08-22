@@ -12,8 +12,28 @@ function getScopeFromParams(params: SeriesFetchOpts): string {
   return params.publisher ? "publisher" : "";
 }
 
-/*
-  Fetch all series. Uses query parameters to opt-in on publisher.
+type SeriesData = {
+  name: string;
+  notes?: string | null;
+  publisherId?: number | null;
+};
+
+/**
+ * Adds a series to the database.
+ *
+ * @param data - The series data to be added.
+ * @returns A promise that resolves to the created series.
+ */
+export function addSeries(data: SeriesData): Promise<Series> {
+  return Series.create(data);
+}
+
+/**
+ * Fetches all series with additional data based on the provided options.
+ *
+ * @param opts - The options for fetching series' additional data.
+ * @returns A promise that resolves to an array of series.
+ * @throws If there is an error while fetching the series.
  */
 export function fetchAllSeries(opts: SeriesFetchOpts): Promise<Series[]> {
   const scope = getScopeFromParams(opts);
@@ -25,8 +45,14 @@ export function fetchAllSeries(opts: SeriesFetchOpts): Promise<Series[]> {
     });
 }
 
-/*
-  Fetch a single series by ID. Uses query parameters to opt-in on publisher.
+/**
+ * Fetches a single series by ID with additional data based on the provided
+ * options.
+ *
+ * @param id - The ID of the series to fetch.
+ * @param opts - The options for fetching the series's additional data.
+ * @returns A promise that resolves to the fetched series or null if not found.
+ * @throws If there is an error while fetching the series.
  */
 export function fetchOneSeries(
   id: number,
@@ -42,8 +68,11 @@ export function fetchOneSeries(
     });
 }
 
-/*
-  Delete a single series from the database (indicated by ID).
+/**
+ * Deletes a single series from the database based on the provided ID.
+ *
+ * @param id - The ID of the series to delete.
+ * @returns A promise that resolves to the number of deleted series.
  */
 export function deleteSeries(id: number) {
   return Series.destroy({ where: { id } });

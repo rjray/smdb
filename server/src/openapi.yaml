@@ -1099,6 +1099,27 @@ paths:
         - Tags
   "/series":
     x-exegesis-controller: seriesController
+    post:
+      summary: Create a new series
+      description: Create a new series.
+      operationId: createSeries
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newSeriesType"
+      responses:
+        "201":
+          description: Series created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/seriesType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Series
     get:
       summary: Fetch all series
       description: Fetch all series as an array. Includes series data with

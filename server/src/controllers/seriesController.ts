@@ -19,9 +19,28 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 }
 
 /*
-  GET /series
+  POST /series
 
-  Return all series. Return value is a list of `Series` objects.
+  Creates a new series.
+
+  @param context - The Exegesis context object.
+  @returns A promise that resolves to the created series.
+ */
+export function createSeries(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
+
+  return SeriesDB.addSeries(body).then((series) =>
+    res.status(201).pureJson(series.clean())
+  );
+}
+
+/**
+ * GET /series
+ *
+ * Retrieves all series based on the provided ExegesisContext.
+ *
+ * @param {ExegesisContext} context - The ExegesisContext object containing the request context.
+ * @returns {Promise<void>} - A promise that resolves once the series have been retrieved and processed.
  */
 export function getAllSeries(context: ExegesisContext) {
   const { query } = context.params;
@@ -34,11 +53,13 @@ export function getAllSeries(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /series/{id}
-
-  Return a single series based on the value of `id`. Return value is a single
-  `Series` object.
+/**
+ * GET /series/{id}
+ *
+ * Retrieves a series by its ID.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the series object if found, or a 404 response if not found.
  */
 export function getSeriesById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -53,10 +74,13 @@ export function getSeriesById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /series/{id}
-
-  Delete a single series based on the value of `id`.
+/**
+ * DELETE /series/{id}
+ *
+ * Deletes a series from the database based on the provided ID.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to void.
  */
 export function deleteSeriesById(context: ExegesisContext) {
   const { id } = context.params.path;
