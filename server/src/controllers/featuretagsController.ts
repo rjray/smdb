@@ -20,10 +20,29 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
-/*
-  GET /featuretags
+/**
+  POST /featuretags
 
-  Return all featuretags. Return value is a list of `FeatureTag` objects.
+  Creates a new feature tag.
+
+  @param context - The Exegesis context object.
+  @returns A promise that resolves to the created feature tag.
+ */
+export function createFeatureTag(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
+
+  return FeatureTags.addFeatureTag(body).then((featuretag) =>
+    res.status(201).pureJson(featuretag.clean())
+  );
+}
+
+/**
+ * GET /featuretags
+ *
+ * Retrieves all feature tags based on the provided query parameters.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to an array of feature tags.
  */
 export function getAllFeatureTags(context: ExegesisContext) {
   const { query } = context.params;
@@ -36,11 +55,14 @@ export function getAllFeatureTags(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /featuretags/{id}
-
-  Return a single feature tag based on the value of `id`. Return value is a
-  single `FeatureTag` object.
+/**
+ * GET /featuretags/{id}
+ *
+ * Retrieves a single feature tag based on the value of `id`.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the fetched feature tag or a 404 if not
+ * found.
  */
 export function getFeatureTagById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -55,10 +77,14 @@ export function getFeatureTagById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /featuretags/{id}
-
-  Delete a single featuretag based on the value of `id`.
+/**
+ * DELETE /featuretags/{id}
+ *
+ * Deletes a single feature tag based on the value of `id`.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to a 200 if the feature tag was deleted, or
+ * a 404 if not found.
  */
 export function deleteFeatureTagById(context: ExegesisContext) {
   const { id } = context.params.path;

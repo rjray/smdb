@@ -13,9 +13,27 @@ function getScopeFromParams(params: FeatureTagFetchOpts): string {
   return params.references ? "references" : "";
 }
 
-/*
-  Fetch all feature tags. Uses query parameters to opt-in on references and/or
-  reference count.
+type FeatureTagData = {
+  name: string;
+  description?: string | null;
+};
+
+/**
+ * Adds a feature tag to the database.
+ *
+ * @param data - The feature tag data to be added.
+ * @returns A promise that resolves to the created feature tag.
+ */
+export function addFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
+  return FeatureTag.create(data);
+}
+
+/**
+ * Fetches all feature tags with additional data based on the provided options.
+ *
+ * @param opts - The options for fetching feature tags' additional data.
+ * @returns A promise that resolves to an array of feature tags.
+ * @throws If there is an error while fetching the feature tags.
  */
 export function fetchAllFeatureTags(
   opts: FeatureTagFetchOpts
@@ -44,9 +62,15 @@ export function fetchAllFeatureTags(
     });
 }
 
-/*
-  Fetch a single feature tag by ID. Uses query parameters to opt-in on
-  references and/or reference count.
+/**
+ * Fetches a single feature tag by ID with additional data based on the
+ * provided options.
+ *
+ * @param id - The ID of the feature tag to fetch.
+ * @param opts - The options for fetching the feature tag's additional data.
+ * @returns A promise that resolves to the fetched feature tag or null if not
+ * found.
+ * @throws If there is an error while fetching the feature tag.
  */
 export function fetchOneFeatureTag(
   id: number,
@@ -77,8 +101,11 @@ export function fetchOneFeatureTag(
     });
 }
 
-/*
-  Delete a single feature tag from the database (indicated by ID).
+/**
+ * Deletes a feature tag from the database based on the provided ID.
+ *
+ * @param id - The ID of the feature tag to delete.
+ * @returns A promise that resolves to the number of deleted feature tags.
  */
 export function deleteFeatureTag(id: number) {
   return FeatureTag.destroy({ where: { id } });

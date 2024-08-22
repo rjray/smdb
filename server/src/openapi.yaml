@@ -652,6 +652,27 @@ paths:
         - References
   "/featuretags":
     x-exegesis-controller: featuretagsController
+    post:
+      summary: Create a new feature tag
+      description: Create a new feature tag.
+      operationId: createFeatureTag
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newFeatureTagType"
+      responses:
+        "201":
+          description: Feature tag created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/featureTagType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - FeatureTags
     get:
       summary: Fetch all feature tags
       description: Fetch feature tags as an array.
