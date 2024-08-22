@@ -15,9 +15,9 @@ function getScopeFromParams(params: MagazineFetchOpts): string {
 
 type MagazineData = {
   name: string;
-  language?: string;
-  aliases?: string;
-  notes?: string;
+  language?: string | null;
+  aliases?: string | null;
+  notes?: string | null;
 };
 
 /**

@@ -14,7 +14,7 @@ function getScopeFromParams(params: PublisherFetchOpts): string {
 
 type PublisherData = {
   name: string;
-  notes?: string;
+  notes?: string | null;
 };
 
 /**
