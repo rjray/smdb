@@ -1181,6 +1181,27 @@ paths:
         - Series
   "/tags":
     x-exegesis-controller: tagsController
+    post:
+      summary: Create a new tag
+      description: Create a new tag.
+      operationId: createTag
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newTagType"
+      responses:
+        "201":
+          description: Tag created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/tagType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
     get:
       summary: Fetch all tags
       description: Fetch tags as an array.

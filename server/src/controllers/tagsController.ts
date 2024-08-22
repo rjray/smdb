@@ -20,10 +20,27 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
-/*
-  GET /tags
+/**
+ * POST /tags
+ *
+ * Creates a new tag.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the created tag.
+ */
+export function createTag(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
 
-  Return all tags. Return value is a list of `Tag` objects.
+  return Tags.addTag(body).then((tag) => res.status(201).pureJson(tag.clean()));
+}
+
+/**
+ * GET /tags
+ *
+ * Retrieves all tags from the database based on the provided query parameters.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to an array of tags.
  */
 export function getAllTags(context: ExegesisContext) {
   const { query } = context.params;
@@ -36,11 +53,13 @@ export function getAllTags(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /tags/{id}
-
-  Return a single tag based on the value of `id`. Return value is a single
-  `Tag` object.
+/**
+ * GET /tags/{id}
+ *
+ * Retrieves a tag by its ID.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the retrieved tag or null if not found.
  */
 export function getTagById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -55,10 +74,13 @@ export function getTagById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /tags/{id}
-
-  Delete a single tag based on the value of `id`.
+/**
+ * DELETE /tags/{id}
+ *
+ * Deletes a tag from the database based on the provided ID.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to void.
  */
 export function deleteTagById(context: ExegesisContext) {
   const { id } = context.params.path;
