@@ -20,11 +20,13 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
-/*
-  POST /magazines
-
-  Create a new magazine. The request body should be a JSON object with the name
-  of the magazine. The response body will be the created magazine object.
+/**
+ * POST /magazines
+ *
+ * Creates a new magazine using the form data in `requestBody`.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the created magazine.
  */
 export function createMagazine(context: ExegesisContext) {
   const { res, requestBody: body } = context;
@@ -34,10 +36,14 @@ export function createMagazine(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /magazines
-
-  Return all magazines. Return value is a list of `Magazine` objects.
+/**
+ * GET /magazines
+ *
+ * Retrieves all magazines with additional data based on the provided query
+ * parameters.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to an array of magazines.
  */
 export function getAllMagazines(context: ExegesisContext) {
   const { query } = context.params;
@@ -50,11 +56,15 @@ export function getAllMagazines(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /magazines/{id}
-
-  Return a single magazine based on the value of `id`. Return value is a single
-  `Magazine` object.
+/**
+ * GET /magazines/{id}
+ *
+ * Retrieves a magazine by its ID with additional data based on the provided
+ * query parameters.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the magazine data if found, or a 404
+ * response if not found.
  */
 export function getMagazineById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -69,10 +79,13 @@ export function getMagazineById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /magazines/{id}
-
-  Delete a single magazine based on the value of `id`.
+/**
+ * DELETE /magazines/{id}
+ *
+ * Deletes a magazine by its ID.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the HTTP response.
  */
 export function deleteMagazineById(context: ExegesisContext) {
   const { id } = context.params.path;

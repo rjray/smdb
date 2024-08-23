@@ -39,7 +39,8 @@ export function createFeatureTag(context: ExegesisContext) {
 /**
  * GET /featuretags
  *
- * Retrieves all feature tags based on the provided query parameters.
+ * Retrieves all feature tags from the database with additional data based on
+ * the provided query parameters.
  *
  * @param context - The Exegesis context object.
  * @returns A promise that resolves to an array of feature tags.
@@ -58,7 +59,8 @@ export function getAllFeatureTags(context: ExegesisContext) {
 /**
  * GET /featuretags/{id}
  *
- * Retrieves a single feature tag based on the value of `id`.
+ * Retrieves a single feature tag based on the value of `id`, with additional
+ * data based on the provided query parameters.
  *
  * @param context - The Exegesis context object.
  * @returns A promise that resolves to the fetched feature tag or a 404 if not

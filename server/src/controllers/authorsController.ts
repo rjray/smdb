@@ -22,13 +22,13 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
-/*
-  POST /authors
-
-  Create a new author. The request body should be a JSON object with the name
-  of the author. The response body will be the created author object. If the
-  request data includes an `aliases` array, the author's aliases will also be
-  created.
+/**
+ * POST /authors
+ *
+ * Creates a new author based on the provided request body.
+ *
+ * @param context - The Exegesis context.
+ * @returns A promise that resolves to the created author.
  */
 export function createAuthor(context: ExegesisContext) {
   const { res, requestBody: body } = context;
@@ -38,10 +38,14 @@ export function createAuthor(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /authors
-
-  Return all authors. Return value is a list of `Author` objects.
+/**
+ * GET /authors
+ *
+ * Retrieves all authors from the database with additional data based on the
+ * provided query parameters.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to an array of authors.
  */
 export function getAllAuthors(context: ExegesisContext) {
   const { query } = context.params;
@@ -54,11 +58,15 @@ export function getAllAuthors(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /authors/{id}
-
-  Return a single author based on the value of `id`. Return value is a single
-  `Author` object.
+/**
+ * GET /authors/{id}
+ *
+ * Retrieves an author by their ID with additional data based on the provided
+ * query parameters.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the author's information if found, or a
+ * 404 response if not found.
  */
 export function getAuthorById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -73,10 +81,13 @@ export function getAuthorById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /authors/{id}
-
-  Delete a single author based on the value of `id`.
+/**
+ * DELETE /authors/{id}
+ *
+ * Deletes an author from the database based on the provided ID.
+ *
+ * @param context - The ExegesisContext object containing the request context.
+ * @returns A promise that resolves to void.
  */
 export function deleteAuthorById(context: ExegesisContext) {
   const { id } = context.params.path;

@@ -21,7 +21,7 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 /*
   POST /series
 
-  Creates a new series.
+  Creates a new series using the form data in `requestBody`.
 
   @param context - The Exegesis context object.
   @returns A promise that resolves to the created series.
@@ -37,10 +37,13 @@ export function createSeries(context: ExegesisContext) {
 /**
  * GET /series
  *
- * Retrieves all series based on the provided ExegesisContext.
+ * Retrieves all series with additional data based on the provided query
+ * parameters.
  *
- * @param {ExegesisContext} context - The ExegesisContext object containing the request context.
- * @returns {Promise<void>} - A promise that resolves once the series have been retrieved and processed.
+ * @param {ExegesisContext} context - The ExegesisContext object containing the
+ * request context.
+ * @returns {Promise<void>} - A promise that resolves once the series have been
+ * retrieved and processed.
  */
 export function getAllSeries(context: ExegesisContext) {
   const { query } = context.params;
@@ -56,10 +59,12 @@ export function getAllSeries(context: ExegesisContext) {
 /**
  * GET /series/{id}
  *
- * Retrieves a series by its ID.
+ * Retrieves a series by its ID with additional data based on the provided
+ * query parameters.
  *
  * @param context - The Exegesis context object.
- * @returns A promise that resolves to the series object if found, or a 404 response if not found.
+ * @returns A promise that resolves to the series object if found, or a 404
+ * response if not found.
  */
 export function getSeriesById(context: ExegesisContext) {
   const { id } = context.params.path;

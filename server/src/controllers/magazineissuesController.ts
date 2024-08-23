@@ -22,7 +22,9 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 }
 
 /**
- * Creates a new magazine issue.
+ * POST /magazineissues
+ *
+ * Creates a new magazine issue using the form data in `requestBody`.
  *
  * @param context - The Exegesis context object.
  * @returns A promise that resolves to the created magazine issue.
@@ -35,11 +37,16 @@ export function createMagazineIssue(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /magazineissues/{id}
-
-  Return a single magazine issue based on the value of `id`. Return value is a
-  single `MagazineIssue` object.
+/**
+ * GET /magazineissues/{id}
+ *
+ * Retrieves a magazine issue by its ID, with additional data based on the
+ * provided query parameters.
+ *
+ * @param context - The ExegesisContext object containing the request
+ * parameters.
+ * @returns A promise that resolves to the response object with the retrieved
+ * magazine issue.
  */
 export function getMagazineIssueById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -54,10 +61,13 @@ export function getMagazineIssueById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /magazineissues/{id}
-
-  Delete a single magazineissue based on the value of `id`.
+/**
+ * DELETE /magazineissues/{id}
+ *
+ * Deletes a magazine issue from the database based on the provided ID.
+ *
+ * @param context - The ExegesisContext object containing the request context.
+ * @returns A promise that resolves to void.
  */
 export function deleteMagazineIssueById(context: ExegesisContext) {
   const { id } = context.params.path;

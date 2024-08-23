@@ -21,7 +21,7 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
 /**
   POST /publishers
 
-  Creates a new publisher.
+  Creates a new publisher using the form data in `requestBody`.
 
   @param context - The Exegesis context object.
   @returns A promise that resolves to the created publisher.
@@ -34,10 +34,14 @@ export function createPublisher(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /publishers
-
-  Return all publishers. Return value is a list of `Publisher` objects.
+/**
+ * GET /publishers
+ *
+ * Retrieves all publishers with additional data based on the provided query
+ * options.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to an array of publishers.
  */
 export function getAllPublishers(context: ExegesisContext) {
   const { query } = context.params;
@@ -50,11 +54,15 @@ export function getAllPublishers(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /publishers/{id}
-
-  Return a single publisher based on the value of `id`. Return value is a single
-  `Publisher` object.
+/**
+ * GET /publishers/{id}
+ *
+ * Retrieves a publisher by its ID with additional data based on the provided
+ * query options.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the publisher object if found, or a 404
+ * response if not found.
  */
 export function getPublisherById(context: ExegesisContext) {
   const { id } = context.params.path;
@@ -69,10 +77,13 @@ export function getPublisherById(context: ExegesisContext) {
   });
 }
 
-/*
-  DELETE /publishers/{id}
-
-  Delete a single publisher based on the value of `id`.
+/**
+ * DELETE /publishers/{id}
+ *
+ * Deletes a publisher from the database based on the provided ID.
+ *
+ * @param context - The ExegesisContext object containing the request context.
+ * @returns A promise that resolves to void.
  */
 export function deletePublisherById(context: ExegesisContext) {
   const { id } = context.params.path;
