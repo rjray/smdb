@@ -18,10 +18,30 @@ function queryToFetchOpts(query: ParametersMap<boolean>) {
   return opts;
 }
 
-/*
-  GET /referencetypes
+/**
+ * POST /referencetypes
+ *
+ * Create a new reference type based on the provided request body.
+ *
+ * @param context - The Exegesis context.
+ * @returns A promise that resolves to the created reference type.
+ */
+export function createReferenceType(context: ExegesisContext) {
+  const { res, requestBody: body } = context;
 
-  Return all reference types. Return value is a list of `ReferenceType` objects.
+  return ReferenceTypes.addReferenceType(body).then((referenceType) =>
+    res.status(201).pureJson(referenceType.clean())
+  );
+}
+
+/**
+ * GET /referencetypes
+ *
+ * Retrieves all reference types with additional data based on the provided
+ * query options.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to an array of reference types.
  */
 export function getAllReferenceTypes(context: ExegesisContext) {
   const { query } = context.params;
@@ -35,11 +55,14 @@ export function getAllReferenceTypes(context: ExegesisContext) {
   );
 }
 
-/*
-  GET /referencetypes/{id}
-
-  Return a single reference type based on the value of `id`. Return value is a
-  Promise of a single `ReferenceTypeRecord` object or `null`.
+/**
+ * Retrieves a reference type by its ID with additional data based on the
+ * provided query options.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that resolves to the reference type if found, or null if
+ * not found.
+ * @throws If there is an error while retrieving the reference type.
  */
 export function getReferenceTypeById(context: ExegesisContext) {
   const { id } = context.params.path;

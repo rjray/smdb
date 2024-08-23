@@ -471,24 +471,33 @@ components:
         - $ref: "#/components/schemas/referenceBookType"
         - $ref: "#/components/schemas/referenceMagazineFeatureType"
         - $ref: "#/components/schemas/referencePhotoCollectionType"
-    referenceTypeType:
+    newReferenceTypeType:
       type: object
       required:
-        - id
         - name
         - description
-        - notes
       properties:
-        id:
-          $ref: "#/components/schemas/idType"
         name:
           type: string
         description:
           type: string
         notes:
           $ref: "#/components/schemas/nullableStringType"
-        referenceCount:
-          $ref: "#/components/schemas/countType"
+    referenceTypeType:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/idType"
+            referenceCount:
+              $ref: "#/components/schemas/countType"
+            references:
+              type: array
+              items:
+                $ref: "#/components/schemas/referenceType"
+        - $ref: "#/components/schemas/newReferenceTypeType"
     newSeriesType:
       type: object
       required:
@@ -1054,6 +1063,27 @@ paths:
         - References
   "/referencetypes":
     x-exegesis-controller: referencetypesController
+    post:
+      summary: Create a new reference type
+      description: Create a new reference type.
+      operationId: createReferenceType
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newReferenceTypeType"
+      responses:
+        "201":
+          description: Reference type created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/referenceTypeType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - ReferenceTypes
     get:
       summary: Fetch all reference types
       description: Fetch an array of all reference types.
