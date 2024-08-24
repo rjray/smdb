@@ -6,6 +6,7 @@ import {
   AllowNull,
   DataType,
   DefaultScope,
+  Scopes,
   Table,
   Column,
   Model,
@@ -55,7 +56,11 @@ export type ReferenceRecord = {
 };
 
 @DefaultScope(() => ({
-  include: [ReferenceType, Author, Tag, Book, MagazineFeature, PhotoCollection],
+  include: [Book, MagazineFeature, PhotoCollection],
+}))
+@Scopes(() => ({
+  authors: { include: [Author] },
+  tags: { include: [Tag] },
 }))
 @Table
 class Reference extends Model {
@@ -71,7 +76,7 @@ class Reference extends Model {
   referenceTypeId!: number;
 
   @BelongsTo(() => ReferenceType)
-  referenceType!: ReferenceType;
+  referenceType?: ReferenceType;
 
   @BelongsToMany(() => Author, () => AuthorsReferences)
   authors?: Author[];
@@ -122,7 +127,8 @@ class Reference extends Model {
       if (result[date]) result[date] = result[date].toISOString();
     }
 
-    result.referenceType = result.referenceType.clean();
+    if (result.referenceType)
+      result.referenceType = result.referenceType.clean();
     if (result.authors)
       result.authors = result.authors.map((a: Author) => a.clean());
     if (result.tags) result.tags = result.tags.map((t: Tag) => t.clean());

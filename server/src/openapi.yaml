@@ -56,10 +56,24 @@ components:
       required: false
       schema:
         type: boolean
+    referenceAuthorsParam:
+      name: authors
+      in: query
+      description: Boolean, whether to include author data with references
+      required: false
+      schema:
+        type: boolean
     referenceCountParam:
       name: referenceCount
       in: query
       description: Boolean, whether to include reference count in a query
+      required: false
+      schema:
+        type: boolean
+    referenceTagsParam:
+      name: tags
+      in: query
+      description: Boolean, whether to include tag data with references
       required: false
       schema:
         type: boolean
@@ -357,11 +371,8 @@ components:
         - id
         - name
         - referenceTypeId
-        - referenceType
         - createdAt
         - updatedAt
-        - authors
-        - tags
       properties:
         id:
           $ref: "#/components/schemas/idType"
@@ -1010,6 +1021,9 @@ paths:
       description: Fetch all references as an array. Includes author, record
         type and sub-type information.
       operationId: getAllReferences
+      parameters:
+        - $ref: "#/components/parameters/referenceAuthorsParam"
+        - $ref: "#/components/parameters/referenceTagsParam"
       responses:
         "200":
           description: All references
@@ -1033,6 +1047,9 @@ paths:
       description: Retrieve a single reference by the ID. Includes author,
         record type and sub-type information.
       operationId: getReferenceById
+      parameters:
+        - $ref: "#/components/parameters/referenceAuthorsParam"
+        - $ref: "#/components/parameters/referenceTagsParam"
       responses:
         "200":
           description: Reference data
