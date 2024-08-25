@@ -2,23 +2,11 @@
   Exegesis controller for all operations under /api/featurefeaturetags.
  */
 
-import { ExegesisContext, ParametersMap } from "exegesis-express";
+import { ExegesisContext } from "exegesis-express";
 
 import { FeatureTags } from "db";
 import { FeatureTag } from "models";
-import { FeatureTagFetchOpts } from "types/featuretag";
-
-// Convert query parameters into a `FeatureTagFetchOpts` instance.
-function queryToFetchOpts(query: ParametersMap<boolean>) {
-  const opts: FeatureTagFetchOpts = {
-    references: false,
-    referenceCount: false,
-  };
-  if (query.references) opts.references = true;
-  if (query.referenceCount) opts.referenceCount = true;
-
-  return opts;
-}
+import { queryToRequestOpts } from "utils";
 
 /**
   POST /featuretags
@@ -49,7 +37,7 @@ export function getAllFeatureTags(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return FeatureTags.fetchAllFeatureTags(opts).then((results: FeatureTag[]) =>
     res.status(200).pureJson(results.map((featuretag) => featuretag.clean()))
@@ -71,7 +59,7 @@ export function getFeatureTagById(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return FeatureTags.fetchOneFeatureTag(id, opts).then((featuretag) => {
     if (featuretag) return res.status(200).pureJson(featuretag.clean());

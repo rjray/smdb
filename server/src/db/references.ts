@@ -2,22 +2,13 @@
   Database operations focused on the Reference model.
  */
 
-import { match } from "ts-pattern";
 import { BaseError } from "sequelize";
 
 import { Reference } from "models";
-import { ReferenceFetchOpts } from "types/reference";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: ReferenceFetchOpts): Array<string> {
-  return match([params.authors, params.tags])
-    .returnType<string[]>()
-    .with([false, false], () => ["defaultScope"])
-    .with([false, true], () => ["defaultScope", "tags"])
-    .with([true, false], () => ["defaultScope", "authors"])
-    .with([true, true], () => ["defaultScope", "authors", "tags"])
-    .run();
-}
+/// The scopes that can be fetched for references.
+const referenceScopes = ["authors", "tags"];
 
 /**
  * Fetches all references with additional data based on the provided options.
@@ -26,10 +17,8 @@ function getScopeFromParams(params: ReferenceFetchOpts): Array<string> {
  * @returns A promise that resolves to an array of references.
  * @throws If there is an error while fetching the references.
  */
-export function fetchAllReferences(
-  opts: ReferenceFetchOpts
-): Promise<Reference[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllReferences(opts: RequestOpts): Promise<Reference[]> {
+  const scope = getScopeFromParams(opts, referenceScopes);
 
   return Reference.scope(scope)
     .findAll()
@@ -50,9 +39,9 @@ export function fetchAllReferences(
  */
 export function fetchOneReference(
   id: number,
-  opts: ReferenceFetchOpts
+  opts: RequestOpts
 ): Promise<Reference | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, referenceScopes);
 
   return Reference.scope(scope)
     .findByPk(id)

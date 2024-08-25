@@ -6,12 +6,10 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { Tag } from "models";
-import { TagFetchOpts } from "types/tag";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: TagFetchOpts): string {
-  return params.references ? "references" : "";
-}
+/// The scopes that can be fetched for tags.
+const tagScopes = ["references"];
 
 type TagData = {
   name: string;
@@ -36,8 +34,8 @@ export function addTag(data: TagData): Promise<Tag> {
  * @returns A promise that resolves to an array of tags.
  * @throws If there is an error while fetching the tags.
  */
-export function fetchAllTags(opts: TagFetchOpts): Promise<Tag[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllTags(opts: RequestOpts): Promise<Tag[]> {
+  const scope = getScopeFromParams(opts, tagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {
@@ -72,9 +70,9 @@ export function fetchAllTags(opts: TagFetchOpts): Promise<Tag[]> {
  */
 export function fetchOneTag(
   id: number,
-  opts: TagFetchOpts
+  opts: RequestOpts
 ): Promise<Tag | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, tagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {

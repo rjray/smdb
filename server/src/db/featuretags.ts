@@ -6,12 +6,10 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { FeatureTag } from "models";
-import { FeatureTagFetchOpts } from "types/featuretag";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: FeatureTagFetchOpts): string {
-  return params.references ? "references" : "";
-}
+/// The scopes that can be fetched for feature tags.
+const featureTagScopes = ["features"];
 
 type FeatureTagData = {
   name: string;
@@ -35,10 +33,8 @@ export function addFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
  * @returns A promise that resolves to an array of feature tags.
  * @throws If there is an error while fetching the feature tags.
  */
-export function fetchAllFeatureTags(
-  opts: FeatureTagFetchOpts
-): Promise<FeatureTag[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllFeatureTags(opts: RequestOpts): Promise<FeatureTag[]> {
+  const scope = getScopeFromParams(opts, featureTagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {
@@ -74,9 +70,9 @@ export function fetchAllFeatureTags(
  */
 export function fetchOneFeatureTag(
   id: number,
-  opts: FeatureTagFetchOpts
+  opts: RequestOpts
 ): Promise<FeatureTag | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, featureTagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {

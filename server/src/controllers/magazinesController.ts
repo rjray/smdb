@@ -2,23 +2,11 @@
   Exegesis controller for all operations under /api/magazines.
  */
 
-import { ExegesisContext, ParametersMap } from "exegesis-express";
+import { ExegesisContext } from "exegesis-express";
 
 import { Magazines } from "db";
 import { Magazine } from "models";
-import { MagazineFetchOpts } from "types/magazine";
-
-// Convert query parameters into a `MagazineFetchOpts` instance.
-function queryToFetchOpts(query: ParametersMap<boolean>) {
-  const opts: MagazineFetchOpts = {
-    issues: false,
-    issueCount: false,
-  };
-  if (query.issues) opts.issues = true;
-  if (query.issueCount) opts.issueCount = true;
-
-  return opts;
-}
+import { queryToRequestOpts } from "utils";
 
 /**
  * POST /magazines
@@ -49,7 +37,7 @@ export function getAllMagazines(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return Magazines.fetchAllMagazines(opts).then((results: Magazine[]) =>
     res.status(200).pureJson(results.map((magazine) => magazine.clean()))
@@ -71,7 +59,7 @@ export function getMagazineById(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return Magazines.fetchOneMagazine(id, opts).then((magazine) => {
     if (magazine) return res.status(200).pureJson(magazine.clean());

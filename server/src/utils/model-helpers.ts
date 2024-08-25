@@ -4,42 +4,36 @@
 
 import { ParametersMap } from "exegesis-express";
 
-export type FetchOpts = Record<string, boolean>;
+export type RequestOpts = Record<string, unknown>;
 
 /**
- * Converts a query object and an array of keys into FetchOpts object.
+ * Converts a query object and an array of keys into RequestOpts object.
  *
- * @param query - The query object containing boolean values.
- * @param keys - The array of keys to be converted into FetchOpts object.
- * @returns The FetchOpts object generated from the query and keys.
+ * @param query - The query object containing unknown values.
+ * @returns The RequestOpts object generated from the query and keys.
  */
-export function queryToFetchOpts(
-  query: ParametersMap<boolean>,
-  keys: string[]
-): FetchOpts {
-  const opts: FetchOpts = {};
-  for (const key of keys) {
-    opts[key] = query[key] || false;
-  }
+export function queryToRequestOpts(query: ParametersMap<unknown>): RequestOpts {
+  const opts: RequestOpts = { ...query };
 
   return opts;
 }
 
 /**
- * Derives the scope from the provided FetchOpts object.
+ * Derives the scope from the provided RequestOpts object.
  *
- * @param params - The fetch options parameters.
+ * @param params - The request options parameters.
  * @param omitDefault - Whether to omit the default scope. Default is false.
  * @returns An array of strings representing the scope.
  */
 export function getScopeFromParams(
-  params: FetchOpts,
+  params: RequestOpts,
+  scopes: Array<string>,
   omitDefault = false
 ): Array<string> {
   const scope = [];
   if (!omitDefault) scope.push("defaultScope");
 
-  for (const key in params) {
+  for (const key of scopes) {
     if (params[key]) scope.push(key);
   }
 

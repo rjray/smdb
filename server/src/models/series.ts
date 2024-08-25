@@ -37,7 +37,10 @@ export type SeriesRecord = {
   books?: Array<BookRecord>;
 };
 
-@Scopes(() => ({ publisher: { include: [Publisher] } }))
+@Scopes(() => ({
+  books: { include: [Book] },
+  publisher: { include: [Publisher] },
+}))
 @Table({ timestamps: false })
 class Series extends Model {
   @AllowNull(false)
@@ -61,7 +64,6 @@ class Series extends Model {
     const result = this.get();
 
     if (result.publisher) result.publisher = result.publisher.clean();
-
     if (result.books) result.books = result.books.map((b: Book) => b.clean());
 
     return result;

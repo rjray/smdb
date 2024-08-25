@@ -2,23 +2,11 @@
   Exegesis controller for all operations under /api/tags.
  */
 
-import { ExegesisContext, ParametersMap } from "exegesis-express";
+import { ExegesisContext } from "exegesis-express";
 
 import { Tags } from "db";
 import { Tag } from "models";
-import { TagFetchOpts } from "types/tag";
-
-// Convert query parameters into a `TagFetchOpts` instance.
-function queryToFetchOpts(query: ParametersMap<boolean>) {
-  const opts: TagFetchOpts = {
-    references: false,
-    referenceCount: false,
-  };
-  if (query.references) opts.references = true;
-  if (query.referenceCount) opts.referenceCount = true;
-
-  return opts;
-}
+import { queryToRequestOpts } from "utils";
 
 /**
  * POST /tags
@@ -46,7 +34,7 @@ export function getAllTags(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return Tags.fetchAllTags(opts).then((results: Tag[]) =>
     res.status(200).pureJson(results.map((tag) => tag.clean()))
@@ -66,7 +54,7 @@ export function getTagById(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return Tags.fetchOneTag(id, opts).then((tag) => {
     if (tag) return res.status(200).pureJson(tag.clean());

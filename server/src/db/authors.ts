@@ -2,23 +2,14 @@
   Database operations focused on the Author model.
  */
 
-import { match } from "ts-pattern";
 import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { Author, AuthorAlias } from "models";
-import { AuthorFetchOpts } from "types/author";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: AuthorFetchOpts): string {
-  return match([params.aliases, params.references])
-    .returnType<string>()
-    .with([false, false], () => "")
-    .with([false, true], () => "references")
-    .with([true, false], () => "aliases")
-    .with([true, true], () => "full")
-    .run();
-}
+/// The scopes that can be fetched for authors.
+const authorScopes = ["references", "aliases"];
 
 type AuthorData = {
   name: string;
@@ -48,8 +39,8 @@ export function addAuthor(data: AuthorData): Promise<Author> {
  * @returns A promise that resolves to an array of authors.
  * @throws If there is an error while fetching authors.
  */
-export function fetchAllAuthors(opts: AuthorFetchOpts): Promise<Author[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllAuthors(opts: RequestOpts): Promise<Author[]> {
+  const scope = getScopeFromParams(opts, authorScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {
@@ -84,9 +75,9 @@ export function fetchAllAuthors(opts: AuthorFetchOpts): Promise<Author[]> {
  */
 export function fetchOneAuthor(
   id: number,
-  opts: AuthorFetchOpts
+  opts: RequestOpts
 ): Promise<Author | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, authorScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {

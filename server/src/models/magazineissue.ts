@@ -41,8 +41,7 @@ export type MagazineIssueRecord = {
 
 @Scopes(() => ({
   magazine: { include: [Magazine] },
-  references: { include: [MagazineFeature] },
-  full: { include: [Magazine, MagazineFeature] },
+  features: { include: [MagazineFeature] },
 }))
 @Table
 class MagazineIssue extends Model {

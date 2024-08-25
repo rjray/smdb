@@ -2,21 +2,11 @@
   Exegesis controller for all operations under /api/series.
  */
 
-import { ExegesisContext, ParametersMap } from "exegesis-express";
+import { ExegesisContext } from "exegesis-express";
 
 import { Series as SeriesDB } from "db";
 import { Series } from "models";
-import { SeriesFetchOpts } from "types/series";
-
-// Convert query parameters into a `SeriesFetchOpts` instance.
-function queryToFetchOpts(query: ParametersMap<boolean>) {
-  const opts: SeriesFetchOpts = {
-    publisher: false,
-  };
-  if (query.publisher) opts.publisher = true;
-
-  return opts;
-}
+import { queryToRequestOpts } from "utils";
 
 /*
   POST /series
@@ -49,7 +39,7 @@ export function getAllSeries(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return SeriesDB.fetchAllSeries(opts).then((results: Series[]) =>
     res.status(200).pureJson(results.map((tag) => tag.clean()))
@@ -71,7 +61,7 @@ export function getSeriesById(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return SeriesDB.fetchOneSeries(id, opts).then((series) => {
     if (series) return res.status(200).pureJson(series.clean());

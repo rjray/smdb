@@ -5,12 +5,10 @@
 import { BaseError } from "sequelize";
 
 import { Publisher } from "models";
-import { PublisherFetchOpts } from "types/publisher";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: PublisherFetchOpts): string {
-  return params.series ? "series" : "";
-}
+/// The scopes that can be fetched for publishers.
+const publisherScopes = ["books", "series"];
 
 type PublisherData = {
   name: string;
@@ -34,10 +32,8 @@ export function addPublisher(data: PublisherData): Promise<Publisher> {
  * @returns A promise that resolves to an array of publishers.
  * @throws If there is an error while fetching the publishers.
  */
-export function fetchAllPublishers(
-  opts: PublisherFetchOpts
-): Promise<Publisher[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllPublishers(opts: RequestOpts): Promise<Publisher[]> {
+  const scope = getScopeFromParams(opts, publisherScopes);
 
   return Publisher.scope(scope)
     .findAll()
@@ -58,9 +54,9 @@ export function fetchAllPublishers(
  */
 export function fetchOnePublisher(
   id: number,
-  opts: PublisherFetchOpts
+  opts: RequestOpts
 ): Promise<Publisher | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, publisherScopes);
 
   return Publisher.scope(scope)
     .findByPk(id)

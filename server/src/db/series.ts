@@ -5,12 +5,10 @@
 import { BaseError } from "sequelize";
 
 import { Series } from "models";
-import { SeriesFetchOpts } from "types/series";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: SeriesFetchOpts): string {
-  return params.publisher ? "publisher" : "";
-}
+/// The scopes that can be fetched for series.
+const seriesScopes = ["books", "publisher"];
 
 type SeriesData = {
   name: string;
@@ -35,8 +33,8 @@ export function addSeries(data: SeriesData): Promise<Series> {
  * @returns A promise that resolves to an array of series.
  * @throws If there is an error while fetching the series.
  */
-export function fetchAllSeries(opts: SeriesFetchOpts): Promise<Series[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllSeries(opts: RequestOpts): Promise<Series[]> {
+  const scope = getScopeFromParams(opts, seriesScopes);
 
   return Series.scope(scope)
     .findAll()
@@ -56,9 +54,9 @@ export function fetchAllSeries(opts: SeriesFetchOpts): Promise<Series[]> {
  */
 export function fetchOneSeries(
   id: number,
-  opts: SeriesFetchOpts
+  opts: RequestOpts
 ): Promise<Series | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, seriesScopes);
 
   return Series.scope(scope)
     .findByPk(id)

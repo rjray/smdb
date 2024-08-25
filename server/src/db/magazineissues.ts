@@ -2,23 +2,14 @@
   Database operations focused on the MagazineIssue model.
  */
 
-import { match } from "ts-pattern";
 import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { MagazineIssue } from "models";
-import { MagazineIssueFetchOpts } from "types/magazineissue";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: MagazineIssueFetchOpts): string {
-  return match([params.magazine, params.references])
-    .returnType<string>()
-    .with([false, false], () => "")
-    .with([false, true], () => "references")
-    .with([true, false], () => "magazine")
-    .with([true, true], () => "full")
-    .run();
-}
+/// The scopes that can be fetched for magazine issues.
+const magazineIssueScopes = ["magazine", "features"];
 
 type MagazineIssueData = {
   issue: string;
@@ -49,9 +40,9 @@ export function addMagazineIssue(
  */
 export function fetchOneMagazineIssue(
   id: number,
-  opts: MagazineIssueFetchOpts
+  opts: RequestOpts
 ): Promise<MagazineIssue | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, magazineIssueScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {

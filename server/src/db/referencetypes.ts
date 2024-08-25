@@ -6,7 +6,7 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { ReferenceType } from "models";
-import { ReferenceTypeFetchOpts } from "types/referencetype";
+import { RequestOpts } from "utils";
 
 type ReferenceTypeData = {
   name: string;
@@ -35,7 +35,7 @@ export function addReferenceType(
  * @throws If there is an error while fetching the reference types.
  */
 export function fetchAllReferenceTypes(
-  opts: ReferenceTypeFetchOpts
+  opts: RequestOpts
 ): Promise<ReferenceType[]> {
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -70,7 +70,7 @@ export function fetchAllReferenceTypes(
  */
 export function fetchOneReferenceType(
   id: number,
-  opts: ReferenceTypeFetchOpts
+  opts: RequestOpts
 ): Promise<ReferenceType | null> {
   const queryOpts: FindOptions = opts.referenceCount
     ? {

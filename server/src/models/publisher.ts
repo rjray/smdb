@@ -36,7 +36,10 @@ export type PublisherRecord = {
   series?: Array<SeriesRecord>;
 };
 
-@Scopes(() => ({ series: { include: [Series] } }))
+@Scopes(() => ({
+  books: { include: [Book] },
+  series: { include: [Series] },
+}))
 @Table({ timestamps: false })
 class Publisher extends Model {
   @AllowNull(false)

@@ -44,7 +44,6 @@ export type AuthorRecord = {
 };
 
 @Scopes(() => ({
-  full: { include: [AuthorAlias, Reference] },
   references: { include: [Reference] },
   aliases: { include: [AuthorAlias] },
 }))

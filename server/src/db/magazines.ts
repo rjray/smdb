@@ -6,12 +6,10 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { Magazine } from "models";
-import { MagazineFetchOpts } from "types/magazine";
+import { RequestOpts, getScopeFromParams } from "utils";
 
-// Derive a `scope` value based on the Boolean query parameters
-function getScopeFromParams(params: MagazineFetchOpts): string {
-  return params.issues ? "issues" : "";
-}
+/// The scopes that can be fetched for magazines.
+const magazineScopes = ["issues"];
 
 type MagazineData = {
   name: string;
@@ -37,10 +35,8 @@ export function addMagazine(data: MagazineData): Promise<Magazine> {
  * @returns A promise that resolves to an array of magazines.
  * @throws If there is an error while fetching the magazines.
  */
-export function fetchAllMagazines(
-  opts: MagazineFetchOpts
-): Promise<Magazine[]> {
-  const scope = getScopeFromParams(opts);
+export function fetchAllMagazines(opts: RequestOpts): Promise<Magazine[]> {
+  const scope = getScopeFromParams(opts, magazineScopes);
   const queryOpts: FindOptions = opts.issueCount
     ? {
         attributes: {
@@ -76,9 +72,9 @@ export function fetchAllMagazines(
  */
 export function fetchOneMagazine(
   id: number,
-  opts: MagazineFetchOpts
+  opts: RequestOpts
 ): Promise<Magazine | null> {
-  const scope = getScopeFromParams(opts);
+  const scope = getScopeFromParams(opts, magazineScopes);
   const queryOpts: FindOptions = opts.issueCount
     ? {
         attributes: {

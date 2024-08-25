@@ -2,25 +2,11 @@
   Exegesis controller for all operations under /api/authors.
  */
 
-import { ExegesisContext, ParametersMap } from "exegesis-express";
+import { ExegesisContext } from "exegesis-express";
 
 import { Authors } from "db";
 import { Author } from "models";
-import { AuthorFetchOpts } from "types/author";
-
-// Convert query parameters into a `AuthorFetchOpts` instance.
-function queryToFetchOpts(query: ParametersMap<boolean>) {
-  const opts: AuthorFetchOpts = {
-    aliases: false,
-    references: false,
-    referenceCount: false,
-  };
-  if (query.aliases) opts.aliases = true;
-  if (query.references) opts.references = true;
-  if (query.referenceCount) opts.referenceCount = true;
-
-  return opts;
-}
+import { queryToRequestOpts } from "utils";
 
 /**
  * POST /authors
@@ -51,7 +37,7 @@ export function getAllAuthors(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return Authors.fetchAllAuthors(opts).then((results: Author[]) =>
     res.status(200).pureJson(results.map((author) => author.clean()))
@@ -73,7 +59,7 @@ export function getAuthorById(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
 
-  const opts = queryToFetchOpts(query);
+  const opts = queryToRequestOpts(query);
 
   return Authors.fetchOneAuthor(id, opts).then((author) => {
     if (author) return res.status(200).pureJson(author.clean());

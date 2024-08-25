@@ -35,7 +35,7 @@ export type FeatureTagRecord = {
   magazineFeatures?: Array<MagazineFeatureRecord>;
 };
 
-@Scopes(() => ({ references: { include: [MagazineFeature] } }))
+@Scopes(() => ({ features: { include: [MagazineFeature] } }))
 @Table({ timestamps: false })
 class FeatureTag extends Model {
   @AllowNull(false)
