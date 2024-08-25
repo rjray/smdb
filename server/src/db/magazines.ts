@@ -99,6 +99,13 @@ export function fetchOneMagazine(
     });
 }
 
+/**
+ * Fetches recently updated magazines. The results are ordered by the latest
+ * update date and limited to the count provided in the options.
+ *
+ * @param opts - The request options.
+ * @returns A promise that resolves to an array of magazines.
+ */
 export function fetchRecentlyUpdatedMagazines(
   opts: RequestOpts
 ): Promise<Magazine[]> {
@@ -113,7 +120,7 @@ export function fetchRecentlyUpdatedMagazines(
         LEFT OUTER JOIN
       (
         SELECT
-          \`magazineId\`, MAX(\`createdAt\`) AS \`latest\`
+          \`magazineId\`, MAX(\`updatedAt\`) AS \`latest\`
         FROM
           \`MagazineIssues\`
         GROUP BY \`magazineId\`

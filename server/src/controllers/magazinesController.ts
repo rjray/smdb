@@ -67,6 +67,16 @@ export function getMagazineById(context: ExegesisContext) {
   });
 }
 
+/**
+ * GET /magazines/mostRecentUpdated
+ *
+ * Retrieves the most recently updated magazines based on the provided query
+ * parameters.
+ *
+ * @param {ExegesisContext} context - The Exegesis context object.
+ * @returns {Promise<void>} - A promise that resolves when the operation is
+ * complete.
+ */
 export function getMostRecentUpdatedMagazines(context: ExegesisContext) {
   const { query } = context.params;
   const { res } = context;
