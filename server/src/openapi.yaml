@@ -99,6 +99,40 @@ components:
       required: false
       schema:
         type: boolean
+    countParam:
+      name: count
+      in: query
+      description: Number of items to return
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    limitParam:
+      name: limit
+      in: query
+      description: Number of items to return
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    offsetParam:
+      name: offset
+      in: query
+      description: Number of items to skip
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+    sortByParam:
+      name: sortBy
+      in: query
+      description: Field to sort by
+      required: false
+      schema:
+        type: string
   schemas:
     idType:
       type: integer
@@ -813,28 +847,28 @@ paths:
       tags:
         - Magazines
         - MagazineIssues
-  # "/magazines/mostRecentlyUpdated":
-  #   x-exegesis-controller: magazinesController
-  #   get:
-  #     summary: Fetch the most-recently-added-to magazines
-  #     description: Fetch a number of magazines that have been most-recently
-  #       added to.
-  #     operationId: getMostRecentUpdatedMagazines
-  #     parameters:
-  #       - $ref: "#/components/parameters/countParam"
-  #     responses:
-  #       "200":
-  #         description: Most-recently-added-to magazines in descending order
-  #         content:
-  #           "application/json":
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: "#/components/schemas/magazineType"
-  #       default:
-  #         $ref: "#/components/responses/generalErrorResponse"
-  #     tags:
-  #       - Magazines
+  "/magazines/mostRecentlyUpdated":
+    x-exegesis-controller: magazinesController
+    get:
+      summary: Fetch the most-recently-added-to magazines
+      description: Fetch a number of magazines that have been most-recently
+        added to.
+      operationId: getMostRecentUpdatedMagazines
+      parameters:
+        - $ref: "#/components/parameters/countParam"
+      responses:
+        "200":
+          description: Most recent magazines in descending order
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/magazineType"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazines
   "/magazines/{id}":
     x-exegesis-controller: magazinesController
     parameters:
