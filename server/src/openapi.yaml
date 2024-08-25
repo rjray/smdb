@@ -20,11 +20,26 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/idType"
+    booksParam:
+      name: books
+      in: query
+      description: Boolean, whether to include books in a query
+      required: false
+      schema:
+        type: boolean
     magazineIssueMagazineParam:
       name: magazine
       in: query
       description: Boolean, whether to include magazine data with magazine
         issues
+      required: false
+      schema:
+        type: boolean
+    magazineIssueFeaturesParam:
+      name: features
+      in: query
+      description: Boolean, whether to include magazine features data with
+        magazine issues
       required: false
       schema:
         type: boolean
@@ -698,7 +713,7 @@ paths:
       description: Fetch feature tags as an array.
       operationId: getAllFeatureTags
       parameters:
-        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/magazineIssueFeaturesParam"
         - $ref: "#/components/parameters/referenceCountParam"
       responses:
         "200":
@@ -724,7 +739,7 @@ paths:
         information.
       operationId: getFeatureTagById
       parameters:
-        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/magazineIssueFeaturesParam"
         - $ref: "#/components/parameters/referenceCountParam"
       responses:
         "200":
@@ -895,7 +910,7 @@ paths:
       operationId: getMagazineIssueById
       parameters:
         - $ref: "#/components/parameters/magazineIssueMagazineParam"
-        - $ref: "#/components/parameters/referencesParam"
+        - $ref: "#/components/parameters/magazineIssueFeaturesParam"
         - $ref: "#/components/parameters/referenceCountParam"
       responses:
         "200":
@@ -956,6 +971,7 @@ paths:
         optionally with series information filled in.
       operationId: getAllPublishers
       parameters:
+        - $ref: "#/components/parameters/booksParam"
         - $ref: "#/components/parameters/publisherSeriesParam"
       responses:
         "200":
@@ -981,6 +997,7 @@ paths:
         publisher information.
       operationId: getPublisherById
       parameters:
+        - $ref: "#/components/parameters/booksParam"
         - $ref: "#/components/parameters/publisherSeriesParam"
       responses:
         "200":
@@ -1173,6 +1190,7 @@ paths:
         publisher information filled in.
       operationId: getAllSeries
       parameters:
+        - $ref: "#/components/parameters/booksParam"
         - $ref: "#/components/parameters/seriesPublisherParam"
       responses:
         "200":
@@ -1198,6 +1216,7 @@ paths:
         information.
       operationId: getSeriesById
       parameters:
+        - $ref: "#/components/parameters/booksParam"
         - $ref: "#/components/parameters/seriesPublisherParam"
       responses:
         "200":
