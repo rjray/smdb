@@ -2,9 +2,9 @@
   Database operations focused on the Magazine model.
  */
 
-import { BaseError, FindOptions } from "sequelize";
+import { BaseError, FindOptions, QueryTypes } from "sequelize";
 
-import { Sequelize } from "database";
+import { Sequelize, connection } from "database";
 import { Magazine } from "models";
 import { RequestOpts, getScopeFromParams } from "utils";
 
@@ -97,6 +97,41 @@ export function fetchOneMagazine(
     .catch((error: BaseError) => {
       throw new Error(error.message);
     });
+}
+
+export function fetchRecentlyUpdatedMagazines(
+  opts: RequestOpts
+): Promise<Magazine[]> {
+  const limit = opts.count || 10;
+
+  const query = `
+    SELECT
+      m.\`id\`, m.\`name\`, m.\`language\`, m.\`aliases\`, m.\`notes\`,
+      m.\`createdAt\`, m.\`updatedAt\`, x.\`latest\`
+    FROM
+      \`Magazines\` AS \`m\`
+        LEFT OUTER JOIN
+      (
+        SELECT
+          \`magazineId\`, MAX(\`createdAt\`) AS \`latest\`
+        FROM
+          \`MagazineIssues\`
+        GROUP BY \`magazineId\`
+      ) AS \`x\` ON x.\`magazineId\` = m.\`id\`
+    ORDER BY x.\`latest\` DESC
+
+    LIMIT ${limit}
+  `;
+
+  const queryOptions = {
+    type: QueryTypes.SELECT,
+  };
+
+  return connection.query(query, queryOptions).then((results) => {
+    return results.map((result) =>
+      Magazine.build(result as Record<string, unknown>)
+    );
+  });
 }
 
 /**

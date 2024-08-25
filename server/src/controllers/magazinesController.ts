@@ -67,6 +67,18 @@ export function getMagazineById(context: ExegesisContext) {
   });
 }
 
+export function getMostRecentUpdatedMagazines(context: ExegesisContext) {
+  const { query } = context.params;
+  const { res } = context;
+
+  const opts = queryToRequestOpts(query);
+
+  return Magazines.fetchRecentlyUpdatedMagazines(opts).then(
+    (results: Magazine[]) =>
+      res.status(200).pureJson(results.map((magazine) => magazine.clean()))
+  );
+}
+
 /**
  * DELETE /magazines/{id}
  *
