@@ -703,6 +703,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Authors
+        - References
     delete:
       summary: Delete an author by ID
       description: Delete the specified author. Removes the author from
@@ -718,7 +719,6 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Authors
-        - References
   "/featuretags":
     x-exegesis-controller: featuretagsController
     post:
@@ -787,7 +787,8 @@ paths:
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
-        - Tags
+        - FeatureTags
+        - MagazineFeatures
     delete:
       summary: Delete a feature tag by ID
       description: Delete the specified feature tag. Removes all relational
@@ -801,8 +802,7 @@ paths:
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
-        - Tags
-        - MagazineFeatures
+        - FeatureTags
   "/magazines":
     x-exegesis-controller: magazinesController
     post:
@@ -932,7 +932,7 @@ paths:
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
-        - Magazine Issues
+        - MagazineIssues
   "/magazineissues/{id}":
     x-exegesis-controller: magazineissuesController
     parameters:
@@ -959,7 +959,7 @@ paths:
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
-        - Magazine Issues
+        - MagazineIssues
         - Magazines
         - References
     delete:
@@ -975,7 +975,7 @@ paths:
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
-        - Magazine Issues
+        - MagazineIssues
   "/publishers":
     x-exegesis-controller: publishersController
     post:
@@ -1021,6 +1021,7 @@ paths:
       tags:
         - Publishers
         - Series
+        - Books
   "/publishers/{id}":
     x-exegesis-controller: publishersController
     parameters:
@@ -1052,6 +1053,7 @@ paths:
       tags:
         - Publishers
         - Series
+        - Books
     delete:
       summary: Delete a publisher by ID
       description: Delete a specific publisher by ID.
@@ -1089,6 +1091,10 @@ paths:
       tags:
         - References
         - Authors
+        - Tags
+        - Books
+        - MagazineFeatures
+        - PhotoCollections
   "/references/{id}":
     x-exegesis-controller: referencesController
     parameters:
@@ -1115,6 +1121,10 @@ paths:
       tags:
         - References
         - Authors
+        - Tags
+        - Books
+        - MagazineFeatures
+        - PhotoCollections
     delete:
       summary: Delete a single reference by ID
       description: Delete a single reference by the ID. Removes any author
@@ -1129,6 +1139,9 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - References
+        - Books
+        - MagazineFeatures
+        - PhotoCollections
   "/referencetypes":
     x-exegesis-controller: referencetypesController
     post:
@@ -1194,7 +1207,7 @@ paths:
         default:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
-        - Tags
+        - ReferenceTypes
   "/series":
     x-exegesis-controller: seriesController
     post:
@@ -1240,6 +1253,7 @@ paths:
       tags:
         - Series
         - Publishers
+        - Books
   "/series/{id}":
     x-exegesis-controller: seriesController
     parameters:
@@ -1266,6 +1280,7 @@ paths:
       tags:
         - Series
         - Publishers
+        - Books
     delete:
       summary: Delete a series by ID
       description: Delete a specific series by ID.
@@ -1348,6 +1363,7 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Tags
+        - References
     delete:
       summary: Delete a tag by ID
       description: Delete the specified tag. Removes all relational links
@@ -1362,4 +1378,3 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - Tags
-        - References
