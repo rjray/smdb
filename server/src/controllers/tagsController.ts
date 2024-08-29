@@ -63,6 +63,25 @@ export function getTagById(context: ExegesisContext) {
 }
 
 /**
+ * PUT /tags/{id}
+ *
+ * Updates a tag in the database based on the provided ID.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that sets the response status and body.
+ * @throws If an error occurs while updating the tag.
+ */
+export function updateTagById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return Tags.updateTag(id, body).then((tag) => {
+    if (tag) return res.status(200).pureJson(tag.clean());
+    else return res.status(404).end();
+  });
+}
+
+/**
  * DELETE /tags/{id}
  *
  * Deletes a tag from the database based on the provided ID.

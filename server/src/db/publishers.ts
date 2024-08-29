@@ -67,6 +67,30 @@ export function fetchOnePublisher(
 }
 
 /**
+ * Updates a single publisher in the database based on the provided ID and data.
+ *
+ * @param id - The ID of the publisher to update.
+ * @param data - The updated publisher data.
+ * @returns A promise that resolves to the updated publisher.
+ * @throws If there is an error while updating the publisher.
+ */
+export function updatePublisher(
+  id: number,
+  data: PublisherData
+): Promise<Publisher> {
+  return Publisher.findByPk(id)
+    .then((publisher) => {
+      if (!publisher) {
+        throw new Error("Publisher not found");
+      }
+      return publisher.update(data);
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Deletes a single publisher from the database based on the provided ID.
  *
  * @param id - The ID of the publisher to delete.

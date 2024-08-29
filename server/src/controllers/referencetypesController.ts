@@ -68,3 +68,23 @@ export function getReferenceTypeById(context: ExegesisContext) {
     }
   );
 }
+
+/**
+ * PUT /referencetypes/{id}
+ *
+ * Updates a reference type in the database based on the provided ID and form
+ * data.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that sets the response status and body.
+ * @throws If an error occurs while updating the reference type.
+ */
+export function updateReferenceTypeById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return ReferenceTypes.updateReferenceType(id, body).then((referenceType) => {
+    if (referenceType) return res.status(200).pureJson(referenceType.clean());
+    else return res.status(404).end();
+  });
+}

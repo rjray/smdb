@@ -68,6 +68,25 @@ export function getFeatureTagById(context: ExegesisContext) {
 }
 
 /**
+ * PUT /featuretags/{id}
+ *
+ * Updates a single feature tag based on the value of `id`.
+ *
+ * @param context - The Exegesis context object.
+ * @returns A promise that sets the response status and body.
+ * @throws If an error occurs while updating the feature tag.
+ */
+export function updateFeatureTagById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return FeatureTags.updateFeatureTag(id, body).then((featuretag) => {
+    if (featuretag) return res.status(200).pureJson(featuretag.clean());
+    else return res.status(404).end();
+  });
+}
+
+/**
  * DELETE /featuretags/{id}
  *
  * Deletes a single feature tag based on the value of `id`.

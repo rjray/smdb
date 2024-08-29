@@ -789,6 +789,30 @@ paths:
       tags:
         - FeatureTags
         - MagazineFeatures
+    put:
+      summary: Update a feature tag by ID
+      description: Update the specified feature tag. Does not affect any
+        relational links.
+      operationId: updateFeatureTagById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newFeatureTagType"
+      responses:
+        "200":
+          description: Feature tag updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/featureTagType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - FeatureTags
     delete:
       summary: Delete a feature tag by ID
       description: Delete the specified feature tag. Removes all relational
@@ -896,6 +920,30 @@ paths:
       tags:
         - Magazines
         - MagazineIssues
+    put:
+      summary: Update a magazine by ID
+      description: Update the specified magazine. Does not affect any relational
+        links.
+      operationId: updateMagazineById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newMagazineType"
+      responses:
+        "200":
+          description: Magazine updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/magazineType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Magazines
     delete:
       summary: Delete a magazine by ID
       description: Delete a specific magazine by ID. Deletes all issues of the
@@ -962,6 +1010,30 @@ paths:
         - MagazineIssues
         - Magazines
         - References
+    put:
+      summary: Update a magazine issue by ID
+      description: Update the specified magazine issue. Does not affect any
+        relational links.
+      operationId: updateMagazineIssueById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newMagazineIssueType"
+      responses:
+        "200":
+          description: Magazine issue updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/magazineIssueType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - MagazineIssues
     delete:
       summary: Delete a magazine issue
       description: Delete a magazine issues. Deletes all references associated
@@ -1054,6 +1126,30 @@ paths:
         - Publishers
         - Series
         - Books
+    put:
+      summary: Update a publisher by ID
+      description: Update the specified publisher. Does not affect any
+        relational links.
+      operationId: updatePublisherById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newPublisherType"
+      responses:
+        "200":
+          description: Publisher updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/publisherType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Publishers
     delete:
       summary: Delete a publisher by ID
       description: Delete a specific publisher by ID.
@@ -1208,6 +1304,30 @@ paths:
           $ref: "#/components/responses/generalErrorResponse"
       tags:
         - ReferenceTypes
+    put:
+      summary: Update a reference type by ID
+      description: Update the specified reference type. Does not affect any
+        relational links.
+      operationId: updateReferenceTypeById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newReferenceTypeType"
+      responses:
+        "200":
+          description: Reference type updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/referenceTypeType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - ReferenceTypes
   "/series":
     x-exegesis-controller: seriesController
     post:
@@ -1281,6 +1401,30 @@ paths:
         - Series
         - Publishers
         - Books
+    put:
+      summary: Update a series by ID
+      description: Update the specified series. Does not affect any relational
+        links.
+      operationId: updateSeriesById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newSeriesType"
+      responses:
+        "200":
+          description: Series updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/seriesType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Series
     delete:
       summary: Delete a series by ID
       description: Delete a specific series by ID.
@@ -1364,6 +1508,30 @@ paths:
       tags:
         - Tags
         - References
+    put:
+      summary: Update a tag by ID
+      description: Update the specified tag. Does not affect any relational
+        links.
+      operationId: updateTagById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newTagType"
+      responses:
+        "200":
+          description: Tag updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/tagType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
+        default:
+          $ref: "#/components/responses/generalErrorResponse"
+      tags:
+        - Tags
     delete:
       summary: Delete a tag by ID
       description: Delete the specified tag. Removes all relational links

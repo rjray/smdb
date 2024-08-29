@@ -70,6 +70,25 @@ export function getSeriesById(context: ExegesisContext) {
 }
 
 /**
+ * PUT /series/{id}
+ *
+ * Updates a series in the database based on the provided ID and form data.
+ *
+ * @param context - The ExegesisContext object containing the request context.
+ * @returns A promise that sets the response status and body.
+ * @throws If an error occurs while updating the series.
+ */
+export function updateSeriesById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return SeriesDB.updateSeries(id, body).then((series) => {
+    if (series) return res.status(200).pureJson(series.clean());
+    else return res.status(404).end();
+  });
+}
+
+/**
  * DELETE /series/{id}
  *
  * Deletes a series from the database based on the provided ID.

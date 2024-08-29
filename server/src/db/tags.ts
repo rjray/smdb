@@ -98,6 +98,28 @@ export function fetchOneTag(
 }
 
 /**
+ * Updates a single tag in the database based on the provided ID and data.
+ *
+ * @param id - The ID of the tag to update.
+ * @param data - The updated tag data.
+ * @returns A promise that resolves to the updated tag.
+ * @throws If the tag is not found.
+ */
+export function updateTag(id: number, data: TagData): Promise<Tag> {
+  return Tag.findByPk(id)
+    .then((tag) => {
+      if (!tag) {
+        throw new Error("Tag not found");
+      }
+
+      return tag.update(data);
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Deletes a single tag from the database based on the provided ID.
  *
  * @param id - The ID of the tag to delete.

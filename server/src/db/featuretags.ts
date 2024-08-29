@@ -98,6 +98,30 @@ export function fetchOneFeatureTag(
 }
 
 /**
+ * Updates a feature tag in the database based on the provided ID and data.
+ *
+ * @param id - The ID of the feature tag to update.
+ * @param data - The feature tag data to update.
+ * @returns A promise that resolves to the updated feature tag.
+ * @throws If the feature tag is not found.
+ */
+export function updateFeatureTag(
+  id: number,
+  data: FeatureTagData
+): Promise<FeatureTag> {
+  return FeatureTag.findByPk(id)
+    .then((featureTag) => {
+      if (!featureTag) {
+        throw new Error("Feature tag not found");
+      }
+      return featureTag.update(data);
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Deletes a feature tag from the database based on the provided ID.
  *
  * @param id - The ID of the feature tag to delete.

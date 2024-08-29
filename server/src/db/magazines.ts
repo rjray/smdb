@@ -142,6 +142,30 @@ export function fetchRecentlyUpdatedMagazines(
 }
 
 /**
+ * Updates a single magazine in the database based on the provided ID and data.
+ *
+ * @param id - The ID of the magazine to update.
+ * @param data - The updated magazine data.
+ * @returns A promise that resolves to the updated magazine.
+ * @throws If the magazine is not found.
+ */
+export function updateMagazine(
+  id: number,
+  data: MagazineData
+): Promise<Magazine> {
+  return Magazine.findByPk(id)
+    .then((magazine) => {
+      if (!magazine) {
+        throw new Error("Magazine not found");
+      }
+      return magazine.update(data);
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Deletes a single magazine from the database based on the provided ID.
  *
  * @param id - The ID of the magazine to delete.

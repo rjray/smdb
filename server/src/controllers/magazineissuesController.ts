@@ -48,6 +48,26 @@ export function getMagazineIssueById(context: ExegesisContext) {
 }
 
 /**
+ * PUT /magazineissues/{id}
+ *
+ * Updates a magazine issue in the database based on the provided ID and form
+ * data.
+ *
+ * @param context - The ExegesisContext object containing the request context.
+ * @returns A promise that sets the response status and body.
+ * @throws If an error occurs while updating the magazine issue.
+ */
+export function updateMagazineIssueById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return MagazineIssues.updateMagazineIssue(id, body).then((issue) => {
+    if (issue) return res.status(200).pureJson(issue.clean());
+    else return res.status(404).end();
+  });
+}
+
+/**
  * DELETE /magazineissues/{id}
  *
  * Deletes a magazine issue from the database based on the provided ID.

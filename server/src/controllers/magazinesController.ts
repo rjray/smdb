@@ -90,6 +90,25 @@ export function getMostRecentUpdatedMagazines(context: ExegesisContext) {
 }
 
 /**
+ * PUT /magazines/{id}
+ *
+ * Updates a magazine by its ID using the form data in `requestBody`.
+ *
+ * @param {ExegesisContext} context - The Exegesis context object.
+ * @returns {Promise<void>} A promise that sets the response status and body.
+ * @throws If an error occurs while updating the magazine.
+ */
+export function updateMagazineById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return Magazines.updateMagazine(id, body).then((magazine) => {
+    if (magazine) return res.status(200).pureJson(magazine.clean());
+    else return res.status(404).end();
+  });
+}
+
+/**
  * DELETE /magazines/{id}
  *
  * Deletes a magazine by its ID.

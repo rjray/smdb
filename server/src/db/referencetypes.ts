@@ -94,3 +94,28 @@ export function fetchOneReferenceType(
       throw new Error(error.message);
     });
 }
+
+/**
+ * Updates a single reference type in the database based on the provided ID and
+ * data.
+ *
+ * @param id - The ID of the reference type to update.
+ * @param data - The updated reference type data.
+ * @returns A promise that resolves to the updated reference type.
+ * @throws If there is an error while updating the reference type.
+ */
+export function updateReferenceType(
+  id: number,
+  data: ReferenceTypeData
+): Promise<ReferenceType> {
+  return ReferenceType.findByPk(id)
+    .then((referenceType) => {
+      if (!referenceType) {
+        throw new Error("Reference type not found");
+      }
+      return referenceType.update(data);
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}

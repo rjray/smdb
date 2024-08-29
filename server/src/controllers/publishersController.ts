@@ -68,6 +68,25 @@ export function getPublisherById(context: ExegesisContext) {
 }
 
 /**
+ * PUT /publishers/{id}
+ *
+ * Updates a publisher in the database based on the provided ID and form data.
+ *
+ * @param context - The ExegesisContext object containing the request context.
+ * @returns A promise that sets the response status and body.
+ * @throws If an error occurs while updating the publisher.
+ */
+export function updatePublisherById(context: ExegesisContext) {
+  const { id } = context.params.path;
+  const { res, requestBody: body } = context;
+
+  return Publishers.updatePublisher(id, body).then((publisher) => {
+    if (publisher) return res.status(200).pureJson(publisher.clean());
+    else return res.status(404).end();
+  });
+}
+
+/**
  * DELETE /publishers/{id}
  *
  * Deletes a publisher from the database based on the provided ID.

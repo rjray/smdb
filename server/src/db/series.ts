@@ -67,6 +67,26 @@ export function fetchOneSeries(
 }
 
 /**
+ * Updates a single series in the database based on the provided ID.
+ *
+ * @param id - The ID of the series to update.
+ * @param data - The series data to update.
+ * @returns A promise that resolves to the updated series.
+ */
+export function updateSeries(id: number, data: SeriesData): Promise<Series> {
+  return Series.findByPk(id)
+    .then((series) => {
+      if (!series) {
+        throw new Error("Series not found");
+      }
+      return series.update(data);
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Deletes a single series from the database based on the provided ID.
  *
  * @param id - The ID of the series to delete.
