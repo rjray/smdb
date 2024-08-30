@@ -76,6 +76,27 @@ class Author extends Model {
 
     return result;
   }
+
+  /**
+   * Remove all AuthorAlias records associated with the author.
+   *
+   * @returns Promise<number>
+   */
+  removeAliases(): Promise<number> {
+    return AuthorAlias.destroy({ where: { authorId: this.id } });
+  }
+
+  /**
+   * Add aliases to the author. Takes an array of strings as input.
+   *
+   * @param aliases - The aliases to add
+   * @returns Promise<AuthorAlias[]>
+   */
+  addAliases(aliases: string[]): Promise<AuthorAlias[]> {
+    return AuthorAlias.bulkCreate(
+      aliases.map((a) => ({ name: a, authorId: this.id }))
+    );
+  }
 }
 
 export default Author;
