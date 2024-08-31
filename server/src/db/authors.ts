@@ -103,6 +103,38 @@ export function fetchOneAuthor(
 }
 
 /**
+ * Updates an author in the database. If the data given includes aliases, they
+ * will be updated as well. Throws an error if the author is not found.
+ *
+ * @param id - The ID of the author to update.
+ * @param data - The data to update the author with.
+ * @returns A promise that resolves to the updated author.
+ */
+export function updateAuthor(id: number, data: AuthorData): Promise<Author> {
+  return Author.findByPk(id)
+    .then((author) => {
+      if (!author) {
+        throw new Error("Author not found");
+      }
+
+      if (data.aliases) {
+        const aliases = data.aliases.map((a) => a.name);
+        delete data.aliases;
+
+        return author
+          .removeAliases()
+          .then(() => author.addAliases(aliases))
+          .then(() => author.update(data));
+      } else {
+        return author.update(data);
+      }
+    })
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Deletes a single author from the database based on the provided ID.
  *
  * @param id - The ID of the author to be deleted.

@@ -171,6 +171,13 @@ components:
           properties:
             id:
               $ref: "#/components/schemas/idType"
+    updatedAuthorAliasType:
+      allOf:
+        - $ref: "#/components/schemas/newAuthorAliasType"
+        - type: object
+          properties:
+            deleted:
+              type: boolean
     newAuthorType:
       type: object
       required:
@@ -217,6 +224,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/referenceType"
+    updatedAuthorType:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        aliases:
+          type: array
+          items:
+            $ref: "#/components/schemas/updatedAuthorAliasType"
     errorObjectType:
       type: object
       required:
@@ -704,6 +722,26 @@ paths:
       tags:
         - Authors
         - References
+    put:
+      summary: Update an author by ID
+      description: Update the specified author. If the request includes any
+        aliases, they will completely replace the existing aliases.
+      operationId: updateAuthorById
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/newAuthorType"
+      responses:
+        "200":
+          description: Author updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/authorType"
+        "404":
+          $ref: "#/components/responses/generalError404Response"
     delete:
       summary: Delete an author by ID
       description: Delete the specified author. Removes the author from
