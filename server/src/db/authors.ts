@@ -6,15 +6,11 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { Author, AuthorAlias } from "models";
+import { AuthorUpdateData, AuthorNewData } from "types/author";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for authors.
 const authorScopes = ["references", "aliases"];
-
-type AuthorData = {
-  name: string;
-  aliases?: { name: string }[];
-};
 
 /**
  * Adds an author to the database.
@@ -22,7 +18,7 @@ type AuthorData = {
  * @param data - The author data to be added.
  * @returns A promise that resolves to the created author.
  */
-export function addAuthor(data: AuthorData): Promise<Author> {
+export function addAuthor(data: AuthorNewData): Promise<Author> {
   if (data.aliases) {
     return Author.create(data, {
       include: [AuthorAlias],
@@ -110,14 +106,17 @@ export function fetchOneAuthor(
  * @param data - The data to update the author with.
  * @returns A promise that resolves to the updated author.
  */
-export function updateAuthor(id: number, data: AuthorData): Promise<Author> {
+export function updateAuthor(
+  id: number,
+  data: AuthorUpdateData
+): Promise<Author> {
   return Author.findByPk(id)
     .then((author) => {
       if (!author) {
         throw new Error("Author not found");
       }
 
-      if (data.aliases) {
+      if (data.aliases && data.aliases.length) {
         const aliases = data.aliases.map((a) => a.name);
         delete data.aliases;
 

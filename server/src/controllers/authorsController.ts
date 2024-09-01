@@ -6,7 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Authors } from "db";
 import { Author } from "models";
-import { AuthorUpdateData } from "types/author";
+import { AuthorUpdateData, AuthorNewData } from "types/author";
 import { queryToRequestOpts } from "utils";
 
 /**
@@ -20,7 +20,7 @@ import { queryToRequestOpts } from "utils";
 export function createAuthor(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return Authors.addAuthor(body).then((author) =>
+  return Authors.addAuthor(body as AuthorNewData).then((author) =>
     res.status(201).pureJson(author.clean())
   );
 }
@@ -83,12 +83,10 @@ export function updateAuthorById(context: ExegesisContext) {
   // Generally, Exegesis will validate the request body before passing it
   // to the controller. However, we need to ensure that the request body is
   // valid before we attempt to update the author. In particular, we need
-  // to clean/filter the aliase data.
+  // to clean/filter the aliases data.
   const body = { ...requestBody } as AuthorUpdateData;
   if (body.aliases)
-    body.aliases = body.aliases
-      .filter((alias) => !alias.deleted)
-      .map(({ name }) => ({ name }));
+    body.aliases = body.aliases.filter((alias) => !alias.deleted);
 
   return Authors.updateAuthor(id, body).then((author) => {
     if (author) return res.status(200).pureJson(author.clean());

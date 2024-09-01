@@ -9,3 +9,10 @@ export type AuthorUpdateData = {
     deleted?: boolean;
   }[];
 };
+
+export type AuthorNewData = {
+  name: string;
+  aliases?: {
+    name: string;
+  }[];
+};
