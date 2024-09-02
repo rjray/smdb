@@ -3,7 +3,7 @@
  */
 
 export type AuthorUpdateData = {
-  name: string;
+  name?: string;
   aliases?: {
     name: string;
     deleted?: boolean;
