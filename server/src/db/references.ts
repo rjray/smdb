@@ -4,11 +4,25 @@
 
 import { BaseError } from "sequelize";
 
-import { Reference, Author, Tag, FeatureTag } from "models";
+import {
+  Reference,
+  Author,
+  Tag,
+  FeatureTag,
+  Book,
+  Publisher,
+  Series,
+  PhotoCollection,
+  MagazineFeature,
+  Magazine,
+  MagazineIssue,
+} from "models";
 import { ReferenceUpdateData, ReferenceNewData } from "types/reference";
 import { AuthorForReference } from "types/author";
 import { TagForReference } from "types/tag";
+import { BookForReference } from "types/book";
 import { FeatureTagForReference } from "types/featuretag";
+import { MagazineFeatureForNewReference } from "types/magazinefeature";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 // The scopes that can be fetched for references.
@@ -61,8 +75,61 @@ async function fixupTags(tags: Array<TagForReference>) {
   return fixedTags;
 }
 
+// Fix up book data for a reference. This may mean creating new publishers and
+// series.
+async function fixupBook(book: BookForReference): Promise<BookForReference> {
+  // Create new publisher if it doesn't exist
+  if (book.publisher && !book.publisher.id && book.publisher.name) {
+    const { name, notes } = book.publisher;
+    const newPublisher = await Publisher.create({ name, notes });
+    book.publisherId = newPublisher.id;
+    delete book.publisher;
+  }
+
+  // Create new series if it doesn't exist
+  if (book.series && !book.series.id && book.series.name) {
+    const { name, notes } = book.series;
+    const publisherId = book.publisherId;
+    const newSeries = await Series.create({ name, notes, publisherId });
+    book.seriesId = newSeries.id;
+    delete book.series;
+  }
+
+  return book;
+}
+
+// Add a book reference to the database. This requires checking of the authors,
+// tags, and book data. Each of those fixup* functions will create new records
+// if necessary.
+async function addBookReference(data: ReferenceNewData) {
+  // These three require "fixup" functions to ensure that the data is correct,
+  // and to create new records if necessary.
+  const authors = await fixupAuthors(data.authors);
+  const tags = await fixupTags(data.tags);
+  // Note that we've already checked that the book data exists prior to this
+  // function being called.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const book = await fixupBook(data.book!);
+
+  // These are the fields that are directly added to the reference.
+  const { name, language, referenceTypeId } = data;
+
+  return Reference.create(
+    {
+      name,
+      language,
+      referenceTypeId,
+      authors,
+      tags,
+      book,
+    },
+    {
+      include: [Author, Tag, Book],
+    }
+  );
+}
+
 // Fix up the list of feature tags for a magazine feature.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fixupFeatureTags(featureTags: Array<FeatureTagForReference>) {
   // Create new feature feature tags if they don't exist
   const fixedFeatureTags: Array<FeatureTagForReference> = [];
@@ -82,22 +149,102 @@ async function fixupFeatureTags(featureTags: Array<FeatureTagForReference>) {
   return fixedFeatureTags;
 }
 
-async function addBookReference(data: ReferenceNewData) {
+// Fix up magazine feature data for a reference. This may mean creating new
+// magazine issue or magazine records. This function will create new records if
+// necessary. Also checks and fixes up the feature tags.
+async function fixupMagazineFeature(
+  magazineFeature: MagazineFeatureForNewReference
+): Promise<MagazineFeatureForNewReference> {
+  // Create new magazine feature if it doesn't exist
+  if (magazineFeature.magazine && magazineFeature.magazine.name) {
+    const { name, language, aliases, notes } = magazineFeature.magazine;
+    const newMagazine = await Magazine.create({
+      name,
+      language,
+      aliases,
+      notes,
+    });
+    magazineFeature.magazineId = newMagazine.id;
+    delete magazineFeature.magazine;
+  }
+
+  // Create new magazine issue if it doesn't exist
+  if (magazineFeature.magazineIssue && !magazineFeature.magazineIssue.issue) {
+    const { issue } = magazineFeature.magazineIssue;
+    const magazineId = magazineFeature.magazineId;
+    const newMagazineIssue = await MagazineIssue.create({
+      issue,
+      magazineId,
+    });
+    magazineFeature.magazineIssueId = newMagazineIssue.id;
+    delete magazineFeature.magazineIssue;
+  }
+
+  // Create any feature tags that don't exist
+  const featureTags = await fixupFeatureTags(magazineFeature.featureTags);
+  magazineFeature.featureTags = featureTags;
+
+  return magazineFeature;
+}
+
+// Add a magazine feature reference to the database. This requires checking of
+// the two basic fields, as at least one is needed. It also requires checking of
+// the authors, tags, and feature tags.
+async function addMagazineFeatureReference(data: ReferenceNewData) {
+  // These two require "fixup" functions to ensure that the data is correct,
+  // and to create new records if necessary.
   const authors = await fixupAuthors(data.authors);
   const tags = await fixupTags(data.tags);
-  const include = [Author, Tag];
+  // Note that we've already checked that the magazine feature data exists
+  // prior to this function being called.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const magazineFeature = await fixupMagazineFeature(data.magazineFeature!);
+
+  // These are the fields that are directly added to the reference.
+  const { name, language, referenceTypeId } = data;
 
   return Reference.create(
     {
-      name: data.name,
-      language: data.language,
-      referenceTypeId: data.referenceTypeId,
-      authors: authors,
-      tags: tags,
-      book: data.book,
+      name,
+      language,
+      referenceTypeId,
+      authors,
+      tags,
+      magazineFeature,
     },
     {
-      include,
+      include: [Author, Tag, MagazineFeature],
+    }
+  );
+}
+
+// Add a photo collection reference to the database. This requires checking of
+// the two fields, as they are required for a photo collection reference to be
+// created. It also requires checking of the authors and tags.
+async function addPhotoCollectionReference(data: ReferenceNewData) {
+  // These two require "fixup" functions to ensure that the data is correct,
+  // and to create new records if necessary.
+  const authors = await fixupAuthors(data.authors);
+  const tags = await fixupTags(data.tags);
+  // Note that we've already checked that the photo collection data exists prior
+  // to this function being called.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const photoCollection = data.photoCollection!;
+
+  // These are the fields that are directly added to the reference.
+  const { name, language, referenceTypeId } = data;
+
+  return Reference.create(
+    {
+      name,
+      language,
+      referenceTypeId,
+      authors,
+      tags,
+      photoCollection,
+    },
+    {
+      include: [Author, Tag, PhotoCollection],
     }
   );
 }
@@ -106,7 +253,11 @@ async function addBookReference(data: ReferenceNewData) {
  * Add a reference to the database. This requires a lot of checking of the data
  * before it is added to the database. It is necessary to determine which of
  * the three sub-types of reference is being created, as well as check for
- * authors and tags.
+ * authors and tags. Additionally, if a book reference is being created, it is
+ * necessary to check for publishers and series. If a magazine feature reference
+ * is being created, it is necessary to check for feature tags, magazine issue
+ * and possibly magazine. Photo collection references are the simplest, as they
+ * have no nested data.
  *
  * @param data - The reference data to be added.
  * @returns A promise that resolves to the created reference.
@@ -132,17 +283,15 @@ export function addReference(data: ReferenceNewData): Promise<Reference> {
       if (!data.magazineFeature) {
         throw new Error("Reference must have magazine feature data");
       }
-      break;
+      return addMagazineFeatureReference(data);
     case 3:
       if (!data.photoCollection) {
         throw new Error("Reference must have photo collection data");
       }
-      break;
+      return addPhotoCollectionReference(data);
     default:
       throw new Error("Invalid reference type ID");
   }
-
-  return Reference.create(data);
 }
 
 /**
