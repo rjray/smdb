@@ -2,6 +2,13 @@
  * Types needed for the Author model beyond the model declaration itself.
  */
 
+export type AuthorNewData = {
+  name: string;
+  aliases?: {
+    name: string;
+  }[];
+};
+
 export type AuthorUpdateData = {
   name?: string;
   aliases?: {
@@ -10,9 +17,7 @@ export type AuthorUpdateData = {
   }[];
 };
 
-export type AuthorNewData = {
-  name: string;
-  aliases?: {
-    name: string;
-  }[];
+export type AuthorForReference = {
+  id?: number;
+  name?: string;
 };

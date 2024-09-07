@@ -143,6 +143,11 @@ components:
       format: int64
       minimum: 1
       nullable: true
+    readonlyIdType:
+      type: integer
+      format: int64
+      minimum: 1
+      readOnly: true
     countType:
       type: integer
       format: int64
@@ -390,48 +395,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/seriesType"
-    newReferenceType:
-      type: object
-      required:
-        - name
-        - ReferenceTypeId
-        - tags
-      properties:
-        name:
-          type: string
-        isbn:
-          $ref: "#/components/schemas/nullableStringType"
-        language:
-          $ref: "#/components/schemas/nullableStringType"
-        referenceTypeId:
-          $ref: "#/components/schemas/idType"
-        magazineIssueId:
-          $ref: "#/components/schemas/idType"
-        magazineIssueNumber:
-          $ref: "#/components/schemas/magazineIssueNumberType"
-        magazineId:
-          $ref: "#/components/schemas/idType"
-        photosLocation:
-          type: string
-        photosMedia:
-          type: string
-        authors:
-          type: array
-          items:
-            $ref: "#/components/schemas/selectedAuthorType"
-        tags:
-          type: array
-          items:
-            $ref: "#/components/schemas/tagType"
-    updateReferenceType:
-      allOf:
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "#/components/schemas/idType"
-        - $ref: "#/components/schemas/newReferenceType"
     referenceCoreElements:
       type: object
       required:
@@ -549,6 +512,195 @@ components:
         - $ref: "#/components/schemas/referenceBookType"
         - $ref: "#/components/schemas/referenceMagazineFeatureType"
         - $ref: "#/components/schemas/referencePhotoCollectionType"
+    referenceCoreCreateElements:
+      type: object
+      required:
+        - name
+        - referenceTypeId
+        - createdAt
+        - updatedAt
+        - authors
+        - tags
+      properties:
+        name:
+          type: string
+        language:
+          $ref: "#/components/schemas/nullableStringType"
+        referenceTypeId:
+          $ref: "#/components/schemas/idType"
+        createdAt:
+          $ref: "#/components/schemas/dateTimeType"
+        updatedAt:
+          $ref: "#/components/schemas/dateTimeType"
+        authors:
+          type: array
+          items:
+            $ref: "#/components/schemas/authorType"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tagType"
+    referenceBookCreateElements:
+      type: object
+      required:
+        - book
+      properties:
+        book:
+          type: object
+          required:
+            - referenceId
+          properties:
+            referenceId:
+              $ref: "#/components/schemas/idType"
+            isbn:
+              $ref: "#/components/schemas/nullableStringType"
+            seriesNumber:
+              $ref: "#/components/schemas/nullableStringType"
+            publisherId:
+              $ref: "#/components/schemas/nullableIdType"
+            seriesId:
+              $ref: "#/components/schemas/nullableIdType"
+    referenceBookCreateType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreCreateElements"
+        - $ref: "#/components/schemas/referenceBookCreateElements"
+    referenceMagazineFeatureCreateElements:
+      type: object
+      required:
+        - magazineFeature
+      properties:
+        magazineFeature:
+          type: object
+          required:
+            - referenceId
+            - magazineIssueId
+            - featureTags
+          properties:
+            referenceId:
+              $ref: "#/components/schemas/idType"
+            magazineIssueId:
+              $ref: "#/components/schemas/idType"
+            featureTags:
+              type: array
+              items:
+                $ref: "#/components/schemas/featureTagType"
+    referenceMagazineFeatureCreateType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreCreateElements"
+        - $ref: "#/components/schemas/referenceMagazineFeatureCreateElements"
+    referencePhotoCollectionCreateElements:
+      type: object
+      required:
+        - photoCollection
+      properties:
+        photoCollection:
+          type: object
+          required:
+            - referenceId
+            - location
+            - media
+          properties:
+            referenceId:
+              $ref: "#/components/schemas/idType"
+            reference:
+              $ref: "#/components/schemas/referenceType"
+            location:
+              type: string
+            media:
+              type: string
+    referencePhotoCollectionCreateType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreCreateElements"
+        - $ref: "#/components/schemas/referencePhotoCollectionCreateElements"
+    referenceCreateType:
+      oneOf:
+        - $ref: "#/components/schemas/referenceBookCreateType"
+        - $ref: "#/components/schemas/referenceMagazineFeatureCreateType"
+        - $ref: "#/components/schemas/referencePhotoCollectionCreateType"
+    referenceCoreUpdateElements:
+      type: object
+      required:
+        - updatedAt
+      properties:
+        name:
+          type: string
+        language:
+          $ref: "#/components/schemas/nullableStringType"
+        referenceTypeId:
+          $ref: "#/components/schemas/idType"
+        createdAt:
+          $ref: "#/components/schemas/dateTimeType"
+        updatedAt:
+          $ref: "#/components/schemas/dateTimeType"
+        authors:
+          type: array
+          items:
+            $ref: "#/components/schemas/authorType"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/tagType"
+    referenceBookUpdateElements:
+      type: object
+      required:
+        - book
+      properties:
+        book:
+          type: object
+          properties:
+            isbn:
+              $ref: "#/components/schemas/nullableStringType"
+            seriesNumber:
+              $ref: "#/components/schemas/nullableStringType"
+            publisherId:
+              $ref: "#/components/schemas/nullableIdType"
+            seriesId:
+              $ref: "#/components/schemas/nullableIdType"
+    referenceBookUpdateType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreUpdateElements"
+        - $ref: "#/components/schemas/referenceBookUpdateElements"
+    referenceMagazineFeatureUpdateElements:
+      type: object
+      required:
+        - magazineFeature
+      properties:
+        magazineFeature:
+          type: object
+          properties:
+            magazineIssueId:
+              $ref: "#/components/schemas/idType"
+            featureTags:
+              type: array
+              items:
+                $ref: "#/components/schemas/featureTagType"
+    referenceMagazineFeatureUpdateType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreUpdateElements"
+        - $ref: "#/components/schemas/referenceMagazineFeatureUpdateElements"
+    referencePhotoCollectionUpdateElements:
+      type: object
+      required:
+        - photoCollection
+      properties:
+        photoCollection:
+          type: object
+          properties:
+            reference:
+              $ref: "#/components/schemas/referenceType"
+            location:
+              type: string
+            media:
+              type: string
+    referencePhotoCollectionUpdateType:
+      allOf:
+        - $ref: "#/components/schemas/referenceCoreUpdateElements"
+        - $ref: "#/components/schemas/referencePhotoCollectionUpdateElements"
+    referenceUpdateType:
+      oneOf:
+        - $ref: "#/components/schemas/referenceBookUpdateType"
+        - $ref: "#/components/schemas/referenceMagazineFeatureUpdateType"
+        - $ref: "#/components/schemas/referencePhotoCollectionUpdateType"
     newReferenceTypeType:
       type: object
       required:
