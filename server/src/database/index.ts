@@ -8,9 +8,11 @@
 
 import { Sequelize } from "sequelize-typescript";
 
+const DATABASE_FILE = process.env.DATABASE_FILE || "smdb.db";
+
 const connection = new Sequelize({
   dialect: "sqlite",
-  storage: "smdb.db",
+  storage: DATABASE_FILE,
   logging: false,
 });
 
