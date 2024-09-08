@@ -8,10 +8,11 @@
   "scripts": {
     "start": "nodemon --delay 2 --ext yaml,js,ts -w src src/server.ts",
     "gen-keys": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj \"/C=US/ST=California/CN=localhost\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.14.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "exegesis": "^4.2.0",
@@ -21,8 +22,7 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.3",
     "sequelize-typescript": "^2.1.6",
-    "sqlite3": "^5.1.7",
-    "ts-pattern": "^5.3.1"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
