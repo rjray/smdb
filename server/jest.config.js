@@ -1,10 +1,13 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} **/
-export default {
-  testEnvironment: "node",
-  transform: {
-    "^.+.tsx?$": ["ts-jest", {}],
+/** @type {import('jest').Config} */
+const config = {
+  moduleNameMapper: {
+    "^(constants|controllers|database|db|models|types|utils)":
+      "<rootDir>/src/$1",
   },
-  testPathIgnorePatterns: ["/node_modules/"],
-  setupFiles: ["<rootDir>/jest.setup.js"],
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  transform: {
+    "\\.tsx?$": "babel-jest",
+  },
+  testEnvironment: "node",
 };
+
+export default config;
