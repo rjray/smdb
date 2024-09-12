@@ -8,8 +8,8 @@
   "scripts": {
     "start": "nodemon --delay 2 --ext yaml,js,ts -w src src/server.ts",
     "gen-keys": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj \"/C=US/ST=California/CN=localhost\"",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest --watch",
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
@@ -26,23 +26,19 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/preset-env": "^7.25.4",
-    "@babel/preset-typescript": "^7.24.7",
     "@eslint/js": "^9.10.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
-    "@types/jest": "^29.5.12",
     "@types/node": "^22.5.4",
-    "babel-jest": "^29.7.0",
     "eslint": "^9.10.0",
-    "jest": "^29.7.0",
     "nodemon": "^3.1.4",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.4.0"
+    "typescript-eslint": "^8.4.0",
+    "vite-tsconfig-paths": "^5.0.1",
+    "vitest": "^2.0.5"
   },
   "nodemonConfig": {
     "execMap": {
