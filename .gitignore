@@ -105,9 +105,7 @@ dist
 
 # Any SQLite droppings
 *.db
-backend/.vscode/
-frontend/.vscode/
-rust-server/.vscode/
+.vscode/
 
 # Local crypto certs
 *cert.pem
@@ -116,3 +114,6 @@ rust-server/.vscode/
 
 .DS_Store
 .vscode
+
+# Vim tmp files
+.*.swp
