@@ -131,17 +131,13 @@ async function fixupBook(
   return book;
 }
 
-// Add a book reference to the database. This requires checking of the authors,
-// tags, and book data. Each of those fixup* functions will create new records
-// if necessary.
+// Add a book reference to the database. This requires checking of the book
+// data then creating the core reference instance. After this is done, the
+// "main" creation function will handle the authors and tags.
 async function addBookReference(
   data: ReferenceNewData,
   transaction: Transaction
 ) {
-  // These three require "fixup" functions to ensure that the data is correct,
-  // and to create new records if necessary.
-  const authors = await fixupAuthors(data.authors, transaction);
-  const tags = await fixupTags(data.tags, transaction);
   // Note that we've already checked that the book data exists prior to this
   // function being called.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -155,12 +151,10 @@ async function addBookReference(
       name,
       language,
       referenceTypeId,
-      authors,
-      tags,
       book,
     },
     {
-      include: [Author, Tag, Book],
+      include: [Book],
       transaction,
     }
   );
@@ -243,16 +237,13 @@ async function fixupMagazineFeatureForCreate(
 }
 
 // Add a magazine feature reference to the database. This requires checking of
-// the two basic fields, as at least one is needed. It also requires checking of
-// the authors, tags, and feature tags.
+// the two basic fields, as at least one is needed. It then creates the core
+// reference instance. After this is done, the "main" creation function will
+// handle the authors and tags.
 async function addMagazineFeatureReference(
   data: ReferenceNewData,
   transaction: Transaction
 ) {
-  // These two require "fixup" functions to ensure that the data is correct,
-  // and to create new records if necessary.
-  const authors = await fixupAuthors(data.authors, transaction);
-  const tags = await fixupTags(data.tags, transaction);
   // Note that we've already checked that the magazine feature data exists
   // prior to this function being called.
   const magazineFeature = await fixupMagazineFeatureForCreate(
@@ -269,12 +260,10 @@ async function addMagazineFeatureReference(
       name,
       language,
       referenceTypeId,
-      authors,
-      tags,
       magazineFeature,
     },
     {
-      include: [Author, Tag, MagazineFeature],
+      include: [MagazineFeature],
       transaction,
     }
   );
@@ -282,15 +271,12 @@ async function addMagazineFeatureReference(
 
 // Add a photo collection reference to the database. This requires checking of
 // the two fields, as they are required for a photo collection reference to be
-// created. It also requires checking of the authors and tags.
+// created. It then creates the core reference instance. After this is done, the
+// "main" creation function will handle the authors and tags.
 async function addPhotoCollectionReference(
   data: ReferenceNewData,
   transaction: Transaction
 ) {
-  // These two require "fixup" functions to ensure that the data is correct,
-  // and to create new records if necessary.
-  const authors = await fixupAuthors(data.authors, transaction);
-  const tags = await fixupTags(data.tags, transaction);
   // Note that we've already checked that the photo collection data exists prior
   // to this function being called.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -307,14 +293,10 @@ async function addPhotoCollectionReference(
       photoCollection,
     },
     {
-      include: [Author, Tag, PhotoCollection],
+      include: [PhotoCollection],
       transaction,
     }
   );
-
-  // Add the authors and tags
-  await reference.addAuthors(authors, { transaction });
-  await reference.addTags(tags, { transaction });
 
   return reference;
 }
@@ -345,29 +327,44 @@ export async function addReference(data: ReferenceNewData): Promise<Reference> {
 
   try {
     const reference = await connection.transaction(async (transaction) => {
+      // These two require "fixup" functions to ensure that the data is correct,
+      // and to create new records if necessary.
+      const authors = await fixupAuthors(data.authors, transaction);
+      const tags = await fixupTags(data.tags, transaction);
+
+      let reference;
       switch (data.referenceTypeId) {
         case ReferenceTypes.Book:
           if (!data.book) {
             throw new Error("addReference: Reference must have book data");
           }
-          return addBookReference(data, transaction);
+          reference = await addBookReference(data, transaction);
+          break;
         case ReferenceTypes.MagazineFeature:
           if (!data.magazineFeature) {
             throw new Error(
               "addReference: Reference must have magazine feature data"
             );
           }
-          return addMagazineFeatureReference(data, transaction);
+          reference = await addMagazineFeatureReference(data, transaction);
+          break;
         case ReferenceTypes.PhotoCollection:
           if (!data.photoCollection) {
             throw new Error(
               "addReference: Reference must have photo collection data"
             );
           }
-          return addPhotoCollectionReference(data, transaction);
+          reference = await addPhotoCollectionReference(data, transaction);
+          break;
         default:
           throw new Error("addReference: Invalid reference type ID");
       }
+
+      // Add the authors and tags
+      await reference.addAuthors(authors, { transaction });
+      await reference.addTags(tags, { transaction });
+
+      return reference;
     });
 
     return reference;

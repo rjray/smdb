@@ -50,6 +50,8 @@ export type ReferenceRecord = {
   language?: string | null;
   referenceTypeId: number;
   referenceType: ReferenceTypeRecord;
+  createdAt: string;
+  updatedAt: string;
   authors?: Array<AuthorRecord>;
   tags?: Array<TagRecord>;
   book?: BookRecord;
@@ -147,10 +149,30 @@ class Reference extends Model {
    *
    * @param authors - The authors to add
    * @param opts - Options for bulkCreate
-   * @returns Promise<Tag[]>
+   * @returns Promise<number> - count of added authors
    */
-  addAuthors(authors: AuthorForReference[], opts = {}): Promise<Author[]> {
-    return Author.bulkCreate(authors, opts);
+  addAuthors(authors: AuthorForReference[], opts = {}): Promise<number> {
+    const newAuthors = authors.map((a) => ({
+      authorId: a.id,
+      referenceId: this.id,
+    }));
+
+    return AuthorsReferences.bulkCreate(newAuthors, opts).then(
+      (arefs) => arefs.length
+    );
+  }
+
+  /**
+   * Remove all AuthorsReferences records associated with the reference.
+   *
+   * @param opts - Options for destroy()
+   * @returns Promise<number>
+   */
+  removeAuthors(opts = {}): Promise<number> {
+    return AuthorsReferences.destroy({
+      where: { referenceId: this.id },
+      ...opts,
+    });
   }
 
   /**
@@ -158,10 +180,30 @@ class Reference extends Model {
    *
    * @param tags - The tags to add
    * @param opts - Options for bulkCreate
-   * @returns Promise<Tag[]>
+   * @returns Promise<number> - count of added tags
    */
-  addTags(tags: TagForReference[], opts = {}): Promise<Tag[]> {
-    return Tag.bulkCreate(tags, opts);
+  addTags(tags: TagForReference[], opts = {}): Promise<number> {
+    const newTags = tags.map((tag) => ({
+      tagId: tag.id,
+      referenceId: this.id,
+    }));
+
+    return TagsReferences.bulkCreate(newTags, opts).then(
+      (trefs) => trefs.length
+    );
+  }
+
+  /**
+   * Remove all TagsReferences records associated with the reference.
+   *
+   * @param opts - Options for destroy()
+   * @returns Promise<number>
+   */
+  removeTags(opts = {}): Promise<number> {
+    return TagsReferences.destroy({
+      where: { referenceId: this.id },
+      ...opts,
+    });
   }
 }
 
