@@ -7,6 +7,7 @@ import { Sequelize } from "sequelize";
 async function up({ context: queryInterface }) {
   await queryInterface.createTable("AuthorsReferences", {
     authorId: {
+      primaryKey: true,
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
@@ -16,6 +17,7 @@ async function up({ context: queryInterface }) {
       onDelete: "CASCADE",
     },
     referenceId: {
+      primaryKey: true,
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
@@ -24,11 +26,6 @@ async function up({ context: queryInterface }) {
       },
       onDelete: "CASCADE",
     },
-  });
-  await queryInterface.addConstraint("AuthorsReferences", {
-    fields: ["authorId", "referenceId"],
-    name: "authors_references_pk",
-    type: "primary key",
   });
   await queryInterface.addIndex("AuthorsReferences", {
     fields: ["authorId"],

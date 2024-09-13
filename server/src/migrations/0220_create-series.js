@@ -25,6 +25,8 @@ async function up({ context: queryInterface }) {
         model: "Publishers",
         key: "id",
       },
+      onDelete: "SET NULL",
+      allowNull: true,
     },
   });
 }

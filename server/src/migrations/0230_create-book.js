@@ -28,6 +28,8 @@ async function up({ context: queryInterface }) {
         model: "Publishers",
         key: "id",
       },
+      onDelete: "SET NULL",
+      allowNull: true,
     },
     seriesId: {
       type: Sequelize.INTEGER,
@@ -35,6 +37,8 @@ async function up({ context: queryInterface }) {
         model: "Series",
         key: "id",
       },
+      onDelete: "SET NULL",
+      allowNull: true,
     },
   });
 }

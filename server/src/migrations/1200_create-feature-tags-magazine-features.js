@@ -7,6 +7,7 @@ import { Sequelize } from "sequelize";
 async function up({ context: queryInterface }) {
   await queryInterface.createTable("FeatureTagsMagazineFeatures", {
     featureTagId: {
+      primaryKey: true,
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
@@ -16,6 +17,7 @@ async function up({ context: queryInterface }) {
       onDelete: "CASCADE",
     },
     magazineFeatureId: {
+      primaryKey: true,
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
@@ -24,11 +26,6 @@ async function up({ context: queryInterface }) {
       },
       onDelete: "CASCADE",
     },
-  });
-  await queryInterface.addConstraint("FeatureTagsMagazineFeatures", {
-    fields: ["featureTagId", "magazineFeatureId"],
-    name: "featuretags_magazinefeatures_pk",
-    type: "primary key",
   });
   await queryInterface.addIndex("FeatureTagsMagazineFeatures", {
     fields: ["featureTagId"],
