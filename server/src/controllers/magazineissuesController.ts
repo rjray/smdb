@@ -18,7 +18,7 @@ import { queryToRequestOpts } from "utils";
 export function createMagazineIssue(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return MagazineIssues.addMagazineIssue(body).then((issue) =>
+  return MagazineIssues.createMagazineIssue(body).then((issue) =>
     res.status(201).pureJson(issue.clean())
   );
 }
@@ -41,7 +41,7 @@ export function getMagazineIssueById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return MagazineIssues.fetchOneMagazineIssue(id, opts).then((issue) => {
+  return MagazineIssues.getMagazineIssueById(id, opts).then((issue) => {
     if (issue) return res.status(200).pureJson(issue.clean());
     else return res.status(404).end();
   });
@@ -61,7 +61,7 @@ export function updateMagazineIssueById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return MagazineIssues.updateMagazineIssue(id, body).then((issue) => {
+  return MagazineIssues.updateMagazineIssueById(id, body).then((issue) => {
     if (issue) return res.status(200).pureJson(issue.clean());
     else return res.status(404).end();
   });
@@ -79,7 +79,7 @@ export function deleteMagazineIssueById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return MagazineIssues.deleteMagazineIssue(id).then((count: number) => {
+  return MagazineIssues.deleteMagazineIssueById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });

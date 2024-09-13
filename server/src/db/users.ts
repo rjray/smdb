@@ -9,7 +9,7 @@ import { User } from "models";
 /*
   Fetch all users.
  */
-export function fetchAllUsers(): Promise<User[]> {
+export function getAllUsers(): Promise<User[]> {
   return User.findAll().catch((error: BaseError) => {
     throw new Error(error.message);
   });
@@ -18,7 +18,7 @@ export function fetchAllUsers(): Promise<User[]> {
 /*
   Fetch a single user by ID.
  */
-export function fetchOneUser(id: number): Promise<User | null> {
+export function getUserById(id: number): Promise<User | null> {
   return User.findByPk(id)
     .then((user) => user)
     .catch((error: BaseError) => {
@@ -29,7 +29,7 @@ export function fetchOneUser(id: number): Promise<User | null> {
 /*
   Fetch a single user by username.
  */
-export function fetchUserByUsername(username: string): Promise<User | null> {
+export function getUserByUsername(username: string): Promise<User | null> {
   return User.findOne({ where: { username } })
     .then((user) => user)
     .catch((error: BaseError) => {
@@ -40,6 +40,6 @@ export function fetchUserByUsername(username: string): Promise<User | null> {
 /*
   Delete a single user from the database (indicated by ID).
  */
-export function deleteUser(id: number) {
+export function deleteUserById(id: number) {
   return User.destroy({ where: { id } });
 }

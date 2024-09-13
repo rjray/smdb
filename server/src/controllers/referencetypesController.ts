@@ -19,7 +19,7 @@ import { queryToRequestOpts } from "utils";
 export function createReferenceType(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return ReferenceTypes.addReferenceType(body).then((referenceType) =>
+  return ReferenceTypes.createReferenceType(body).then((referenceType) =>
     res.status(201).pureJson(referenceType.clean())
   );
 }
@@ -39,7 +39,7 @@ export function getAllReferenceTypes(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return ReferenceTypes.fetchAllReferenceTypes(opts).then(
+  return ReferenceTypes.getAllReferenceTypes(opts).then(
     (results: ReferenceType[]) =>
       res.status(200).pureJson(results.map((rt) => rt.clean()))
   );
@@ -61,12 +61,10 @@ export function getReferenceTypeById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return ReferenceTypes.fetchOneReferenceType(id, opts).then(
-    (referenceType) => {
-      if (referenceType) return res.status(200).pureJson(referenceType.clean());
-      else return res.status(404).end();
-    }
-  );
+  return ReferenceTypes.getReferenceTypeById(id, opts).then((referenceType) => {
+    if (referenceType) return res.status(200).pureJson(referenceType.clean());
+    else return res.status(404).end();
+  });
 }
 
 /**
@@ -83,8 +81,10 @@ export function updateReferenceTypeById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return ReferenceTypes.updateReferenceType(id, body).then((referenceType) => {
-    if (referenceType) return res.status(200).pureJson(referenceType.clean());
-    else return res.status(404).end();
-  });
+  return ReferenceTypes.updateReferenceTypeById(id, body).then(
+    (referenceType) => {
+      if (referenceType) return res.status(200).pureJson(referenceType.clean());
+      else return res.status(404).end();
+    }
+  );
 }

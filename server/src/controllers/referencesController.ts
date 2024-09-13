@@ -20,8 +20,8 @@ import { queryToRequestOpts } from "utils";
 export function createReference(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return References.addReference(body as ReferenceNewData).then((reference) =>
-    res.status(201).pureJson(reference.clean())
+  return References.createReference(body as ReferenceNewData).then(
+    (reference) => res.status(201).pureJson(reference.clean())
   );
 }
 
@@ -40,7 +40,7 @@ export function getAllReferences(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return References.fetchAllReferences(opts).then((results: Reference[]) =>
+  return References.getAllReferences(opts).then((results: Reference[]) =>
     res.status(200).pureJson(results.map((reference) => reference.clean()))
   );
 }
@@ -62,7 +62,7 @@ export function getReferenceById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return References.fetchOneReference(id, opts).then((reference) => {
+  return References.getOneReferenceById(id, opts).then((reference) => {
     if (reference) return res.status(200).pureJson(reference.clean());
     else return res.status(404).end();
   });
@@ -80,7 +80,7 @@ export function updateReferenceById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return References.updateReference(id, body as ReferenceUpdateData).then(
+  return References.updateReferenceById(id, body as ReferenceUpdateData).then(
     (reference) => {
       if (reference) return res.status(200).pureJson(reference.clean());
       else return res.status(404).end();
@@ -98,7 +98,7 @@ export function deleteReferenceById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return References.deleteReference(id).then((count: number) => {
+  return References.deleteReferenceById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });

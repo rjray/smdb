@@ -24,7 +24,7 @@ type MagazineData = {
  * @param data - The magazine data to be added.
  * @returns A promise that resolves to the created magazine.
  */
-export function addMagazine(data: MagazineData): Promise<Magazine> {
+export function createMagazine(data: MagazineData): Promise<Magazine> {
   return Magazine.create(data);
 }
 
@@ -35,7 +35,7 @@ export function addMagazine(data: MagazineData): Promise<Magazine> {
  * @returns A promise that resolves to an array of magazines.
  * @throws If there is an error while fetching the magazines.
  */
-export function fetchAllMagazines(opts: RequestOpts): Promise<Magazine[]> {
+export function getAllMagazines(opts: RequestOpts): Promise<Magazine[]> {
   const scope = getScopeFromParams(opts, magazineScopes);
   const queryOpts: FindOptions = opts.issueCount
     ? {
@@ -70,7 +70,7 @@ export function fetchAllMagazines(opts: RequestOpts): Promise<Magazine[]> {
  * found.
  * @throws If there is an error while fetching the magazine.
  */
-export function fetchOneMagazine(
+export function getMagazineById(
   id: number,
   opts: RequestOpts
 ): Promise<Magazine | null> {
@@ -106,7 +106,7 @@ export function fetchOneMagazine(
  * @param opts - The request options.
  * @returns A promise that resolves to an array of magazines.
  */
-export function fetchRecentlyUpdatedMagazines(
+export function getRecentlyUpdatedMagazines(
   opts: RequestOpts
 ): Promise<Magazine[]> {
   const limit = opts.count || 10;
@@ -149,7 +149,7 @@ export function fetchRecentlyUpdatedMagazines(
  * @returns A promise that resolves to the updated magazine.
  * @throws If the magazine is not found.
  */
-export function updateMagazine(
+export function updateMagazineById(
   id: number,
   data: MagazineData
 ): Promise<Magazine> {
@@ -171,6 +171,6 @@ export function updateMagazine(
  * @param id - The ID of the magazine to delete.
  * @returns A promise that resolves to the number of deleted magazines.
  */
-export function deleteMagazine(id: number) {
+export function deleteMagazineById(id: number) {
   return Magazine.destroy({ where: { id } });
 }

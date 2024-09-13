@@ -21,7 +21,7 @@ type PublisherData = {
  * @param data - The publisher data to be added.
  * @returns A promise that resolves to the created publisher.
  */
-export function addPublisher(data: PublisherData): Promise<Publisher> {
+export function createPublisher(data: PublisherData): Promise<Publisher> {
   return Publisher.create(data);
 }
 
@@ -32,7 +32,7 @@ export function addPublisher(data: PublisherData): Promise<Publisher> {
  * @returns A promise that resolves to an array of publishers.
  * @throws If there is an error while fetching the publishers.
  */
-export function fetchAllPublishers(opts: RequestOpts): Promise<Publisher[]> {
+export function getAllPublishers(opts: RequestOpts): Promise<Publisher[]> {
   const scope = getScopeFromParams(opts, publisherScopes);
 
   return Publisher.scope(scope)
@@ -52,7 +52,7 @@ export function fetchAllPublishers(opts: RequestOpts): Promise<Publisher[]> {
  * found.
  * @throws If there is an error while fetching the publisher.
  */
-export function fetchOnePublisher(
+export function getPublisherById(
   id: number,
   opts: RequestOpts
 ): Promise<Publisher | null> {
@@ -74,7 +74,7 @@ export function fetchOnePublisher(
  * @returns A promise that resolves to the updated publisher.
  * @throws If there is an error while updating the publisher.
  */
-export function updatePublisher(
+export function updatePublisherById(
   id: number,
   data: PublisherData
 ): Promise<Publisher> {
@@ -96,6 +96,6 @@ export function updatePublisher(
  * @param id - The ID of the publisher to delete.
  * @returns A promise that resolves to the number of deleted publishers.
  */
-export function deletePublisher(id: number) {
+export function deletePublisherById(id: number) {
   return Publisher.destroy({ where: { id } });
 }

@@ -314,7 +314,9 @@ async function addPhotoCollectionReference(
  * @param data - The reference data to be added.
  * @returns A promise that resolves to the created reference.
  */
-export async function addReference(data: ReferenceNewData): Promise<Reference> {
+export async function createReference(
+  data: ReferenceNewData
+): Promise<Reference> {
   if (!data.referenceTypeId) {
     throw new Error("addReference: Reference type ID is required");
   }
@@ -386,7 +388,7 @@ export async function addReference(data: ReferenceNewData): Promise<Reference> {
  * @returns A promise that resolves to an array of references.
  * @throws If there is an error while fetching the references.
  */
-export function fetchAllReferences(opts: RequestOpts): Promise<Reference[]> {
+export function getAllReferences(opts: RequestOpts): Promise<Reference[]> {
   const scope = getScopeFromParams(opts ?? {}, referenceScopes);
 
   return Reference.scope(scope)
@@ -406,7 +408,7 @@ export function fetchAllReferences(opts: RequestOpts): Promise<Reference[]> {
  * found.
  * @throws If there is an error while fetching the reference.
  */
-export function fetchOneReference(
+export function getOneReferenceById(
   id: number,
   opts: RequestOpts
 ): Promise<Reference | null> {
@@ -675,7 +677,7 @@ async function updatePhotoCollectionData(
  * the return value.
  * @returns A promise that resolves to the updated reference.
  */
-export async function updateReference(
+export async function updateReferenceById(
   id: number,
   data: ReferenceUpdateData
 ): Promise<Reference | null> {
@@ -774,6 +776,6 @@ export async function updateReference(
  * @param id - The ID of the reference to delete.
  * @returns A promise that resolves to the number of deleted references.
  */
-export function deleteReference(id: number) {
+export function deleteReferenceById(id: number) {
   return Reference.destroy({ where: { id } });
 }

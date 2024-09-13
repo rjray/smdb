@@ -19,7 +19,7 @@ import { queryToRequestOpts } from "utils";
 export function createMagazine(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return Magazines.addMagazine(body).then((magazine) =>
+  return Magazines.createMagazine(body).then((magazine) =>
     res.status(201).pureJson(magazine.clean())
   );
 }
@@ -39,7 +39,7 @@ export function getAllMagazines(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Magazines.fetchAllMagazines(opts).then((results: Magazine[]) =>
+  return Magazines.getAllMagazines(opts).then((results: Magazine[]) =>
     res.status(200).pureJson(results.map((magazine) => magazine.clean()))
   );
 }
@@ -61,7 +61,7 @@ export function getMagazineById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Magazines.fetchOneMagazine(id, opts).then((magazine) => {
+  return Magazines.getMagazineById(id, opts).then((magazine) => {
     if (magazine) return res.status(200).pureJson(magazine.clean());
     else return res.status(404).end();
   });
@@ -83,7 +83,7 @@ export function getMostRecentUpdatedMagazines(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Magazines.fetchRecentlyUpdatedMagazines(opts).then(
+  return Magazines.getRecentlyUpdatedMagazines(opts).then(
     (results: Magazine[]) =>
       res.status(200).pureJson(results.map((magazine) => magazine.clean()))
   );
@@ -102,7 +102,7 @@ export function updateMagazineById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return Magazines.updateMagazine(id, body).then((magazine) => {
+  return Magazines.updateMagazineById(id, body).then((magazine) => {
     if (magazine) return res.status(200).pureJson(magazine.clean());
     else return res.status(404).end();
   });
@@ -120,7 +120,7 @@ export function deleteMagazineById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return Magazines.deleteMagazine(id).then((count: number) => {
+  return Magazines.deleteMagazineById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });

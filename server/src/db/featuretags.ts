@@ -22,7 +22,7 @@ type FeatureTagData = {
  * @param data - The feature tag data to be added.
  * @returns A promise that resolves to the created feature tag.
  */
-export function addFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
+export function createFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
   return FeatureTag.create(data);
 }
 
@@ -33,7 +33,7 @@ export function addFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
  * @returns A promise that resolves to an array of feature tags.
  * @throws If there is an error while fetching the feature tags.
  */
-export function fetchAllFeatureTags(opts: RequestOpts): Promise<FeatureTag[]> {
+export function getAllFeatureTags(opts: RequestOpts): Promise<FeatureTag[]> {
   const scope = getScopeFromParams(opts, featureTagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -68,7 +68,7 @@ export function fetchAllFeatureTags(opts: RequestOpts): Promise<FeatureTag[]> {
  * found.
  * @throws If there is an error while fetching the feature tag.
  */
-export function fetchOneFeatureTag(
+export function getFeatureTagById(
   id: number,
   opts: RequestOpts
 ): Promise<FeatureTag | null> {
@@ -105,7 +105,7 @@ export function fetchOneFeatureTag(
  * @returns A promise that resolves to the updated feature tag.
  * @throws If the feature tag is not found.
  */
-export function updateFeatureTag(
+export function updateFeatureTagById(
   id: number,
   data: FeatureTagData
 ): Promise<FeatureTag> {
@@ -127,6 +127,6 @@ export function updateFeatureTag(
  * @param id - The ID of the feature tag to delete.
  * @returns A promise that resolves to the number of deleted feature tags.
  */
-export function deleteFeatureTag(id: number) {
+export function deleteFeatureTagById(id: number) {
   return FeatureTag.destroy({ where: { id } });
 }

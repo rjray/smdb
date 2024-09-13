@@ -19,7 +19,7 @@ import { queryToRequestOpts } from "utils";
 export function createSeries(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return SeriesDB.addSeries(body).then((series) =>
+  return SeriesDB.createSeries(body).then((series) =>
     res.status(201).pureJson(series.clean())
   );
 }
@@ -41,7 +41,7 @@ export function getAllSeries(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return SeriesDB.fetchAllSeries(opts).then((results: Series[]) =>
+  return SeriesDB.getAllSeries(opts).then((results: Series[]) =>
     res.status(200).pureJson(results.map((tag) => tag.clean()))
   );
 }
@@ -63,7 +63,7 @@ export function getSeriesById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return SeriesDB.fetchOneSeries(id, opts).then((series) => {
+  return SeriesDB.getSeriesById(id, opts).then((series) => {
     if (series) return res.status(200).pureJson(series.clean());
     else return res.status(404).end();
   });
@@ -82,7 +82,7 @@ export function updateSeriesById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return SeriesDB.updateSeries(id, body).then((series) => {
+  return SeriesDB.updateSeriesById(id, body).then((series) => {
     if (series) return res.status(200).pureJson(series.clean());
     else return res.status(404).end();
   });
@@ -100,7 +100,7 @@ export function deleteSeriesById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return SeriesDB.deleteSeries(id).then((count: number) => {
+  return SeriesDB.deleteSeriesById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });

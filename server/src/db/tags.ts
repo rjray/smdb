@@ -23,7 +23,7 @@ type TagData = {
  * @param data - The tag data to be added.
  * @returns A promise that resolves to the created tag.
  */
-export function addTag(data: TagData): Promise<Tag> {
+export function createTag(data: TagData): Promise<Tag> {
   return Tag.create(data);
 }
 
@@ -34,7 +34,7 @@ export function addTag(data: TagData): Promise<Tag> {
  * @returns A promise that resolves to an array of tags.
  * @throws If there is an error while fetching the tags.
  */
-export function fetchAllTags(opts: RequestOpts): Promise<Tag[]> {
+export function getAllTags(opts: RequestOpts): Promise<Tag[]> {
   const scope = getScopeFromParams(opts, tagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -68,10 +68,7 @@ export function fetchAllTags(opts: RequestOpts): Promise<Tag[]> {
  * @returns A promise that resolves to the fetched tag or null if not found.
  * @throws If there is an error while fetching the tag.
  */
-export function fetchOneTag(
-  id: number,
-  opts: RequestOpts
-): Promise<Tag | null> {
+export function getTagById(id: number, opts: RequestOpts): Promise<Tag | null> {
   const scope = getScopeFromParams(opts, tagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -105,7 +102,7 @@ export function fetchOneTag(
  * @returns A promise that resolves to the updated tag.
  * @throws If the tag is not found.
  */
-export function updateTag(id: number, data: TagData): Promise<Tag> {
+export function updateTagById(id: number, data: TagData): Promise<Tag> {
   return Tag.findByPk(id)
     .then((tag) => {
       if (!tag) {
@@ -125,6 +122,6 @@ export function updateTag(id: number, data: TagData): Promise<Tag> {
  * @param id - The ID of the tag to delete.
  * @returns A promise that resolves to the number of deleted tags.
  */
-export function deleteTag(id: number) {
+export function deleteTagById(id: number) {
   return Tag.destroy({ where: { id } });
 }

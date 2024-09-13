@@ -22,7 +22,7 @@ type SeriesData = {
  * @param data - The series data to be added.
  * @returns A promise that resolves to the created series.
  */
-export function addSeries(data: SeriesData): Promise<Series> {
+export function createSeries(data: SeriesData): Promise<Series> {
   return Series.create(data);
 }
 
@@ -33,7 +33,7 @@ export function addSeries(data: SeriesData): Promise<Series> {
  * @returns A promise that resolves to an array of series.
  * @throws If there is an error while fetching the series.
  */
-export function fetchAllSeries(opts: RequestOpts): Promise<Series[]> {
+export function getAllSeries(opts: RequestOpts): Promise<Series[]> {
   const scope = getScopeFromParams(opts, seriesScopes);
 
   return Series.scope(scope)
@@ -52,7 +52,7 @@ export function fetchAllSeries(opts: RequestOpts): Promise<Series[]> {
  * @returns A promise that resolves to the fetched series or null if not found.
  * @throws If there is an error while fetching the series.
  */
-export function fetchOneSeries(
+export function getSeriesById(
   id: number,
   opts: RequestOpts
 ): Promise<Series | null> {
@@ -73,7 +73,10 @@ export function fetchOneSeries(
  * @param data - The series data to update.
  * @returns A promise that resolves to the updated series.
  */
-export function updateSeries(id: number, data: SeriesData): Promise<Series> {
+export function updateSeriesById(
+  id: number,
+  data: SeriesData
+): Promise<Series> {
   return Series.findByPk(id)
     .then((series) => {
       if (!series) {
@@ -92,6 +95,6 @@ export function updateSeries(id: number, data: SeriesData): Promise<Series> {
  * @param id - The ID of the series to delete.
  * @returns A promise that resolves to the number of deleted series.
  */
-export function deleteSeries(id: number) {
+export function deleteSeriesById(id: number) {
   return Series.destroy({ where: { id } });
 }

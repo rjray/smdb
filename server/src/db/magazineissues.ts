@@ -22,7 +22,7 @@ type MagazineIssueData = {
  * @param data - The magazine issue data to be added.
  * @returns A promise that resolves to the created magazine issue.
  */
-export function addMagazineIssue(
+export function createMagazineIssue(
   data: MagazineIssueData
 ): Promise<MagazineIssue> {
   return MagazineIssue.create(data);
@@ -38,7 +38,7 @@ export function addMagazineIssue(
  * not found.
  * @throws If there is an error while fetching the magazine issue.
  */
-export function fetchOneMagazineIssue(
+export function getMagazineIssueById(
   id: number,
   opts: RequestOpts
 ): Promise<MagazineIssue | null> {
@@ -76,7 +76,7 @@ export function fetchOneMagazineIssue(
  * @returns A promise that resolves to the updated magazine issue.
  * @throws If the magazine issue is not found.
  */
-export function updateMagazineIssue(
+export function updateMagazineIssueById(
   id: number,
   data: MagazineIssueData
 ): Promise<MagazineIssue> {
@@ -98,6 +98,6 @@ export function updateMagazineIssue(
  * @param id - The ID of the magazine issue to delete.
  * @returns A promise that resolves to the number of deleted magazine issues.
  */
-export function deleteMagazineIssue(id: number) {
+export function deleteMagazineIssueById(id: number) {
   return MagazineIssue.destroy({ where: { id } });
 }

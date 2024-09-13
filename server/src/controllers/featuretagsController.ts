@@ -19,7 +19,7 @@ import { queryToRequestOpts } from "utils";
 export function createFeatureTag(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return FeatureTags.addFeatureTag(body).then((featuretag) =>
+  return FeatureTags.createFeatureTag(body).then((featuretag) =>
     res.status(201).pureJson(featuretag.clean())
   );
 }
@@ -39,7 +39,7 @@ export function getAllFeatureTags(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return FeatureTags.fetchAllFeatureTags(opts).then((results: FeatureTag[]) =>
+  return FeatureTags.getAllFeatureTags(opts).then((results: FeatureTag[]) =>
     res.status(200).pureJson(results.map((featuretag) => featuretag.clean()))
   );
 }
@@ -61,7 +61,7 @@ export function getFeatureTagById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return FeatureTags.fetchOneFeatureTag(id, opts).then((featuretag) => {
+  return FeatureTags.getFeatureTagById(id, opts).then((featuretag) => {
     if (featuretag) return res.status(200).pureJson(featuretag.clean());
     else return res.status(404).end();
   });
@@ -80,7 +80,7 @@ export function updateFeatureTagById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return FeatureTags.updateFeatureTag(id, body).then((featuretag) => {
+  return FeatureTags.updateFeatureTagById(id, body).then((featuretag) => {
     if (featuretag) return res.status(200).pureJson(featuretag.clean());
     else return res.status(404).end();
   });
@@ -99,7 +99,7 @@ export function deleteFeatureTagById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return FeatureTags.deleteFeatureTag(id).then((count: number) => {
+  return FeatureTags.deleteFeatureTagById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });

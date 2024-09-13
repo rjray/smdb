@@ -19,7 +19,9 @@ import { queryToRequestOpts } from "utils";
 export function createTag(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return Tags.addTag(body).then((tag) => res.status(201).pureJson(tag.clean()));
+  return Tags.createTag(body).then((tag) =>
+    res.status(201).pureJson(tag.clean())
+  );
 }
 
 /**
@@ -36,7 +38,7 @@ export function getAllTags(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Tags.fetchAllTags(opts).then((results: Tag[]) =>
+  return Tags.getAllTags(opts).then((results: Tag[]) =>
     res.status(200).pureJson(results.map((tag) => tag.clean()))
   );
 }
@@ -56,7 +58,7 @@ export function getTagById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Tags.fetchOneTag(id, opts).then((tag) => {
+  return Tags.getTagById(id, opts).then((tag) => {
     if (tag) return res.status(200).pureJson(tag.clean());
     else return res.status(404).end();
   });
@@ -75,7 +77,7 @@ export function updateTagById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return Tags.updateTag(id, body).then((tag) => {
+  return Tags.updateTagById(id, body).then((tag) => {
     if (tag) return res.status(200).pureJson(tag.clean());
     else return res.status(404).end();
   });
@@ -93,7 +95,7 @@ export function deleteTagById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return Tags.deleteTag(id).then((count: number) => {
+  return Tags.deleteTagById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });

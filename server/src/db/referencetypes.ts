@@ -20,7 +20,7 @@ type ReferenceTypeData = {
  * @param data - The reference type data to be added.
  * @returns A promise that resolves to the created reference type.
  */
-export function addReferenceType(
+export function createReferenceType(
   data: ReferenceTypeData
 ): Promise<ReferenceType> {
   return ReferenceType.create(data);
@@ -34,7 +34,7 @@ export function addReferenceType(
  * @returns A promise that resolves to an array of reference types.
  * @throws If there is an error while fetching the reference types.
  */
-export function fetchAllReferenceTypes(
+export function getAllReferenceTypes(
   opts: RequestOpts
 ): Promise<ReferenceType[]> {
   const queryOpts: FindOptions = opts.referenceCount
@@ -68,7 +68,7 @@ export function fetchAllReferenceTypes(
  * not found.
  * @throws If there is an error while fetching the reference type.
  */
-export function fetchOneReferenceType(
+export function getReferenceTypeById(
   id: number,
   opts: RequestOpts
 ): Promise<ReferenceType | null> {
@@ -104,7 +104,7 @@ export function fetchOneReferenceType(
  * @returns A promise that resolves to the updated reference type.
  * @throws If there is an error while updating the reference type.
  */
-export function updateReferenceType(
+export function updateReferenceTypeById(
   id: number,
   data: ReferenceTypeData
 ): Promise<ReferenceType> {

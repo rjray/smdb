@@ -147,7 +147,7 @@ describe("Authors: Retrieval", () => {
   test("Get author by ID with references and aliases", async () => {
     // Start by creating a very basic (photo collection) reference for the
     // author.
-    const reference = await References.addReference({
+    const reference = await References.createReference({
       name: "Reference 1",
       referenceTypeId: ReferenceTypes.PhotoCollection,
       tags: [{ name: "Tag 1" }, { name: "Tag 2" }],
