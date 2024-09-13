@@ -18,7 +18,7 @@ const authorScopes = ["references", "aliases"];
  * @param data - The author data to be added.
  * @returns A promise that resolves to the created author.
  */
-export function addAuthor(data: AuthorNewData): Promise<Author> {
+export function createAuthor(data: AuthorNewData): Promise<Author> {
   if (data.aliases) {
     return Author.create(data, {
       include: [AuthorAlias],
@@ -35,7 +35,7 @@ export function addAuthor(data: AuthorNewData): Promise<Author> {
  * @returns A promise that resolves to an array of authors.
  * @throws If there is an error while fetching authors.
  */
-export function fetchAllAuthors(opts: RequestOpts = {}): Promise<Author[]> {
+export function getAllAuthors(opts: RequestOpts = {}): Promise<Author[]> {
   const scope = getScopeFromParams(opts, authorScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -69,7 +69,7 @@ export function fetchAllAuthors(opts: RequestOpts = {}): Promise<Author[]> {
  * @returns A Promise that resolves to the fetched author or null if not found.
  * @throws An error if there was an issue fetching the author.
  */
-export function fetchOneAuthor(
+export function getAuthorById(
   id: number,
   opts: RequestOpts = {}
 ): Promise<Author | null> {
@@ -106,7 +106,7 @@ export function fetchOneAuthor(
  * @param data - The data to update the author with.
  * @returns A promise that resolves to the updated author.
  */
-export function updateAuthor(
+export function updateAuthorById(
   id: number,
   data: AuthorUpdateData
 ): Promise<Author> {
@@ -139,6 +139,6 @@ export function updateAuthor(
  * @param id - The ID of the author to be deleted.
  * @returns A promise that resolves when the author is successfully deleted.
  */
-export function deleteAuthor(id: number) {
+export function deleteAuthorById(id: number) {
   return Author.destroy({ where: { id } });
 }

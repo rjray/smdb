@@ -20,7 +20,7 @@ import { queryToRequestOpts } from "utils";
 export function createAuthor(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return Authors.addAuthor(body as AuthorNewData).then((author) =>
+  return Authors.createAuthor(body as AuthorNewData).then((author) =>
     res.status(201).pureJson(author.clean())
   );
 }
@@ -40,7 +40,7 @@ export function getAllAuthors(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Authors.fetchAllAuthors(opts).then((results: Author[]) =>
+  return Authors.getAllAuthors(opts).then((results: Author[]) =>
     res.status(200).pureJson(results.map((author) => author.clean()))
   );
 }
@@ -62,7 +62,7 @@ export function getAuthorById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return Authors.fetchOneAuthor(id, opts).then((author) => {
+  return Authors.getAuthorById(id, opts).then((author) => {
     if (author) return res.status(200).pureJson(author.clean());
     else return res.status(404).end();
   });
@@ -88,7 +88,7 @@ export function updateAuthorById(context: ExegesisContext) {
   if (body.aliases)
     body.aliases = body.aliases.filter((alias) => !alias.deleted);
 
-  return Authors.updateAuthor(id, body).then((author) => {
+  return Authors.updateAuthorById(id, body).then((author) => {
     if (author) return res.status(200).pureJson(author.clean());
     else return res.status(404).end();
   });
@@ -106,7 +106,7 @@ export function deleteAuthorById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res } = context;
 
-  return Authors.deleteAuthor(id).then((count: number) => {
+  return Authors.deleteAuthorById(id).then((count: number) => {
     if (count) return res.status(200).end();
     else return res.status(404).end();
   });
