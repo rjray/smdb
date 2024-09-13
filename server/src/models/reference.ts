@@ -24,6 +24,8 @@ import PhotoCollection, { PhotoCollectionRecord } from "./photocollection";
 import ReferenceType, { ReferenceTypeRecord } from "./referencetype";
 import Tag, { TagRecord } from "./tag";
 import TagsReferences from "./tagsreferences";
+import { AuthorForReference } from "types/author";
+import { TagForReference } from "types/tag";
 
 /**
  * JSON representation of a reference record.
@@ -134,6 +136,32 @@ class Reference extends Model {
     if (result.tags) result.tags = result.tags.map((t: Tag) => t.clean());
 
     return result;
+  }
+
+  // One-to-many relations can be automatically populated by Sequelize when
+  // the main object is created. But for many-to-many, we need to do it
+  // manually.
+
+  /**
+   * Add authors to the reference. Takes an array of author structures as input.
+   *
+   * @param authors - The authors to add
+   * @param opts - Options for bulkCreate
+   * @returns Promise<Tag[]>
+   */
+  addAuthors(authors: AuthorForReference[], opts = {}): Promise<Author[]> {
+    return Author.bulkCreate(authors, opts);
+  }
+
+  /**
+   * Add tags to the reference. Takes an array of tag structures as input.
+   *
+   * @param tags - The tags to add
+   * @param opts - Options for bulkCreate
+   * @returns Promise<Tag[]>
+   */
+  addTags(tags: TagForReference[], opts = {}): Promise<Tag[]> {
+    return Tag.bulkCreate(tags, opts);
   }
 }
 

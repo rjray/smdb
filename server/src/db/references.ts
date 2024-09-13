@@ -55,19 +55,18 @@ async function fixupAuthors(
   // Create new authors if they don't exist. If the record is essentially
   // empty, ignore it.
   const fixedAuthors: Array<AuthorForReference> = [];
-  fixedAuthors.length = authors.length;
-  authors.forEach(async (author, index) => {
+  for (const author of authors) {
     // If the author is already in the database, don't need to create.
     if (author.id) {
-      fixedAuthors[index] = author;
+      fixedAuthors.push(author);
     } else if (author.name) {
       const newAuthor = await Author.create(
         { name: author.name },
         { transaction }
       );
-      fixedAuthors[index] = { id: newAuthor.id, name: newAuthor.name };
+      fixedAuthors.push({ id: newAuthor.id, name: newAuthor.name });
     }
-  });
+  }
 
   return fixedAuthors;
 }
@@ -85,18 +84,17 @@ async function fixupTags(
   // little differently, there shouldn't be any empty records. So an empty
   // record is an error.
   const fixedTags: Array<TagForReference> = [];
-  fixedTags.length = tags.length;
-  tags.forEach(async (tag, index) => {
+  for (const tag of tags) {
     // If the tag is already in the database, don't need to create.
     if (tag.id) {
-      fixedTags[index] = tag;
+      fixedTags.push(tag);
     } else if (tag.name) {
       const newTag = await Tag.create({ name: tag.name }, { transaction });
-      fixedTags[index] = { id: newTag.id, name: newTag.name };
+      fixedTags.push({ id: newTag.id, name: newTag.name });
     } else {
       throw new Error("fixupTags: Tag name is required to create a new tag");
     }
-  });
+  }
 
   return fixedTags;
 }
@@ -301,13 +299,11 @@ async function addPhotoCollectionReference(
   // These are the fields that are directly added to the reference.
   const { name, language, referenceTypeId } = data;
 
-  return Reference.create(
+  const reference = await Reference.create(
     {
       name,
       language,
       referenceTypeId,
-      authors,
-      tags,
       photoCollection,
     },
     {
@@ -315,6 +311,12 @@ async function addPhotoCollectionReference(
       transaction,
     }
   );
+
+  // Add the authors and tags
+  await reference.addAuthors(authors, { transaction });
+  await reference.addTags(tags, { transaction });
+
+  return reference;
 }
 
 /**
