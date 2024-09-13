@@ -23,7 +23,8 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.3",
     "sequelize-typescript": "^2.1.6",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "umzug": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
