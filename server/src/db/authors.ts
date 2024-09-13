@@ -35,7 +35,7 @@ export function addAuthor(data: AuthorNewData): Promise<Author> {
  * @returns A promise that resolves to an array of authors.
  * @throws If there is an error while fetching authors.
  */
-export function fetchAllAuthors(opts: RequestOpts): Promise<Author[]> {
+export function fetchAllAuthors(opts: RequestOpts = {}): Promise<Author[]> {
   const scope = getScopeFromParams(opts, authorScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -71,7 +71,7 @@ export function fetchAllAuthors(opts: RequestOpts): Promise<Author[]> {
  */
 export function fetchOneAuthor(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<Author | null> {
   const scope = getScopeFromParams(opts, authorScopes);
   const queryOpts: FindOptions = opts.referenceCount

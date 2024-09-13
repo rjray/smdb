@@ -12,8 +12,9 @@
 
 import fs from "fs";
 import { parse } from "csv-parse";
-import sqlite3 from "sqlite3";
+import { Umzug, SequelizeStorage } from "umzug";
 
+import { connection } from "./index";
 import { ReferenceType, Tag, FeatureTag } from "models";
 
 // Helper function to process CSV files.
@@ -37,7 +38,7 @@ async function processCsvFile(file: string, columns: string[]) {
 // Seed the reference types into the database.
 async function seedReferenceTypes(directory: string): Promise<void> {
   const referenceTypes = await processCsvFile(
-    `${directory}/reference_types.csv`,
+    `${directory}/seeders/reference_types.csv`,
     ["id", "name", "description", "notes"]
   );
   await ReferenceType.bulkCreate(referenceTypes);
@@ -50,7 +51,7 @@ async function seedReferenceTypes(directory: string): Promise<void> {
 
 // Seed the tags into the database.
 async function seedTags(directory: string): Promise<void> {
-  const tags = await processCsvFile(`${directory}/tags.csv`, [
+  const tags = await processCsvFile(`${directory}/seeders/tags.csv`, [
     "id",
     "name",
     "type",
@@ -66,11 +67,10 @@ async function seedTags(directory: string): Promise<void> {
 
 // Seed the feature tags into the database.
 async function seedFeatureTags(directory: string): Promise<void> {
-  const featureTags = await processCsvFile(`${directory}/feature_tags.csv`, [
-    "id",
-    "name",
-    "description",
-  ]);
+  const featureTags = await processCsvFile(
+    `${directory}/seeders/feature_tags.csv`,
+    ["id", "name", "description"]
+  );
   await FeatureTag.bulkCreate(featureTags);
   const rows = await FeatureTag.findAll();
 
@@ -79,16 +79,17 @@ async function seedFeatureTags(directory: string): Promise<void> {
   }
 }
 
-// Initialize the database. This will run the schema and add the seed data. It
-// uses the `connection` object to run a raw query that creates the schema, then
-// calls the three seed functions.
-export default async function setupDatabase(file: string, directory: string) {
+// Initialize the database. This uses an Umzug instance to do the migration,
+// and then adds the seed data from the CSV files in the `seeders` directory.
+export default async function setupDatabase(directory: string) {
   try {
-    // Install the schema
-    const schema = fs.readFileSync(`${directory}/schema.sql`, "utf-8");
-    const conn = new sqlite3.Database(file);
-    await conn.exec(schema);
-    conn.close();
+    const umzug = new Umzug({
+      migrations: { glob: `${directory}/migrations/*.js` },
+      context: connection.getQueryInterface(),
+      storage: new SequelizeStorage({ sequelize: connection }),
+      logger: undefined,
+    });
+    await umzug.up();
 
     // Add the seed data
     await seedReferenceTypes(directory);
