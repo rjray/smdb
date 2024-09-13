@@ -147,7 +147,7 @@ describe("Authors: Retrieval", () => {
   test("Get author by ID with references and aliases", async () => {
     // Start by creating a very basic (photo collection) reference for the
     // author.
-    await References.addReference({
+    const reference = await References.addReference({
       name: "Reference 1",
       referenceTypeId: ReferenceTypes.PhotoCollection,
       tags: [{ name: "Tag 1" }, { name: "Tag 2" }],
@@ -157,25 +157,59 @@ describe("Authors: Retrieval", () => {
         media: "Media 1",
       },
     });
-    // console.log(JSON.stringify(reference, null, 2));
 
     const author = await Authors.getAuthorById(2, {
       references: true,
       aliases: true,
     });
-    expect(author?.id).toBe(2);
-    expect(author?.name).toBe("Author 2");
-    if (author?.aliases) {
-      expect(author.aliases.length).toBe(2);
-      expect(author.aliases[0].name).toBe("Alias 1");
-      expect(author.aliases[1].name).toBe("Alias 2");
+
+    if (author) {
+      expect(author.id).toBe(2);
+      expect(author.name).toBe("Author 2");
+      if (author.aliases) {
+        expect(author.aliases.length).toBe(2);
+        expect(author.aliases[0].name).toBe("Alias 1");
+        expect(author.aliases[1].name).toBe("Alias 2");
+      } else {
+        assert.fail("No author.aliases found");
+      }
+      if (author.references) {
+        expect(author.references.length).toBe(1);
+      } else {
+        assert.fail("No author.references found");
+      }
+
+      const cleaned = author.clean();
+      const refCleaned = reference.clean();
+      // We know these will be present and valid, since Sequelize handles them.
+      const { createdAt, updatedAt } = cleaned;
+      expect(cleaned).toEqual({
+        id: 2,
+        name: "Author 2",
+        createdAt,
+        updatedAt,
+        aliases: [
+          { id: 1, name: "Alias 1", authorId: 2 },
+          { id: 2, name: "Alias 2", authorId: 2 },
+        ],
+        references: [
+          {
+            id: 1,
+            name: "Reference 1",
+            language: null,
+            referenceTypeId: 3,
+            photoCollection: {
+              location: "Location 1",
+              media: "Media 1",
+              referenceId: 1,
+            },
+            createdAt: `${refCleaned.createdAt}`,
+            updatedAt: `${refCleaned.updatedAt}`,
+          },
+        ],
+      });
     } else {
-      assert.fail("No author.aliases found");
-    }
-    if (author?.references) {
-      expect(author.references.length).toBe(1);
-    } else {
-      assert.fail("No author.references found");
+      assert.fail("Failed to fetch author by ID");
     }
   });
 });
