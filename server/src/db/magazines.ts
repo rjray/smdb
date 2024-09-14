@@ -35,7 +35,7 @@ export function createMagazine(data: MagazineData): Promise<Magazine> {
  * @returns A promise that resolves to an array of magazines.
  * @throws If there is an error while fetching the magazines.
  */
-export function getAllMagazines(opts: RequestOpts): Promise<Magazine[]> {
+export function getAllMagazines(opts: RequestOpts = {}): Promise<Magazine[]> {
   const scope = getScopeFromParams(opts, magazineScopes);
   const queryOpts: FindOptions = opts.issueCount
     ? {
@@ -72,7 +72,7 @@ export function getAllMagazines(opts: RequestOpts): Promise<Magazine[]> {
  */
 export function getMagazineById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<Magazine | null> {
   const scope = getScopeFromParams(opts, magazineScopes);
   const queryOpts: FindOptions = opts.issueCount
@@ -107,7 +107,7 @@ export function getMagazineById(
  * @returns A promise that resolves to an array of magazines.
  */
 export function getRecentlyUpdatedMagazines(
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<Magazine[]> {
   const limit = opts.count || 10;
 
