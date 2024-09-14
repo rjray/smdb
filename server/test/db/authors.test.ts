@@ -7,7 +7,7 @@ import fs from "fs";
 
 import setupDatabase from "database/setup";
 import { Authors, References } from "db";
-// Need a full relative path due to deprecation "constants" module in Node.
+// Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
 
 // Need to have this here in case the test file is an actual file rather than
