@@ -12,6 +12,7 @@ import { RequestOpts, getScopeFromParams } from "utils";
 const magazineScopes = ["issues"];
 
 type MagazineData = {
+  id?: number;
   name: string;
   language?: string | null;
   aliases?: string | null;
