@@ -62,7 +62,7 @@ class Magazine extends Model {
   issues?: MagazineIssue[];
 
   clean(): MagazineRecord {
-    const result = this.get();
+    const result = { ...this.get() };
 
     // The two dates are Date objects, convert them to ISO strings so that
     // they don't stringify automatically.

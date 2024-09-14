@@ -98,7 +98,7 @@ class Reference extends Model {
   photoCollection?: PhotoCollection;
 
   clean(): ReferenceRecord {
-    const result = this.get();
+    const result = { ...this.get() };
     delete result.AuthorsReferences;
     delete result.TagsReferences;
 

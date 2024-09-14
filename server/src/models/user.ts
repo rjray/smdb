@@ -57,7 +57,7 @@ class User extends Model {
   password!: string;
 
   clean(): UserRecord {
-    return this.get();
+    return { ...this.get() };
   }
 }
 

@@ -60,7 +60,7 @@ class Author extends Model {
   references?: Reference[];
 
   clean(): AuthorRecord {
-    const result = this.get();
+    const result = { ...this.get() };
     delete result.AuthorsReferences;
 
     // The two dates are Date objects, convert them to ISO strings so that
