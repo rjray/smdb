@@ -9,6 +9,7 @@ async function up({ context: queryInterface }) {
     referenceId: {
       allowNull: false,
       primaryKey: true,
+      unique: true,
       references: {
         model: "References",
         key: "id",
