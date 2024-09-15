@@ -8,9 +8,9 @@
   "scripts": {
     "start": "nodemon --delay 2 --ext yaml,js,ts -w src src/server.ts",
     "gen-keys": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj \"/C=US/ST=California/CN=localhost\"",
-    "test": "vitest --run",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
+    "test": "vitest --run --no-file-parallelism",
+    "test:watch": "vitest --watch --no-file-parallelism",
+    "test:coverage": "vitest --coverage --no-file-parallelism"
   },
   "dependencies": {
     "compression": "^1.7.4",
