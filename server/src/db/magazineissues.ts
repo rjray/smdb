@@ -12,8 +12,9 @@ import { RequestOpts, getScopeFromParams } from "utils";
 const magazineIssueScopes = ["magazine", "features"];
 
 type MagazineIssueData = {
-  issue: string;
-  magazineId: number;
+  id?: number;
+  issue?: string;
+  magazineId?: number;
 };
 
 /**
@@ -40,7 +41,7 @@ export function createMagazineIssue(
  */
 export function getMagazineIssueById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<MagazineIssue | null> {
   const scope = getScopeFromParams(opts, magazineIssueScopes);
   const queryOpts: FindOptions = opts.referenceCount
