@@ -32,10 +32,12 @@ import { TagForReference } from "types/tag";
  *
  * @property {number} id - The ID of the reference.
  * @property {string} name - The name of the reference.
- * @property {string|null} [language] - The language of the reference
- * (optional).
+ * @property {string|null} language - The language of the reference (optional).
  * @property {number} referenceTypeId - The ID of the reference type.
- * @property {ReferenceTypeRecord} referenceType - The reference type record.
+ * @property {ReferenceTypeRecord} [referenceType] - The reference type record.
+ * (optional).
+ * @property {string} createdAt - The creation date of the reference.
+ * @property {string} updatedAt - The last update date of the reference.
  * @property {AuthorRecord[]} [authors] - An array of author records (optional).
  * @property {TagRecord[]} [tags] - An array of tag records (optional).
  * @property {BookRecord} [book] - The book record (optional).
@@ -47,9 +49,9 @@ import { TagForReference } from "types/tag";
 export type ReferenceRecord = {
   id: number;
   name: string;
-  language?: string | null;
+  language: string | null;
   referenceTypeId: number;
-  referenceType: ReferenceTypeRecord;
+  referenceType?: ReferenceTypeRecord;
   createdAt: string;
   updatedAt: string;
   authors?: Array<AuthorRecord>;

@@ -21,7 +21,7 @@ import Series, { SeriesRecord } from "./series";
  *
  * @property {number} id - The ID of the publisher.
  * @property {string} name - The name of the publisher.
- * @property {string|null} [notes] - Additional notes about the publisher
+ * @property {string|null} notes - Additional notes about the publisher
  * (optional).
  * @property {BookRecord[]} [books] - An array of book records associated with
  * the publisher (optional).
@@ -31,7 +31,7 @@ import Series, { SeriesRecord } from "./series";
 export type PublisherRecord = {
   id: number;
   name: string;
-  notes?: string | null;
+  notes: string | null;
   books?: Array<BookRecord>;
   series?: Array<SeriesRecord>;
 };

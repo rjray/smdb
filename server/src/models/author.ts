@@ -23,15 +23,15 @@ import Reference, { ReferenceRecord } from "./reference";
  * @property {number} id - The unique identifier of the author.
  * @property {string} name - The name of the author.
  * @property {string} createdAt - The date and time when the author record was
- *            created.
+ * created.
  * @property {string} updatedAt - The date and time when the author record was
- *            last updated.
+ * last updated.
  * @property {number} [referenceCount] - The number of references associated
- *            with the author.
+ * with the author (optional).
  * @property {Array<AuthorAliasRecord>} [aliases] - An array of author alias
- *            records associated with the author.
+ * records associated with the author (optional).
  * @property {Array<ReferenceRecord>} [references] - An array of reference
- *            records associated with the author.
+ * records associated with the author (optional).
  */
 export type AuthorRecord = {
   id: number;

@@ -20,7 +20,7 @@ import Reference, { ReferenceRecord } from "./reference";
  * @property {number} id - The ID of the reference type.
  * @property {string} name - The name of the reference type.
  * @property {string} description - The description of the reference type.
- * @property {string|null} [notes] - Additional notes about the reference type
+ * @property {string|null} notes - Additional notes about the reference type
  * (optional).
  * @property {ReferenceRecord[]} [references] - An array of reference records
  * associated with the reference type (optional).
@@ -29,7 +29,7 @@ export type ReferenceTypeRecord = {
   id: number;
   name: string;
   description: string;
-  notes?: string | null;
+  notes: string | null;
   references?: Array<ReferenceRecord>;
 };
 

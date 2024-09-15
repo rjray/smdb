@@ -19,10 +19,9 @@ import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
  *
  * @property {number} id - The unique identifier of the magazine.
  * @property {string} name - The name of the magazine.
- * @property {string | null} [language] - The language of the magazine
- * (optional).
- * @property {string | null} [aliases] - The aliases of the magazine (optional).
- * @property {string | null} [notes] - Additional notes about the magazine
+ * @property {string|null} language - The language of the magazine (optional).
+ * @property {string|null} aliases - The aliases of the magazine (optional).
+ * @property {string|null} notes - Additional notes about the magazine
  * (optional).
  * @property {string} createdAt - The timestamp when the magazine record was
  * created.

@@ -32,10 +32,10 @@ import Series, { SeriesRecord } from "./series";
  */
 export type BookRecord = {
   referenceId: number;
-  isbn?: string | null;
-  seriesNumber?: string | null;
-  publisherId?: number | null;
-  seriesId?: number | null;
+  isbn: string | null;
+  seriesNumber: string | null;
+  publisherId: number | null;
+  seriesId: number | null;
   reference?: ReferenceRecord;
   publisher?: PublisherRecord;
   series?: SeriesRecord;

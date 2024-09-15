@@ -20,17 +20,17 @@ import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
  *
  * @property {number} id - The ID of the feature tag.
  * @property {string} name - The name of the feature tag.
- * @property {string|undefined} [description] - The description of the feature
+ * @property {string|null} description - The description of the feature
  * tag (optional).
- * @property {number|undefined} [referenceCount] - The number of references
- * associated with the feature tag (optional).
+ * @property {number} [referenceCount] - The number of references associated
+ * with the feature tag (optional).
  * @property {MagazineFeatureRecord[]} [magazineFeatures] - An array of magazine
  * feature records associated with the feature tag (optional).
  */
 export type FeatureTagRecord = {
   id: number;
   name: string;
-  description?: string;
+  description: string;
   referenceCount?: number;
   magazineFeatures?: Array<MagazineFeatureRecord>;
 };
