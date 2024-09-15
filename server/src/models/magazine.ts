@@ -34,9 +34,9 @@ import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
 export type MagazineRecord = {
   id: number;
   name: string;
-  language?: string | null;
-  aliases?: string | null;
-  notes?: string | null;
+  language: string | null;
+  aliases: string | null;
+  notes: string | null;
   createdAt: string;
   updatedAt: string;
   issues?: Array<MagazineIssueRecord>;

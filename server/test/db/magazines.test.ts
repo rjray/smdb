@@ -132,3 +132,38 @@ describe("Magazines: Retrieval", () => {
     expect(magazines[5].issues).toHaveLength(0);
   });
 });
+
+describe("Magazines: Update", () => {
+  test("Update basic Magazine", async () => {
+    const magazine = await Magazines.updateMagazineById(6, {
+      name: "Magazine 6 Updated",
+      language: "English",
+    });
+
+    expect(magazine.id).toBe(6);
+    expect(magazine.name).toBe("Magazine 6 Updated");
+    expect(magazine.language).toBe("English");
+  });
+});
+
+describe("Magazines: Delete", () => {
+  test("Delete Magazine by ID", async () => {
+    const result = await Magazines.deleteMagazineById(6);
+    expect(result).toBe(1);
+    const magazines = await Magazines.getAllMagazines();
+    expect(magazines.length).toBe(5);
+  });
+
+  test("Delete non-existent Magazine", async () => {
+    const result = await Magazines.deleteMagazineById(6);
+    expect(result).toBe(0);
+  });
+});
+
+describe("Magazines: Misc", () => {
+  test("Test getRecentlyUpdatedMagazines", async () => {
+    const magazines = await Magazines.getRecentlyUpdatedMagazines();
+    expect(magazines.length).toBe(5);
+    expect(magazines.map((m) => m.id)).toEqual([5, 4, 3, 2, 1]);
+  });
+});
