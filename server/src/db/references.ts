@@ -165,25 +165,28 @@ async function fixupFeatureTags(
   featureTags: Array<FeatureTagForReference>,
   transaction: Transaction
 ) {
-  // Create new feature feature tags if they don't exist
+  if (!featureTags || featureTags.length === 0) {
+    return []; // Nothing to do
+  }
+
+  // Create new feature feature tags if they don't exist.
   const fixedFeatureTags: Array<FeatureTagForReference> = [];
-  fixedFeatureTags.length = featureTags.length;
-  featureTags.forEach(async (featureTag, index) => {
+  for (const featureTag of featureTags) {
     // If the featureTag is already in the database, don't need to create.
     if (featureTag.id) {
-      fixedFeatureTags[index] = featureTag;
+      fixedFeatureTags.push(featureTag);
     } else if (featureTag.name) {
       const newTag = await FeatureTag.create(
         { name: featureTag.name },
         { transaction }
       );
-      fixedFeatureTags[index] = { id: newTag.id, name: newTag.name };
+      fixedFeatureTags.push({ id: newTag.id, name: newTag.name });
     } else {
       throw new Error(
         "fixupFeatureTags: Tag name is required to create a new feature tag"
       );
     }
-  });
+  }
 
   return fixedFeatureTags;
 }
@@ -246,16 +249,17 @@ async function addMagazineFeatureReference(
 ) {
   // Note that we've already checked that the magazine feature data exists
   // prior to this function being called.
-  const magazineFeature = await fixupMagazineFeatureForCreate(
+  const magazineFeatureData = await fixupMagazineFeatureForCreate(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.magazineFeature!,
     transaction
   );
+  const { featureTags, ...magazineFeature } = magazineFeatureData;
 
   // These are the fields that are directly added to the reference.
   const { name, language, referenceTypeId } = data;
 
-  return Reference.create(
+  const reference = await Reference.create(
     {
       name,
       language,
@@ -267,6 +271,19 @@ async function addMagazineFeatureReference(
       transaction,
     }
   );
+
+  if (featureTags) {
+    // Add the feature tags.
+
+    // This won't be null because we just created the reference. The creation
+    // would have thrown an error if it failed.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await reference.magazineFeature!.addFeatureTags(featureTags, {
+      transaction,
+    });
+  }
+
+  return reference;
 }
 
 // Add a photo collection reference to the database. This requires checking of
