@@ -1,5 +1,5 @@
 /**
- * Test suite for the database code in the `db/authors.ts` module.
+ * Test suite for the database code in the `db/magazines.ts` module.
  */
 
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
