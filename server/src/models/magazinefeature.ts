@@ -18,6 +18,7 @@ import FeatureTag, { FeatureTagRecord } from "./featuretag";
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
 import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
 import Reference, { ReferenceRecord } from "./reference";
+import { FeatureTagForReference } from "types/featuretag";
 
 /**
  * JSON representation of a magazine feature record.
@@ -72,6 +73,39 @@ class MagazineFeature extends Model {
       );
 
     return result;
+  }
+
+  /**
+   * Add feature tags to the instance. Takes an array of feature tag structures
+   * as input.
+   *
+   * @param tags - The feature tags to add
+   * @param opts - Options for bulkCreate
+   * @returns Promise<number> - count of added tags
+   */
+  addFeatureTags(tags: FeatureTagForReference[], opts = {}): Promise<number> {
+    const newTags = tags.map((tag) => ({
+      featureTagId: tag.id,
+      magazineFeatureId: this.referenceId,
+    }));
+
+    return FeatureTagsMagazineFeatures.bulkCreate(newTags, opts).then(
+      (trefs) => trefs.length
+    );
+  }
+
+  /**
+   * Remove all FeatureTagsMagazineFeatures records associated with the
+   * instance.
+   *
+   * @param opts - Options for destroy()
+   * @returns Promise<number>
+   */
+  removeFeatureTags(opts = {}): Promise<number> {
+    return FeatureTagsMagazineFeatures.destroy({
+      where: { magazineFeatureId: this.referenceId },
+      ...opts,
+    });
   }
 }
 
