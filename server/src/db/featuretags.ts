@@ -33,7 +33,9 @@ export function createFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
  * @returns A promise that resolves to an array of feature tags.
  * @throws If there is an error while fetching the feature tags.
  */
-export function getAllFeatureTags(opts: RequestOpts): Promise<FeatureTag[]> {
+export function getAllFeatureTags(
+  opts: RequestOpts = {}
+): Promise<FeatureTag[]> {
   const scope = getScopeFromParams(opts, featureTagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -70,7 +72,7 @@ export function getAllFeatureTags(opts: RequestOpts): Promise<FeatureTag[]> {
  */
 export function getFeatureTagById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<FeatureTag | null> {
   const scope = getScopeFromParams(opts, featureTagScopes);
   const queryOpts: FindOptions = opts.referenceCount

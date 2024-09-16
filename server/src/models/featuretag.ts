@@ -45,6 +45,9 @@ class FeatureTag extends Model {
   @Column(DataType.STRING)
   description?: string | null;
 
+  @Column(DataType.VIRTUAL)
+  referenceCount?: number;
+
   @BelongsToMany(() => MagazineFeature, () => FeatureTagsMagazineFeatures)
   magazineFeatures?: MagazineFeature[];
 
