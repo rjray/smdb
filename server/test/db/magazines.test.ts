@@ -40,7 +40,7 @@ afterAll(async () => {
   }
 });
 
-describe("Magazines: Creation", () => {
+describe("Magazines: Create", () => {
   test("Create basic Magazine", async () => {
     const magazine = await Magazines.createMagazine({
       name: "Magazine 6",
@@ -62,7 +62,7 @@ describe("Magazines: Creation", () => {
   });
 });
 
-describe("Magazines: Retrieval", () => {
+describe("Magazines: Retrieve", () => {
   test("Get all Magazines", async () => {
     const magazines = await Magazines.getAllMagazines();
 

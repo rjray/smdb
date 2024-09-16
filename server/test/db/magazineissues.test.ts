@@ -43,7 +43,7 @@ afterAll(async () => {
   }
 });
 
-describe("MagazineIssues: Creation", () => {
+describe("MagazineIssues: Create", () => {
   test("Create basic magazine issue", async () => {
     const issue = await MagazineIssues.createMagazineIssue({
       id: 26,
@@ -57,7 +57,7 @@ describe("MagazineIssues: Creation", () => {
   });
 });
 
-describe("MagazineIssues: Retrieval", () => {
+describe("MagazineIssues: Retrieve", () => {
   test("Get magazine issue by ID", async () => {
     const issue = await MagazineIssues.getMagazineIssueById(26);
 

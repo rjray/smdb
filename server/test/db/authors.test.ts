@@ -26,7 +26,7 @@ afterAll(async () => {
   }
 });
 
-describe("Authors: Creation", () => {
+describe("Authors: Create", () => {
   test("Create basic author", async () => {
     const author = await Authors.createAuthor({
       name: "Author 1",
@@ -57,7 +57,7 @@ describe("Authors: Creation", () => {
   });
 });
 
-describe("Authors: Retrieval", () => {
+describe("Authors: Retrieve", () => {
   test("Get all authors", async () => {
     const authors = await Authors.getAllAuthors();
     expect(authors.length).toBe(2);
