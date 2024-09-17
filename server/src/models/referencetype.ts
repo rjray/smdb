@@ -3,6 +3,7 @@
  */
 
 import {
+  Scopes,
   DataType,
   Table,
   Column,
@@ -33,6 +34,7 @@ export type ReferenceTypeRecord = {
   references?: Array<ReferenceRecord>;
 };
 
+@Scopes(() => ({ references: { include: [Reference] } }))
 @Table({ timestamps: false })
 class ReferenceType extends Model {
   @AllowNull(false)
@@ -46,6 +48,9 @@ class ReferenceType extends Model {
 
   @Column(DataType.STRING)
   notes?: string | null;
+
+  @Column(DataType.VIRTUAL)
+  referenceCount?: number;
 
   @HasMany(() => Reference)
   references?: Reference[];

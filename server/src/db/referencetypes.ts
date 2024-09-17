@@ -6,13 +6,14 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { ReferenceType } from "models";
-import { RequestOpts } from "utils";
+import { RequestOpts, getScopeFromParams } from "utils";
+import {
+  ReferenceTypeNewData,
+  ReferenceTypeUpdateData,
+} from "../types/referencetype";
 
-type ReferenceTypeData = {
-  name: string;
-  description: string;
-  notes?: string | null;
-};
+/// The scopes that can be fetched for feature tags.
+const referenceTypeScopes = ["references"];
 
 /**
  * Adds a reference type to the database.
@@ -21,7 +22,7 @@ type ReferenceTypeData = {
  * @returns A promise that resolves to the created reference type.
  */
 export function createReferenceType(
-  data: ReferenceTypeData
+  data: ReferenceTypeNewData
 ): Promise<ReferenceType> {
   return ReferenceType.create(data);
 }
@@ -35,8 +36,9 @@ export function createReferenceType(
  * @throws If there is an error while fetching the reference types.
  */
 export function getAllReferenceTypes(
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<ReferenceType[]> {
+  const scope = getScopeFromParams(opts, referenceTypeScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {
@@ -53,9 +55,11 @@ export function getAllReferenceTypes(
       }
     : {};
 
-  return ReferenceType.findAll(queryOpts).catch((error: BaseError) => {
-    throw new Error(error.message);
-  });
+  return ReferenceType.scope(scope)
+    .findAll(queryOpts)
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
 }
 
 /**
@@ -70,8 +74,9 @@ export function getAllReferenceTypes(
  */
 export function getReferenceTypeById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<ReferenceType | null> {
+  const scope = getScopeFromParams(opts, referenceTypeScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
         attributes: {
@@ -88,7 +93,8 @@ export function getReferenceTypeById(
       }
     : {};
 
-  return ReferenceType.findByPk(id, queryOpts)
+  return ReferenceType.scope(scope)
+    .findByPk(id, queryOpts)
     .then((referenceType) => referenceType)
     .catch((error: BaseError) => {
       throw new Error(error.message);
@@ -106,7 +112,7 @@ export function getReferenceTypeById(
  */
 export function updateReferenceTypeById(
   id: number,
-  data: ReferenceTypeData
+  data: ReferenceTypeUpdateData
 ): Promise<ReferenceType> {
   return ReferenceType.findByPk(id)
     .then((referenceType) => {
