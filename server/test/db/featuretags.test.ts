@@ -106,7 +106,7 @@ describe("FeatureTags: Retrieve", () => {
     }
   });
 
-  test("Get feature tag by ID with references", async () => {
+  test("Get feature tag by ID with features", async () => {
     const featureTag = await FeatureTags.getFeatureTagById(1, {
       features: true,
     });
@@ -117,7 +117,7 @@ describe("FeatureTags: Retrieve", () => {
       if (featureTag.magazineFeatures) {
         expect(featureTag.magazineFeatures.length).toBe(5);
       } else {
-        assert.fail("No feature tag.references found");
+        assert.fail("No featureTag.magazineFeatures found");
       }
     } else {
       assert.fail("No feature tag found");
