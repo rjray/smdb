@@ -14,6 +14,7 @@ async function up({ context: queryInterface }) {
     },
     name: {
       type: Sequelize.STRING,
+      unique: true,
       allowNull: false,
     },
     notes: {
