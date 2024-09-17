@@ -38,10 +38,6 @@ async function up({ context: queryInterface }) {
 }
 
 async function down({ context: queryInterface }) {
-  await queryInterface.removeConstraint(
-    "FeatureTagsMagazineFeatures",
-    "featuretags_magazinefeatures_pk"
-  );
   await queryInterface.removeIndex(
     "FeatureTagsMagazineFeatures",
     "featuretags_magazinefeatures_featuretag"

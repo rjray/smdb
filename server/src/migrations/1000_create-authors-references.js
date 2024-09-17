@@ -38,10 +38,6 @@ async function up({ context: queryInterface }) {
 }
 
 async function down({ context: queryInterface }) {
-  await queryInterface.removeConstraint(
-    "AuthorsReferences",
-    "authors_references_pk"
-  );
   await queryInterface.removeIndex(
     "AuthorsReferences",
     "authors_references_author"
