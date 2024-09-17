@@ -53,6 +53,9 @@ class Author extends Model {
   @Column(DataType.STRING)
   name!: string;
 
+  @Column(DataType.VIRTUAL)
+  referenceCount?: number;
+
   @HasMany(() => AuthorAlias)
   aliases?: AuthorAlias[];
 

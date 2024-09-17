@@ -35,6 +35,7 @@ export type MagazineIssueRecord = {
   magazineId: number;
   createdAt: string;
   updatedAt: string;
+  referenceCount?: number;
   magazine?: MagazineRecord;
   magazineFeatures?: Array<MagazineFeatureRecord>;
 };
@@ -52,6 +53,9 @@ class MagazineIssue extends Model {
   @ForeignKey(() => Magazine)
   @Column(DataType.INTEGER)
   magazineId!: number;
+
+  @Column(DataType.VIRTUAL)
+  referenceCount?: number;
 
   @BelongsTo(() => Magazine, { onDelete: "CASCADE" })
   magazine?: Magazine;

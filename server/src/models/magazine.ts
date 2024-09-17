@@ -38,6 +38,7 @@ export type MagazineRecord = {
   notes: string | null;
   createdAt: string;
   updatedAt: string;
+  issueCount?: number;
   issues?: Array<MagazineIssueRecord>;
 };
 
@@ -56,6 +57,9 @@ class Magazine extends Model {
 
   @Column(DataType.STRING)
   notes?: string | null;
+
+  @Column(DataType.VIRTUAL)
+  issueCount?: number;
 
   @HasMany(() => MagazineIssue)
   issues?: MagazineIssue[];
