@@ -33,7 +33,7 @@ export function createSeries(data: SeriesData): Promise<Series> {
  * @returns A promise that resolves to an array of series.
  * @throws If there is an error while fetching the series.
  */
-export function getAllSeries(opts: RequestOpts): Promise<Series[]> {
+export function getAllSeries(opts: RequestOpts = {}): Promise<Series[]> {
   const scope = getScopeFromParams(opts, seriesScopes);
 
   return Series.scope(scope)
@@ -54,7 +54,7 @@ export function getAllSeries(opts: RequestOpts): Promise<Series[]> {
  */
 export function getSeriesById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<Series | null> {
   const scope = getScopeFromParams(opts, seriesScopes);
 

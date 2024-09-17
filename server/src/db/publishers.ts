@@ -32,7 +32,7 @@ export function createPublisher(data: PublisherData): Promise<Publisher> {
  * @returns A promise that resolves to an array of publishers.
  * @throws If there is an error while fetching the publishers.
  */
-export function getAllPublishers(opts: RequestOpts): Promise<Publisher[]> {
+export function getAllPublishers(opts: RequestOpts = {}): Promise<Publisher[]> {
   const scope = getScopeFromParams(opts, publisherScopes);
 
   return Publisher.scope(scope)
@@ -54,7 +54,7 @@ export function getAllPublishers(opts: RequestOpts): Promise<Publisher[]> {
  */
 export function getPublisherById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<Publisher | null> {
   const scope = getScopeFromParams(opts, publisherScopes);
 

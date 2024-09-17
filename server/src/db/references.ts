@@ -405,7 +405,7 @@ export async function createReference(
  * @returns A promise that resolves to an array of references.
  * @throws If there is an error while fetching the references.
  */
-export function getAllReferences(opts: RequestOpts): Promise<Reference[]> {
+export function getAllReferences(opts: RequestOpts = {}): Promise<Reference[]> {
   const scope = getScopeFromParams(opts ?? {}, referenceScopes);
 
   return Reference.scope(scope)
@@ -427,7 +427,7 @@ export function getAllReferences(opts: RequestOpts): Promise<Reference[]> {
  */
 export function getOneReferenceById(
   id: number,
-  opts: RequestOpts
+  opts: RequestOpts = {}
 ): Promise<Reference | null> {
   const scope = getScopeFromParams(opts ?? {}, referenceScopes);
 
