@@ -47,11 +47,11 @@ class Series extends Model {
   name!: string;
 
   @Column(DataType.STRING)
-  notes?: string | null;
+  notes!: string | null;
 
   @ForeignKey(() => Publisher)
   @Column(DataType.INTEGER)
-  publisherId?: number;
+  publisherId!: number | null;
 
   @BelongsTo(() => Publisher, { onDelete: "CASCADE" })
   publisher?: Publisher;

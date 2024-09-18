@@ -29,9 +29,16 @@ async function up({ context: queryInterface }) {
       allowNull: true,
     },
   });
+
+  await queryInterface.addIndex("Series", {
+    name: "unique_name_publisher",
+    fields: ["name", Sequelize.fn("ifnull", Sequelize.col("publisherId"), 0)],
+    unique: true,
+  });
 }
 
 async function down({ context: queryInterface }) {
+  await queryInterface.removeIndex("Series", "unique_name_publisher");
   await queryInterface.dropTable("Series");
 }
 
