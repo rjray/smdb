@@ -21,6 +21,8 @@ import {
  * @property {string} email - The email of the user.
  * @property {string} username - The username of the user.
  * @property {string} password - The password of the user.
+ * @property {string} createdAt - The creation date of the reference.
+ * @property {string} updatedAt - The last update date of the reference.
  */
 export type UserRecord = {
   id: number;
@@ -28,6 +30,8 @@ export type UserRecord = {
   email: string;
   username: string;
   password: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 @Table
