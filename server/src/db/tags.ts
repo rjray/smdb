@@ -34,7 +34,7 @@ export function createTag(data: TagData): Promise<Tag> {
  * @returns A promise that resolves to an array of tags.
  * @throws If there is an error while fetching the tags.
  */
-export function getAllTags(opts: RequestOpts): Promise<Tag[]> {
+export function getAllTags(opts: RequestOpts = {}): Promise<Tag[]> {
   const scope = getScopeFromParams(opts, tagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {
@@ -68,7 +68,10 @@ export function getAllTags(opts: RequestOpts): Promise<Tag[]> {
  * @returns A promise that resolves to the fetched tag or null if not found.
  * @throws If there is an error while fetching the tag.
  */
-export function getTagById(id: number, opts: RequestOpts): Promise<Tag | null> {
+export function getTagById(
+  id: number,
+  opts: RequestOpts = {}
+): Promise<Tag | null> {
   const scope = getScopeFromParams(opts, tagScopes);
   const queryOpts: FindOptions = opts.referenceCount
     ? {

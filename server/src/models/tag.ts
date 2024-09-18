@@ -49,6 +49,9 @@ class Tag extends Model {
   @Column(DataType.STRING)
   description?: string | null;
 
+  @Column(DataType.VIRTUAL)
+  referenceCount?: number;
+
   @BelongsToMany(() => Reference, () => TagsReferences)
   references?: Reference[];
 
