@@ -3,6 +3,7 @@
  */
 
 export type AuthorNewData = {
+  id?: number;
   name: string;
   aliases?: {
     name: string;
