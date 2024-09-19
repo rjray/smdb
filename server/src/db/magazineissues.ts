@@ -30,6 +30,45 @@ export function createMagazineIssue(
 }
 
 /**
+ * Fetch all magazine issues with additional data based on the provided options.
+ * Can fetch for just one magazine or all of them, based on opts.magazineId.
+ *
+ * @param opts - The options for fetching magazine issues' additional data.
+ * @returns A promise that resolves to an array of magazine issues.
+ * @throws If there is an error while fetching the magazine issues.
+ */
+export function getAllMagazineIssues(
+  opts: RequestOpts = {}
+): Promise<MagazineIssue[]> {
+  const scope = getScopeFromParams(opts, magazineIssueScopes);
+  const queryOpts: FindOptions = opts.referenceCount
+    ? {
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(
+                `(SELECT COUNT(*) FROM \`MagazineFeatures\`
+                 WHERE MagazineIssue.\`id\` = \`magazineIssueId\`)`
+              ),
+              "referenceCount",
+            ],
+          ],
+        },
+      }
+    : {};
+  if (opts.magazineId) {
+    queryOpts.where = { magazineId: opts.magazineId };
+  }
+
+  return MagazineIssue.scope(scope)
+    .findAll(queryOpts)
+    .then((issues) => issues)
+    .catch((error: BaseError) => {
+      throw new Error(error.message);
+    });
+}
+
+/**
  * Fetches a single magazine issue by ID with additional data based on the
  * provided options.
  *
