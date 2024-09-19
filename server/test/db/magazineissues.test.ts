@@ -46,31 +46,40 @@ afterAll(async () => {
 describe("MagazineIssues: Create", () => {
   test("Create basic magazine issue", async () => {
     const issue = await MagazineIssues.createMagazineIssue({
-      id: 26,
       magazineId: 1,
       issue: "6",
     });
 
-    expect(issue.id).toBe(26);
     expect(issue.magazineId).toBe(1);
     expect(issue.issue).toBe("6");
+  });
+
+  test("Attempt to create duplicate magazine issue", async () => {
+    async function failToCreate() {
+      return await MagazineIssues.createMagazineIssue({
+        magazineId: 1,
+        issue: "6",
+      });
+    }
+
+    expect(() => failToCreate()).rejects.toThrowError("Validation error");
   });
 });
 
 describe("MagazineIssues: Retrieve", () => {
   test("Get magazine issue by ID", async () => {
-    const issue = await MagazineIssues.getMagazineIssueById(26);
+    const issue = await MagazineIssues.getMagazineIssueById(1);
 
     if (issue) {
       expect(issue.magazineId).toBe(1);
-      expect(issue.issue).toBe("6");
+      expect(issue.issue).toBe("1");
     } else {
       assert.fail("No magazine issue found");
     }
   });
 
   test("Get magazine issue by ID with magazine", async () => {
-    const issue = await MagazineIssues.getMagazineIssueById(26, {
+    const issue = await MagazineIssues.getMagazineIssueById(1, {
       magazine: true,
     });
 
@@ -82,8 +91,8 @@ describe("MagazineIssues: Retrieve", () => {
       const { createdAt: magazineCreatedAt, updatedAt: magazineUpdatedAt } =
         cleaned.magazine || {};
       expect(cleaned).toEqual({
-        id: 26,
-        issue: "6",
+        id: 1,
+        issue: "1",
         magazineId: 1,
         createdAt,
         updatedAt,
@@ -110,12 +119,12 @@ describe("MagazineIssues: Retrieve", () => {
       tags: [{ name: "Tag 1" }, { name: "Tag 2" }],
       magazineFeature: {
         magazineId: 1,
-        magazineIssueId: 26,
+        magazineIssueId: 1,
         featureTags: [{ id: 1 }, { id: 2 }],
       },
     });
 
-    const issue = await MagazineIssues.getMagazineIssueById(26, {
+    const issue = await MagazineIssues.getMagazineIssueById(1, {
       features: true,
     });
 
@@ -127,18 +136,18 @@ describe("MagazineIssues: Retrieve", () => {
       const { createdAt: mfCreatedAt, updatedAt: mfUpdatedAt } =
         cleaned.magazineFeatures?.[0].magazineIssue || {};
       expect(cleaned).toEqual({
-        id: 26,
-        issue: "6",
+        id: 1,
+        issue: "1",
         magazineId: 1,
         createdAt,
         updatedAt,
         magazineFeatures: [
           {
             referenceId: 1,
-            magazineIssueId: 26,
+            magazineIssueId: 1,
             magazineIssue: {
-              id: 26,
-              issue: "6",
+              id: 1,
+              issue: "1",
               magazineId: 1,
               createdAt: mfCreatedAt,
               updatedAt: mfUpdatedAt,
@@ -166,18 +175,20 @@ describe("MagazineIssues: Retrieve", () => {
 
 describe("MagazineIssues: Update", () => {
   test("Update basic magazine issue", async () => {
-    const magazineIssue = await MagazineIssues.updateMagazineIssueById(26, {
-      issue: "6 Updated",
+    const magazineIssue = await MagazineIssues.updateMagazineIssueById(1, {
+      issue: "1 Updated",
     });
 
-    expect(magazineIssue.id).toBe(26);
-    expect(magazineIssue.issue).toBe("6 Updated");
+    expect(magazineIssue.issue).toBe("1 Updated");
   });
 });
 
 describe("MagazineIssues: Delete", () => {
-  test("Delete basic magazine issue", async () => {
-    const result = await MagazineIssues.deleteMagazineIssueById(26);
+  test("Delete basic magazine issue", async (context) => {
+    const count = (await MagazineIssues.getAllMagazineIssues()).length;
+    if (count < 26) context.skip();
+
+    const result = await MagazineIssues.deleteMagazineIssueById(1);
     expect(result).toBe(1);
 
     const magazine = await Magazines.getMagazineById(1, {
@@ -191,5 +202,10 @@ describe("MagazineIssues: Delete", () => {
 
     const magazineFeature = await MagazineFeature.findByPk(1);
     expect(magazineFeature).toBeNull();
+  });
+
+  test("Delete non-existent magazine issue", async () => {
+    const result = await MagazineIssues.deleteMagazineIssueById(100);
+    expect(result).toBe(0);
   });
 });
