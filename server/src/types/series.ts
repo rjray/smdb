@@ -8,3 +8,16 @@ export type SeriesForBook = {
   notes?: string;
   publisherId?: number;
 };
+
+export type SeriesNewData = {
+  id?: number;
+  name: string;
+  notes?: string;
+  publisherId?: number;
+};
+
+export type SeriesUpdateData = {
+  name?: string;
+  notes?: string;
+  publisherId?: number;
+};

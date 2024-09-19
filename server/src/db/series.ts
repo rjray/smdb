@@ -5,16 +5,11 @@
 import { BaseError } from "sequelize";
 
 import { Series } from "models";
+import { SeriesUpdateData, SeriesNewData } from "types/series";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for series.
 const seriesScopes = ["books", "publisher"];
-
-type SeriesData = {
-  name: string;
-  notes?: string | null;
-  publisherId?: number | null;
-};
 
 /**
  * Adds a series to the database.
@@ -22,7 +17,7 @@ type SeriesData = {
  * @param data - The series data to be added.
  * @returns A promise that resolves to the created series.
  */
-export function createSeries(data: SeriesData): Promise<Series> {
+export function createSeries(data: SeriesNewData): Promise<Series> {
   return Series.create(data);
 }
 
@@ -75,7 +70,7 @@ export function getSeriesById(
  */
 export function updateSeriesById(
   id: number,
-  data: SeriesData
+  data: SeriesUpdateData
 ): Promise<Series> {
   return Series.findByPk(id)
     .then((series) => {

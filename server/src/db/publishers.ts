@@ -5,15 +5,11 @@
 import { BaseError } from "sequelize";
 
 import { Publisher } from "models";
+import { PublisherUpdateData, PublisherNewData } from "types/publisher";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for publishers.
 const publisherScopes = ["books", "series"];
-
-type PublisherData = {
-  name: string;
-  notes?: string | null;
-};
 
 /**
  * Adds a publisher to the database.
@@ -21,7 +17,7 @@ type PublisherData = {
  * @param data - The publisher data to be added.
  * @returns A promise that resolves to the created publisher.
  */
-export function createPublisher(data: PublisherData): Promise<Publisher> {
+export function createPublisher(data: PublisherNewData): Promise<Publisher> {
   return Publisher.create(data);
 }
 
@@ -76,7 +72,7 @@ export function getPublisherById(
  */
 export function updatePublisherById(
   id: number,
-  data: PublisherData
+  data: PublisherUpdateData
 ): Promise<Publisher> {
   return Publisher.findByPk(id)
     .then((publisher) => {
