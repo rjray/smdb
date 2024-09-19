@@ -34,9 +34,16 @@ async function up({ context: queryInterface }) {
       type: Sequelize.DATE,
     },
   });
+
+  await queryInterface.addIndex("MagazineIssues", {
+    name: "unique_magazine_issue",
+    fields: ["magazineId", "issue"],
+    unique: true,
+  });
 }
 
 async function down({ context: queryInterface }) {
+  await queryInterface.removeIndex("MagazineIssues", "unique_magazine_issue");
   await queryInterface.dropTable("MagazineIssues");
 }
 
