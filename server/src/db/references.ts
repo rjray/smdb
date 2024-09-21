@@ -99,36 +99,155 @@ async function fixupTags(
   return fixedTags;
 }
 
+// Fix up publisher data in a book reference. This may mean creating new
+// publishers.
+async function fixupPublisher(
+  book: BookForReference,
+  fixed: BookForReference,
+  transaction: Transaction
+): Promise<void> {
+  if (book.publisher) {
+    if (book.publisherId) {
+      if (book.publisher.id) {
+        if (book.publisherId === book.publisher.id) {
+          // The publisher is already in the database. Don't need to create.
+          fixed.publisherId = book.publisherId;
+          return;
+        } else {
+          throw new Error(
+            "fixupPublisher: Mismatch between publisherId and publisher data"
+          );
+        }
+      } else {
+        // No value in `book.publisher.id` but there is a `book.publisherId`,
+        // so throw an error.
+        throw new Error(
+          "fixupPublisher: publisherId and publisher data are incompatible"
+        );
+      }
+    } else {
+      // No value in `book.publisherId` but there is a `book.publisher`, so
+      // create a new publisher.
+      const { name, notes } = book.publisher;
+      if (name) {
+        const newPublisher = await Publisher.create(
+          { name, notes },
+          { transaction }
+        );
+
+        fixed.publisherId = newPublisher.id;
+        return;
+      } else {
+        throw new Error(
+          "fixupPublisher: Publisher name is required to create a new publisher"
+        );
+      }
+    }
+  } else if (book.publisherId) {
+    fixed.publisherId = book.publisherId;
+    return;
+  }
+}
+
+// Fix up series data in a book reference. This may mean creating a new series.
+async function fixupSeries(
+  book: BookForReference,
+  fixed: BookForReference,
+  transaction: Transaction
+): Promise<void> {
+  if (book.series) {
+    if (book.seriesId) {
+      if (book.series.id) {
+        if (book.seriesId === book.series.id) {
+          // The series is already in the database. Don't need to create.
+          fixed.seriesId = book.seriesId;
+          return;
+        } else {
+          throw new Error(
+            "fixupSeries: Mismatch between seriesId and series data"
+          );
+        }
+      } else {
+        // No value in `book.series.id` but there is a `book.seriesId`, so
+        // throw an error.
+        throw new Error(
+          "fixupSeries: seriesId and series data are incompatible"
+        );
+      }
+    } else {
+      // No value in `book.seriesId` but there is a `book.series`, so
+      // create a new series.
+      const { name, notes, publisherId: seriesPublisherId } = book.series;
+
+      if (seriesPublisherId) {
+        if (fixed.publisherId) {
+          if (fixed.publisherId !== seriesPublisherId) {
+            // The series publisher doesn't match the book publisher.
+            throw new Error(
+              "fixupSeries: Series publisher doesn't match book publisher"
+            );
+          }
+        } else {
+          fixed.publisherId = seriesPublisherId;
+        }
+      }
+
+      if (name) {
+        const newSeries = await Series.create(
+          { name, notes, publisherId: fixed.publisherId },
+          { transaction }
+        );
+
+        fixed.seriesId = newSeries.id;
+        return;
+      } else {
+        throw new Error(
+          "fixupSeries: Series name is required to create a new series"
+        );
+      }
+    }
+  } else if (book.seriesId) {
+    fixed.seriesId = book.seriesId;
+    const series = await Series.findByPk(book.seriesId, {
+      transaction,
+    });
+    if (!series) {
+      throw new Error("fixupSeries: Specified series not found");
+    }
+
+    if (fixed.publisherId) {
+      if (fixed.publisherId !== series.publisherId) {
+        // The series publisher doesn't match the book publisher.
+        throw new Error(
+          "fixupSeries: Series publisher doesn't match book-provided publisher"
+        );
+      }
+    } else {
+      if (series.publisherId) {
+        fixed.publisherId = series.publisherId;
+      }
+    }
+
+    return;
+  }
+}
+
 // Fix up book data for a reference. This may mean creating new publishers and
 // series.
 async function fixupBook(
   book: BookForReference,
   transaction: Transaction
 ): Promise<BookForReference> {
+  const fixed: BookForReference = {};
+  fixed.seriesNumber = book.seriesNumber;
+  fixed.isbn = book.isbn;
+
   // Create new publisher if it doesn't exist
-  if (book.publisher && !book.publisher.id && book.publisher.name) {
-    const { name, notes } = book.publisher;
-    const newPublisher = await Publisher.create(
-      { name, notes },
-      { transaction }
-    );
-    book.publisherId = newPublisher.id;
-    delete book.publisher;
-  }
-
+  await fixupPublisher(book, fixed, transaction);
   // Create new series if it doesn't exist
-  if (book.series && !book.series.id && book.series.name) {
-    const { name, notes } = book.series;
-    const publisherId = book.publisherId;
-    const newSeries = await Series.create(
-      { name, notes, publisherId },
-      { transaction }
-    );
-    book.seriesId = newSeries.id;
-    delete book.series;
-  }
+  await fixupSeries(book, fixed, transaction);
 
-  return book;
+  return fixed;
 }
 
 // Add a book reference to the database. This requires checking of the book
@@ -213,9 +332,12 @@ async function fixupMagazineFeatureForCreate(
     magazineFeature.magazineId = newMagazine.id;
     delete magazineFeature.magazine;
   }
+  if (!magazineFeature.magazineId) {
+    throw new Error("fixupMagazineFeatureForCreate: magazineId is required");
+  }
 
   // Create new magazine issue if it doesn't exist
-  if (magazineFeature.magazineIssue && !magazineFeature.magazineIssue.issue) {
+  if (magazineFeature.magazineIssue && magazineFeature.magazineIssue.issue) {
     const { issue } = magazineFeature.magazineIssue;
     const magazineId = magazineFeature.magazineId;
     const newMagazineIssue = await MagazineIssue.create(
@@ -227,6 +349,11 @@ async function fixupMagazineFeatureForCreate(
     );
     magazineFeature.magazineIssueId = newMagazineIssue.id;
     delete magazineFeature.magazineIssue;
+  }
+  if (!magazineFeature.magazineIssueId) {
+    throw new Error(
+      "fixupMagazineFeatureForCreate: magazineIssueId is required"
+    );
   }
 
   // Create any feature tags that don't exist
@@ -425,7 +552,7 @@ export function getAllReferences(opts: RequestOpts = {}): Promise<Reference[]> {
  * found.
  * @throws If there is an error while fetching the reference.
  */
-export function getOneReferenceById(
+export function getReferenceById(
   id: number,
   opts: RequestOpts = {}
 ): Promise<Reference | null> {
