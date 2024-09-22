@@ -17,9 +17,6 @@ import {
   MagazineFeature,
   Magazine,
   MagazineIssue,
-  AuthorsReferences,
-  TagsReferences,
-  FeatureTagsMagazineFeatures,
 } from "models";
 import { ReferenceUpdateData, ReferenceNewData } from "types/reference";
 import { AuthorForReference } from "types/author";
@@ -402,12 +399,18 @@ async function addMagazineFeatureReference(
   if (featureTags) {
     // Add the feature tags.
 
-    // This won't be null because we just created the reference. The creation
-    // would have thrown an error if it failed.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await reference.magazineFeature!.addFeatureTags(featureTags, {
-      transaction,
-    });
+    if (featureTags.length === 0) {
+      throw new Error(
+        "addMagazineFeatureReference: featureTags cannot be an empty array"
+      );
+    } else {
+      // This won't be null because we just created the reference. The creation
+      // would have thrown an error if it failed.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await reference.magazineFeature!.addFeatureTags(featureTags, {
+        transaction,
+      });
+    }
   }
 
   return reference;
@@ -582,33 +585,15 @@ async function updateCoreReferenceData(
   // need to remove the old relations and add the new ones.
   if (authors) {
     const newAuthors = await fixupAuthors(authors, transaction);
-    await AuthorsReferences.destroy({
-      where: { referenceId: reference.id },
-      transaction,
-    });
-    await AuthorsReferences.bulkCreate(
-      newAuthors.map((author) => ({
-        authorId: author.id,
-        referenceId: reference.id,
-      })),
-      { transaction }
-    );
+    await reference.removeAuthors({ transaction });
+    await reference.addAuthors(newAuthors, { transaction });
   }
   // Note that while tags are required, they aren't necessary for an update.
   // But if the value is provided, we need to fix it up.
   if (tags && tags.length > 0) {
     const newTags = await fixupTags(tags, transaction);
-    await TagsReferences.destroy({
-      where: { referenceId: reference.id },
-      transaction,
-    });
-    await TagsReferences.bulkCreate(
-      newTags.map((tag) => ({
-        tagId: tag.id,
-        referenceId: reference.id,
-      })),
-      { transaction }
-    );
+    await reference.removeTags({ transaction });
+    await reference.addTags(newTags, { transaction });
   }
 
   // Update the basic data. This also returns the updated reference instance.
@@ -618,7 +603,9 @@ async function updateCoreReferenceData(
   if (language) {
     data.language = language;
   }
-  return reference.update(data, { transaction });
+  await reference.update(data, { transaction });
+
+  return;
 }
 
 // Update the data for a book relation in the database. If the reference is
@@ -627,9 +614,14 @@ async function updateCoreReferenceData(
 // validation of `book` is more strict and a new book relation is created.
 async function updateBookData(
   reference: Reference,
-  book: BookForReference,
+  book: BookForReference | undefined,
   transaction: Transaction
 ): Promise<void> {
+  if (!book) {
+    // Ths update doesn't change any of the book data.
+    return;
+  }
+
   // First we do a fix-up on the book data. This will create any new series or
   // publisher if necessary.
   const newBook = await fixupBook(book, transaction);
@@ -661,51 +653,193 @@ async function updateBookData(
 // magazine issue or magazine records. This function will create new records if
 // necessary. Also checks and fixes up the feature tags.
 async function fixupMagazineFeatureForUpdate(
+  existingMagazineFeature: MagazineFeature,
   magazineFeature: MagazineFeatureForUpdateReference,
   transaction: Transaction
 ): Promise<MagazineFeatureForUpdateReference> {
-  // Create new magazine feature if it doesn't exist
-  if (magazineFeature.magazine && magazineFeature.magazine.name) {
-    const { name, language, aliases, notes } = magazineFeature.magazine;
-    const newMagazine = await Magazine.create(
-      {
-        name,
-        language,
-        aliases,
-        notes,
-      },
-      { transaction }
-    );
-    magazineFeature.magazineId = newMagazine.id;
-    delete magazineFeature.magazine;
-  }
+  const newMagazineFeature: MagazineFeatureForUpdateReference = {};
+  const { featureTags, magazine, magazineId, magazineIssue, magazineIssueId } =
+    magazineFeature;
 
-  // Create new magazine issue if it doesn't exist
-  if (magazineFeature.magazineIssue && !magazineFeature.magazineIssue.issue) {
-    const { issue } = magazineFeature.magazineIssue;
-    const magazineId = magazineFeature.magazineId;
-    const newMagazineIssue = await MagazineIssue.create(
-      {
-        issue,
-        magazineId,
-      },
-      { transaction }
-    );
-    magazineFeature.magazineIssueId = newMagazineIssue.id;
-    delete magazineFeature.magazineIssue;
+  // There are a number of different cases that can occur here:
+  //
+  // 1. There is magazineId, nothing else:
+  //    - A magazineId by itself is not allowed. It would either be a different
+  //      magazine than what the issue record points to, or it would be the
+  //      same magazine (which would be a no-op). Throw an error.
+  // 2. There is magazineIssueId, nothing else
+  //    - A magazineIssueId by itself changes the corresponding value in the
+  //      MagazineFeature record. It may or may not change what magazine the
+  //      reference is associated with.
+  // 3. There is magazineId and magazineIssueId
+  //    - A magazineId and a magazineIssueId is not allowed, because the
+  //      magazineId is at best redundant and possibly conflicting with the
+  //      magazineIssueId. Throw an error.
+  // 4. There is magazineId and magazineIssue
+  //    - A magazineId and a magazineIssue means that a new MagazineIssue
+  //      record will be created, pointing to the corresponding magazine. Its
+  //      ID value will be stored in the MagazineFeature record.
+  // 5. There is magazine and magazineIssueId
+  //    - A magazine and a magazineIssueId is not allowed, as the magazine
+  //      issue is already associated with another magazine. Throw an error.
+  // 6. There is magazine and no magazineIssue
+  //    - A magazine and no magazineIssue is an error because there is no way
+  //      to associate the new magazine with an issue. Throw an error.
+  // 7. There is magazineIssue and no magazine
+  //    - A magazineIssue and no magazine means to create a new magazine issue
+  //      record using the ID of the magazine that the record is currently
+  //      associated with. The new issue's ID will be stored in the
+  //      MagazineFeature record.
+  // 8. There is magazine and magazineIssue
+  //    - A magazine and a magazineIssue means that a new Magazine record will
+  //      be created, and its ID will be used when creating the new
+  //      MagazineIssue record. That record's ID will be stored in the
+  //      MagazineFeature record.
+  // 9. Nothing is provided:
+  //    - If there is no magazine, no issue, and no new data for either, then do
+  //      nothing.
+  //
+  // Note that there are other combinations, but these are the only ones that
+  // are important due to precedence.
+
+  // Check for `magazineId` first.
+  if (magazineId) {
+    if (magazineIssueId) {
+      // Case 3. Error.
+      throw new Error(
+        "fixupMagazineFeatureForUpdate: magazineId and magazineIssueId " +
+          "cannot both be provided"
+      );
+    } else if (magazineIssue) {
+      // Case 4. Create new magazine issue, using the provided `magazineId`.
+      const { issue } = magazineIssue;
+      if (issue) {
+        const newMagazineIssue = await MagazineIssue.create(
+          {
+            issue,
+            magazineId,
+          },
+          { transaction }
+        );
+        newMagazineFeature.magazineIssueId = newMagazineIssue.id;
+      } else {
+        // Absence of `issue`, cannot proceed.
+        throw new Error(
+          "fixupMagazineFeatureForUpdate: magazineId without magazineIssue " +
+            "`issue`data is not allowed"
+        );
+      }
+    } else {
+      // Case 1. Error.
+      throw new Error(
+        "fixupMagazineFeatureForUpdate: magazineId without magazineIssue " +
+          "data is not allowed"
+      );
+    }
+  } else if (magazineIssueId) {
+    if (magazine) {
+      // Case 5. Error.
+      throw new Error(
+        "fixupMagazineFeatureForUpdate: magazineIssueId cannot be provided " +
+          "with magazine data"
+      );
+    } else {
+      // Case 2. Simply set up the update of the feature.
+      newMagazineFeature.magazineIssueId = magazineIssueId;
+    }
+  } else if (magazine) {
+    if (magazineIssue) {
+      // Case 8. Create new Magazine, using the provided data. Use the new ID
+      // in the creation of a new MagazineIssue record.
+      const { name, language, aliases, notes } = magazine;
+      const newMagazine = await Magazine.create(
+        {
+          name,
+          language,
+          aliases,
+          notes,
+        },
+        { transaction }
+      );
+      const { issue } = magazineIssue;
+      if (issue) {
+        const newMagazineIssue = await MagazineIssue.create(
+          {
+            issue,
+            magazineId: newMagazine.id,
+          },
+          { transaction }
+        );
+        newMagazineFeature.magazineIssueId = newMagazineIssue.id;
+      }
+    } else {
+      // Case 6. Error.
+      throw new Error(
+        "fixupMagazineFeatureForUpdate: magazine data without magazineIssue " +
+          "data is not allowed"
+      );
+    }
+  } else if (magazineIssue) {
+    // Case 7. By default, we know that there is no `magazine` or `magazineId`
+    // provided. Create a new issue using the data in `magazineIssue`. If the
+    // data does not include `magazineId`, then use the ID of the magazine the
+    // record is currently associated with.
+    const { issue, magazineId } = magazineIssue;
+    if (!issue) {
+      throw new Error(
+        "fixupMagazineFeatureForUpdate: magazineIssue without issue data " +
+          "is not allowed"
+      );
+    } else {
+      if (magazineId) {
+        const newMagazineIssue = await MagazineIssue.create(
+          {
+            issue,
+            magazineId,
+          },
+          { transaction }
+        );
+        newMagazineFeature.magazineIssueId = newMagazineIssue.id;
+      } else {
+        // If there is no `magazineId`, then the issue is associated with the
+        // magazine that the feature is currently associated with. We just have
+        // to get that.
+        if (existingMagazineFeature.magazineIssue?.magazineId) {
+          const { magazineId } = existingMagazineFeature.magazineIssue;
+          const newMagazineIssue = await MagazineIssue.create(
+            {
+              issue,
+              magazineId,
+            },
+            { transaction }
+          );
+          newMagazineFeature.magazineIssueId = newMagazineIssue.id;
+        } else {
+          throw new Error(
+            "fixupMagazineFeatureForUpdate: Unable to derive `magazineId` " +
+              "from `magazineIssue`"
+          );
+        }
+      }
+    }
   }
+  // Case 9. None of the four elements were present.
 
   // Though feature tags are optional for an update, we need to fix them up if
   // they are provided.
-  if (magazineFeature.featureTags) {
-    const featureTags = await fixupFeatureTags(
-      magazineFeature.featureTags,
-      transaction
-    );
-    magazineFeature.featureTags = featureTags;
+  if (featureTags) {
+    // If present, `featureTags` cannot be empty.
+    if (featureTags.length) {
+      const newFeatureTags = await fixupFeatureTags(featureTags, transaction);
+      newMagazineFeature.featureTags = newFeatureTags;
+    } else {
+      throw new Error(
+        "fixupMagazineFeatureForUpdate: featureTags cannot be empty"
+      );
+    }
   }
 
-  return magazineFeature;
+  return newMagazineFeature;
 }
 
 // Update a magazine feature reference in the database. If this is already a
@@ -713,13 +847,24 @@ async function fixupMagazineFeatureForUpdate(
 // then the validation of `magazineFeature` is more strict.
 async function updateMagazineFeatureData(
   reference: Reference,
-  magazineFeature: MagazineFeatureForUpdateReference,
+  magazineFeature: MagazineFeatureForUpdateReference | undefined,
   transaction: Transaction
 ): Promise<void> {
+  if (!magazineFeature) {
+    // Ths update doesn't change any of the magazine feature data.
+    return;
+  }
+
   // First we do a fix-up on the magazine feature data. This will create any new
   // magazine issue or magazine if necessary.
   const { featureTags, ...newMagazineFeature } =
-    await fixupMagazineFeatureForUpdate(magazineFeature, transaction);
+    await fixupMagazineFeatureForUpdate(
+      // OK to use `!` here, because `magazineFeature` is known to be defined.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      reference.magazineFeature!,
+      magazineFeature,
+      transaction
+    );
 
   if (reference.referenceTypeId !== 2) {
     // This was not a magazine feature reference previously. We don't have to
@@ -734,16 +879,15 @@ async function updateMagazineFeatureData(
       },
       { transaction }
     );
+    if (!newMagazineFeatureRecord) {
+      throw new Error("updateMagazineFeatureData: Failed to create new record");
+    }
 
     // Note that in this case, feature tags are required.
-    if (featureTags) {
-      await FeatureTagsMagazineFeatures.bulkCreate(
-        featureTags.map((featureTag) => ({
-          featureTagId: featureTag.id,
-          magazineFeatureId: newMagazineFeatureRecord.id,
-        })),
-        { transaction }
-      );
+    if (featureTags && featureTags.length > 0) {
+      await newMagazineFeatureRecord.addFeatureTags(featureTags, {
+        transaction,
+      });
     } else {
       throw new Error(
         "updateMagazineFeatureData: New data must have 'featureTags'"
@@ -752,12 +896,23 @@ async function updateMagazineFeatureData(
   } else {
     // This was a magazine feature reference previously. We just need to update
     // the magazine feature relation.
-    await MagazineFeature.update(newMagazineFeature, {
-      where: {
-        referenceId: reference.id,
-      },
-      transaction,
-    });
+    if (reference.magazineFeature) {
+      await reference.magazineFeature.update(newMagazineFeature, {
+        transaction,
+      });
+      if (featureTags) {
+        await reference.magazineFeature.removeFeatureTags({
+          transaction,
+        });
+        await reference.magazineFeature.addFeatureTags(featureTags, {
+          transaction,
+        });
+      }
+    } else {
+      throw new Error(
+        "updateMagazineFeatureData: No magazineFeature property on reference"
+      );
+    }
   }
 }
 
@@ -767,13 +922,20 @@ async function updateMagazineFeatureData(
 // new photo collection relation is created.
 async function updatePhotoCollectionData(
   reference: Reference,
-  photoCollection: PhotoCollectionForUpdateReference,
+  photoCollection: PhotoCollectionForUpdateReference | undefined,
   transaction: Transaction
 ): Promise<void> {
+  if (!photoCollection) {
+    // Ths update doesn't change any of the photo collection data.
+    return;
+  }
+
+  const collection = { ...photoCollection };
+
   if (reference.referenceTypeId !== 3) {
     // This was not a photo collection reference, so check the new data more
     // strictly.
-    if (!photoCollection.location || !photoCollection.media) {
+    if (!collection.location || !collection.media) {
       throw new Error(
         "updatePhotoCollectionData: New data must have both 'location' and 'media'"
       );
@@ -781,7 +943,7 @@ async function updatePhotoCollectionData(
       // Create the new photo collection, linked to this reference.
       await PhotoCollection.create(
         {
-          ...photoCollection,
+          ...collection,
           referenceId: reference.id,
         },
         { transaction }
@@ -791,17 +953,24 @@ async function updatePhotoCollectionData(
     // This was already a photo collection reference, so check the new data more
     // loosely. If either element is missing/null, just remove it from the
     // object. We'll only update the `PhotoCollection` property if need be.
-    if (!photoCollection.location) {
-      delete photoCollection.location;
+    if (!collection.location) {
+      delete collection.location;
     }
-    if (!photoCollection.media) {
-      delete photoCollection.media;
+    if (!collection.media) {
+      delete collection.media;
     }
-    if (Object.keys(photoCollection).length !== 0) {
-      await PhotoCollection.update(photoCollection, {
-        where: { referenceId: reference.id },
-        transaction,
-      });
+    if (Object.keys(collection).length !== 0) {
+      // Update the photo collection.
+      if (reference.photoCollection) {
+        await reference.photoCollection.update(collection, {
+          transaction,
+        });
+      } else {
+        await PhotoCollection.update(collection, {
+          where: { referenceId: reference.id },
+          transaction,
+        });
+      }
     }
   }
 }
@@ -816,24 +985,28 @@ async function updatePhotoCollectionData(
  * Throws an error if the reference is not found.
  *
  * @param id - The ID of the reference to update.
- * @param data - The data to update the reference with.
+ * @param dataIn - The data to update the reference with.
  * @param opts - The options for fetching the reference's additional data in
  * the return value.
  * @returns A promise that resolves to the updated reference.
  */
 export async function updateReferenceById(
   id: number,
-  data: ReferenceUpdateData
+  dataIn: ReferenceUpdateData
 ): Promise<Reference | null> {
+  const data = { ...dataIn };
+
   return Reference.findByPk(id)
     .then(async (reference) => {
       if (!reference) {
         throw new Error(`updateReference: Reference ID ${id} not found`);
       }
+      data.referenceTypeId = data.referenceTypeId || reference.referenceTypeId;
+      const changingType = reference.referenceTypeId !== data.referenceTypeId;
 
       try {
-        const result = await connection.transaction(async (transaction) => {
-          if (reference.referenceTypeId !== data.referenceTypeId) {
+        await connection.transaction(async (transaction) => {
+          if (changingType) {
             switch (reference.referenceTypeId) {
               case ReferenceTypes.Book:
                 await Book.destroy({
@@ -860,7 +1033,7 @@ export async function updateReferenceById(
 
           switch (data.referenceTypeId) {
             case ReferenceTypes.Book:
-              if (!data.book) {
+              if (changingType && !data.book) {
                 throw new Error(
                   "updateReference: Reference must have book data"
                 );
@@ -868,7 +1041,7 @@ export async function updateReferenceById(
               await updateBookData(reference, data.book, transaction);
               break;
             case ReferenceTypes.MagazineFeature:
-              if (!data.magazineFeature) {
+              if (changingType && !data.magazineFeature) {
                 throw new Error(
                   "updateReference: Reference must have magazine feature data"
                 );
@@ -880,7 +1053,7 @@ export async function updateReferenceById(
               );
               break;
             case ReferenceTypes.PhotoCollection:
-              if (!data.photoCollection) {
+              if (changingType && !data.photoCollection) {
                 throw new Error(
                   "updateReference: Reference must have photo collection data"
                 );
@@ -895,10 +1068,10 @@ export async function updateReferenceById(
               break;
           }
 
-          return updateCoreReferenceData(reference, data, transaction);
+          await updateCoreReferenceData(reference, data, transaction);
         });
 
-        return result;
+        return Reference.findByPk(id);
       } catch (error) {
         if (error instanceof BaseError) {
           throw new Error(
