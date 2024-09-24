@@ -44,10 +44,10 @@ class Tag extends Model {
   name!: string;
 
   @Column(DataType.STRING)
-  type?: string | null;
+  type!: string | null;
 
   @Column(DataType.STRING)
-  description?: string | null;
+  description!: string | null;
 
   @Column(DataType.VIRTUAL)
   referenceCount?: number;

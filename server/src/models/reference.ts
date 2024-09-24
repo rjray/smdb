@@ -75,7 +75,7 @@ class Reference extends Model {
   name!: string;
 
   @Column(DataType.STRING)
-  language?: string | null;
+  language!: string | null;
 
   @ForeignKey(() => ReferenceType)
   @Column(DataType.INTEGER)

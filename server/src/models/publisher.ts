@@ -48,7 +48,7 @@ class Publisher extends Model {
   name!: string;
 
   @Column(DataType.STRING)
-  notes?: string | null;
+  notes!: string | null;
 
   @HasMany(() => Book)
   books?: Book[];

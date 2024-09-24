@@ -53,24 +53,24 @@ class Book extends Model {
   reference?: Reference;
 
   @Column(DataType.STRING)
-  isbn?: string | null;
+  isbn!: string | null;
 
   @Column(DataType.STRING)
-  seriesNumber?: string | null;
+  seriesNumber!: string | null;
 
   @ForeignKey(() => Publisher)
   @Column(DataType.INTEGER)
-  publisherId?: number;
+  publisherId!: number | null;
 
   @BelongsTo(() => Publisher, { onDelete: "SET NULL" })
-  publisher?: Publisher;
+  publisher!: Publisher;
 
   @ForeignKey(() => Series)
   @Column(DataType.INTEGER)
-  seriesId?: number;
+  seriesId!: number | null;
 
   @BelongsTo(() => Series, { onDelete: "SET NULL" })
-  series?: Series;
+  series!: Series;
 
   clean(): BookRecord {
     const result = this.get();

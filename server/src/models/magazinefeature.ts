@@ -55,10 +55,10 @@ class MagazineFeature extends Model {
   magazineIssueId!: number;
 
   @BelongsTo(() => MagazineIssue, { onDelete: "CASCADE" })
-  magazineIssue?: MagazineIssue;
+  magazineIssue!: MagazineIssue;
 
   @BelongsToMany(() => FeatureTag, () => FeatureTagsMagazineFeatures)
-  featureTags?: FeatureTag[];
+  featureTags!: FeatureTag[];
 
   clean(): MagazineFeatureRecord {
     const result = this.get();

@@ -47,7 +47,7 @@ class ReferenceType extends Model {
   description!: string;
 
   @Column(DataType.STRING)
-  notes?: string | null;
+  notes!: string | null;
 
   @Column(DataType.VIRTUAL)
   referenceCount?: number;

@@ -50,13 +50,13 @@ class Magazine extends Model {
   name!: string;
 
   @Column(DataType.STRING)
-  language?: string | null;
+  language!: string | null;
 
   @Column(DataType.STRING)
-  aliases?: string | null;
+  aliases!: string | null;
 
   @Column(DataType.STRING)
-  notes?: string | null;
+  notes!: string | null;
 
   @Column(DataType.VIRTUAL)
   issueCount?: number;

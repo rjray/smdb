@@ -43,7 +43,7 @@ class FeatureTag extends Model {
   name!: string;
 
   @Column(DataType.STRING)
-  description?: string | null;
+  description!: string | null;
 
   @Column(DataType.VIRTUAL)
   referenceCount?: number;
