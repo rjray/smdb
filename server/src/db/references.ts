@@ -231,7 +231,7 @@ async function fixupSeries(
 
 // Fix up book data for a reference. This may mean creating new publishers and
 // series.
-async function fixupBook(
+async function fixupBookForCreate(
   book: BookForReference,
   transaction: Transaction
 ): Promise<BookForReference> {
@@ -257,7 +257,7 @@ async function addBookReference(
   // Note that we've already checked that the book data exists prior to this
   // function being called.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const book = await fixupBook(data.book!, transaction);
+  const book = await fixupBookForCreate(data.book!, transaction);
 
   // These are the fields that are directly added to the reference.
   const { name, language, referenceTypeId } = data;
@@ -624,9 +624,9 @@ async function updateBookData(
 
   // First we do a fix-up on the book data. This will create any new series or
   // publisher if necessary.
-  const newBook = await fixupBook(book, transaction);
+  const newBook = await fixupBookForCreate(book, transaction);
 
-  if (reference.referenceTypeId !== 1) {
+  if (reference.referenceTypeId !== ReferenceTypes.Book) {
     // This was not a book reference previously. We don't have to check the
     // data any harder, because all of the fields are optional. But we do have
     // to use Book.create() to create the new book relation.
@@ -866,7 +866,7 @@ async function updateMagazineFeatureData(
       transaction
     );
 
-  if (reference.referenceTypeId !== 2) {
+  if (reference.referenceTypeId !== ReferenceTypes.MagazineFeature) {
     // This was not a magazine feature reference previously. We don't have to
     // check the data any harder, because the fix-up fn above does that. But
     // we do have to use MagazineFeature.create() to create the new magazine
@@ -932,7 +932,7 @@ async function updatePhotoCollectionData(
 
   const collection = { ...photoCollection };
 
-  if (reference.referenceTypeId !== 3) {
+  if (reference.referenceTypeId !== ReferenceTypes.PhotoCollection) {
     // This was not a photo collection reference, so check the new data more
     // strictly.
     if (!collection.location || !collection.media) {
@@ -999,7 +999,7 @@ export async function updateReferenceById(
   return Reference.findByPk(id)
     .then(async (reference) => {
       if (!reference) {
-        throw new Error(`updateReference: Reference ID ${id} not found`);
+        throw new Error(`Reference ID ${id} not found`);
       }
       data.referenceTypeId = data.referenceTypeId || reference.referenceTypeId;
       const changingType = reference.referenceTypeId !== data.referenceTypeId;
@@ -1034,17 +1034,13 @@ export async function updateReferenceById(
           switch (data.referenceTypeId) {
             case ReferenceTypes.Book:
               if (changingType && !data.book) {
-                throw new Error(
-                  "updateReference: Reference must have book data"
-                );
+                throw new Error("Reference must have book data");
               }
               await updateBookData(reference, data.book, transaction);
               break;
             case ReferenceTypes.MagazineFeature:
               if (changingType && !data.magazineFeature) {
-                throw new Error(
-                  "updateReference: Reference must have magazine feature data"
-                );
+                throw new Error("Reference must have magazine feature data");
               }
               await updateMagazineFeatureData(
                 reference,
@@ -1054,9 +1050,7 @@ export async function updateReferenceById(
               break;
             case ReferenceTypes.PhotoCollection:
               if (changingType && !data.photoCollection) {
-                throw new Error(
-                  "updateReference: Reference must have photo collection data"
-                );
+                throw new Error("Reference must have photo collection data");
               }
               await updatePhotoCollectionData(
                 reference,
@@ -1074,9 +1068,7 @@ export async function updateReferenceById(
         return Reference.findByPk(id);
       } catch (error) {
         if (error instanceof BaseError) {
-          throw new Error(
-            `updateReference: Error in update transaction: ${error.message}`
-          );
+          throw new Error(`Error in update transaction: ${error.message}`);
         } else {
           throw error;
         }

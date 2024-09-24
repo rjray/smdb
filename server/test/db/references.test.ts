@@ -20,11 +20,11 @@ import {
   MagazineIssues,
   Publishers,
   References,
-  Series,
+  Series as SeriesDB,
 } from "db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
-import { PhotoCollection } from "models";
+import { Magazine, PhotoCollection, Reference } from "models";
 
 // Need to have this here in case the test file is an actual file rather than
 // an in-memory database.
@@ -63,11 +63,11 @@ beforeAll(async () => {
   }
 
   // Series - one tied to a publisher, one not
-  await Series.createSeries({
+  await SeriesDB.createSeries({
     name: "Series 1",
     publisherId: 1,
   });
-  await Series.createSeries({ name: "Series 2" });
+  await SeriesDB.createSeries({ name: "Series 2" });
 
   // Authors
   for (const id of [1, 2, 3, 4, 5]) {
@@ -76,6 +76,29 @@ beforeAll(async () => {
       id,
     });
   }
+
+  // Create a single baseline book for testing an empty update later on.
+  await References.createReference({
+    name: "Book Reference 1",
+    referenceTypeId: ReferenceTypes.Book,
+    tags: [{ id: 1 }, { id: 2 }],
+    authors: [{ id: 1 }, { id: 2 }],
+    book: {
+      isbn: "ISBN 1",
+    },
+  });
+  // Same for a magazine feature.
+  await References.createReference({
+    name: "Magazine Feature Reference 1",
+    referenceTypeId: ReferenceTypes.MagazineFeature,
+    tags: [{ id: 1 }, { id: 2 }],
+    authors: [{ id: 1 }, { id: 2 }],
+    magazineFeature: {
+      magazineId: 1,
+      magazineIssueId: 1,
+      featureTags: [{ id: 1 }, { id: 2 }],
+    },
+  });
 });
 afterAll(async () => {
   if (fs.existsSync(file)) {
@@ -817,7 +840,7 @@ describe("References: Retrieve", () => {
   test("Get all references", async () => {
     const references = await References.getAllReferences();
 
-    expect(references.length >= 6).toBe(true);
+    expect(references.length >= 8).toBe(true);
   });
 
   test("Get reference by ID", async () => {
@@ -844,15 +867,19 @@ describe("References: Retrieve", () => {
 
         expect(cleaned).toEqual({
           id: 1,
-          name: "Photo Collection Reference 1",
+          name: "Book Reference 1",
           language: null,
-          referenceTypeId: 3,
-          createdAt,
-          updatedAt,
-          photoCollection: {
+          referenceTypeId: 1,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          book: {
             referenceId: 1,
-            location: "Location 1",
-            media: "Media 1",
+            isbn: "ISBN 1",
+            seriesNumber: null,
+            publisherId: null,
+            seriesId: null,
+            publisher: null,
+            series: null,
           },
           authors: [
             {
@@ -1097,32 +1124,274 @@ describe("References: Update", () => {
       );
     });
 
-    describe.skip("Combinations of magazine/issue updates", () => {
+    describe("Combinations of magazine/issue updates", () => {
       // Try to test all the combinations of magazine and issue updates, where
       // each can be either a given ID or a new object. See the (large) comment
-      // block in db/references.ts for more details.
+      // block in db/references.ts (`fixupMagazineFeatureForUpdate`) for more
+      // details.
+
+      // 1. `magazineId` only: Should be an error.
+      test("Update feature failure, magazine ID only", async () => {
+        async function failToUpdate() {
+          await References.updateReferenceById(magazineFeatureId, {
+            magazineFeature: {
+              magazineId: 2,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "magazineId without magazineIssue data is not allowed"
+        );
+      });
+
+      // 2. `magazineIssueId` only: Should work as intended.
+      test("Update feature, issue ID only", async () => {
+        const reference = await References.updateReferenceById(
+          magazineFeatureId,
+          {
+            magazineFeature: {
+              magazineIssueId: 6,
+            },
+          }
+        );
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.magazineFeature?.magazineIssue?.issue).toBe("1");
+          expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(2);
+        }
+      });
+
+      // 3. `magazineId` and `magazineIssueId`: Should be an error.
+      test("Update feature failure, magazine ID & issue ID", async () => {
+        async function failToUpdate() {
+          await References.updateReferenceById(magazineFeatureId, {
+            magazineFeature: {
+              magazineId: 1,
+              magazineIssueId: 6,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "magazineId and magazineIssueId cannot both be provided"
+        );
+      });
+
+      // 4. `magazineId` and `magazineIssue`: Should work as intended.
+      test("Update feature, magazine ID & issue data", async () => {
+        const reference = await References.updateReferenceById(
+          magazineFeatureId,
+          {
+            magazineFeature: {
+              magazineId: 1,
+              magazineIssue: {
+                issue: "4 test",
+              },
+            },
+          }
+        );
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.magazineFeature?.magazineIssue?.issue).toBe(
+            "4 test"
+          );
+          expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(1);
+        }
+      });
+
+      // 5. `magazine` and `magazineIssueId`: Should be an error.
+      test("Update feature failure, magazine data & issue ID", async () => {
+        async function failToUpdate() {
+          await References.updateReferenceById(magazineFeatureId, {
+            magazineFeature: {
+              magazine: {
+                name: "Test",
+              },
+              magazineIssueId: 6,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "magazineIssueId cannot be provided with magazine data"
+        );
+      });
+
+      // 6. `magazine` and no `magazineIssue`: Should be an error.
+      test("Update feature failure, magazine data & no issue data", async () => {
+        async function failToUpdate() {
+          await References.updateReferenceById(magazineFeatureId, {
+            magazineFeature: {
+              magazine: {
+                name: "Test",
+              },
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "magazine data without magazineIssue data is not allowed"
+        );
+      });
+
+      // 7. `magazineIssue` and no `magazine`: Should work as intended.
+      test("Update feature, issue data & no magazine data (1)", async () => {
+        const reference = await References.updateReferenceById(
+          magazineFeatureId,
+          {
+            magazineFeature: {
+              magazineIssue: {
+                issue: "7.1 test",
+              },
+            },
+          }
+        );
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.magazineFeature?.magazineIssue?.issue).toBe(
+            "7.1 test"
+          );
+          expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(1);
+        }
+      });
+
+      test("Update feature, issue data & no magazine data (2)", async () => {
+        const reference = await References.updateReferenceById(
+          magazineFeatureId,
+          {
+            magazineFeature: {
+              magazineIssue: {
+                issue: "7.2 test",
+                magazineId: 2,
+              },
+            },
+          }
+        );
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.magazineFeature?.magazineIssue?.issue).toBe(
+            "7.2 test"
+          );
+          expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(2);
+        }
+      });
+
+      // 8. `magazineIssue` and `magazine`: Should work as intended.
+      test("Update feature, issue data & magazine data", async () => {
+        const reference = await References.updateReferenceById(
+          magazineFeatureId,
+          {
+            magazineFeature: {
+              magazine: {
+                name: "Test 8",
+              },
+              magazineIssue: {
+                issue: "8 test",
+              },
+            },
+          }
+        );
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          const magazine = await Magazine.findOne({
+            where: { name: "Test 8" },
+          });
+          expect(reference.magazineFeature?.magazineIssue?.issue).toBe(
+            "8 test"
+          );
+          expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(
+            magazine?.id
+          );
+        }
+      });
+      // 9. Nothing is provided: No update should happen.
+      test("Update feature, no data provided", async () => {
+        const baselineFeature = await Reference.findOne({
+          where: { name: "Magazine Feature Reference 1" },
+        });
+
+        if (baselineFeature) {
+          const oldUpdatedAt = baselineFeature.updatedAt;
+
+          const reference = await References.updateReferenceById(
+            baselineFeature.id,
+            {
+              magazineFeature: {},
+            }
+          );
+
+          expect(reference).toBeDefined();
+          expect(reference?.updatedAt).toStrictEqual(oldUpdatedAt);
+        } else {
+          throw new Error("Baseline magazine feature not found");
+        }
+      });
     });
   });
 
-  describe.skip("Update of Books", () => {
-    // let bookId: number = 0;
-    // beforeAll(async () => {
-    //   const book = await References.createReference({
-    //     name: "Book Reference 1",
-    //     referenceTypeId: ReferenceTypes.Book,
-    //     tags: [{ id: 1 }, { id: 2 }],
-    //     authors: [{ id: 1 }, { id: 2 }],
-    //     book: {
-    //       isbn: "123456789",
-    //       publisher: { name: "Publisher For Update" },
-    //       series: { name: "Series For Update" },
-    //     },
-    //   });
-    //   bookId = book.id;
-    // });
+  describe("Update of Books", () => {
+    let bookIdx: number = 0;
+    let bookId: number = 0;
+    let baselineBook: Reference;
+
+    beforeEach(async () => {
+      // Create a baseline book reference for each test. Use `bookIdx` to keep
+      // track of which reference we are creating.
+      bookIdx++;
+
+      baselineBook = await References.createReference({
+        name: `Baseline Book Reference ${bookIdx}`,
+        referenceTypeId: ReferenceTypes.Book,
+        tags: [{ id: 1 }, { id: 2 }],
+        authors: [{ id: 1 }, { id: 2 }],
+        book: {
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        },
+      });
+      bookId = baselineBook.id;
+    });
+
+    describe("Combinations of publisher/series updates", () => {
+      test("Update book, changing series changes publisher", async () => {
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            seriesId: 1,
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisherId).toBe(1);
+          expect(reference.book?.seriesId).toBe(1);
+        }
+      });
+
+      test("Update book failure, changing publisher without series", async () => {
+        async function failToUpdate() {
+          await References.updateReferenceById(bookId, {
+            book: {
+              publisherId: 1,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "Cannot change publisher when series is already set"
+        );
+      });
+    });
   });
 
-  describe.skip("Updates to Different Reference Types", () => {
+  describe.skip("Updates Between Different Reference Types", () => {
     // Test the various paths of updates which change a reference's type.
   });
 });
