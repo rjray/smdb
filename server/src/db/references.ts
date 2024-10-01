@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*
   Database operations focused on the Reference model.
  */
 
 import { BaseError, Transaction } from "sequelize";
+import { match, P } from "ts-pattern";
 
 import { connection } from "database";
 import {
@@ -31,6 +33,9 @@ import { PhotoCollectionForUpdateReference } from "types/photocollection";
 // Oops... tripped over a deprecated name if I don't use the relative import.
 import { ReferenceTypes } from "../constants";
 import { RequestOpts, getScopeFromParams } from "utils";
+
+// A local type for use in the fix-up functions for book references.
+type BookForReferenceFixup = Omit<BookForReference, "isbn" | "seriesNumber">;
 
 // The scopes that can be fetched for references.
 const referenceScopes = ["authors", "tags"];
@@ -96,154 +101,242 @@ async function fixupTags(
   return fixedTags;
 }
 
-// Fix up publisher data in a book reference. This may mean creating new
-// publishers.
-async function fixupPublisher(
-  book: BookForReference,
-  fixed: BookForReference,
-  transaction: Transaction
-): Promise<void> {
-  if (book.publisher) {
-    if (book.publisherId) {
-      if (book.publisher.id) {
-        if (book.publisherId === book.publisher.id) {
-          // The publisher is already in the database. Don't need to create.
-          fixed.publisherId = book.publisherId;
-          return;
-        } else {
-          throw new Error(
-            "fixupPublisher: Mismatch between publisherId and publisher data"
-          );
-        }
-      } else {
-        // No value in `book.publisher.id` but there is a `book.publisherId`,
-        // so throw an error.
-        throw new Error(
-          "fixupPublisher: publisherId and publisher data are incompatible"
-        );
-      }
-    } else {
-      // No value in `book.publisherId` but there is a `book.publisher`, so
-      // create a new publisher.
-      const { name, notes } = book.publisher;
-      if (name) {
-        const newPublisher = await Publisher.create(
-          { name, notes },
-          { transaction }
-        );
-
-        fixed.publisherId = newPublisher.id;
-        return;
-      } else {
-        throw new Error(
-          "fixupPublisher: Publisher name is required to create a new publisher"
-        );
-      }
-    }
-  } else if (book.publisherId) {
-    fixed.publisherId = book.publisherId;
-    return;
-  }
-}
-
-// Fix up series data in a book reference. This may mean creating a new series.
-async function fixupSeries(
-  book: BookForReference,
-  fixed: BookForReference,
-  transaction: Transaction
-): Promise<void> {
-  if (book.series) {
-    if (book.seriesId) {
-      if (book.series.id) {
-        if (book.seriesId === book.series.id) {
-          // The series is already in the database. Don't need to create.
-          fixed.seriesId = book.seriesId;
-          return;
-        } else {
-          throw new Error(
-            "fixupSeries: Mismatch between seriesId and series data"
-          );
-        }
-      } else {
-        // No value in `book.series.id` but there is a `book.seriesId`, so
-        // throw an error.
-        throw new Error(
-          "fixupSeries: seriesId and series data are incompatible"
-        );
-      }
-    } else {
-      // No value in `book.seriesId` but there is a `book.series`, so
-      // create a new series.
-      const { name, notes, publisherId: seriesPublisherId } = book.series;
-
-      if (seriesPublisherId) {
-        if (fixed.publisherId) {
-          if (fixed.publisherId !== seriesPublisherId) {
-            // The series publisher doesn't match the book publisher.
-            throw new Error(
-              "fixupSeries: Series publisher doesn't match book publisher"
-            );
-          }
-        } else {
-          fixed.publisherId = seriesPublisherId;
-        }
-      }
-
-      if (name) {
-        const newSeries = await Series.create(
-          { name, notes, publisherId: fixed.publisherId },
-          { transaction }
-        );
-
-        fixed.seriesId = newSeries.id;
-        return;
-      } else {
-        throw new Error(
-          "fixupSeries: Series name is required to create a new series"
-        );
-      }
-    }
-  } else if (book.seriesId) {
-    fixed.seriesId = book.seriesId;
-    const series = await Series.findByPk(book.seriesId, {
-      transaction,
-    });
-    if (!series) {
-      throw new Error("fixupSeries: Specified series not found");
-    }
-
-    if (fixed.publisherId) {
-      if (fixed.publisherId !== series.publisherId) {
-        // The series publisher doesn't match the book publisher.
-        throw new Error(
-          "fixupSeries: Series publisher doesn't match book-provided publisher"
-        );
-      }
-    } else {
-      if (series.publisherId) {
-        fixed.publisherId = series.publisherId;
-      }
-    }
-
-    return;
-  }
-}
-
-// Fix up book data for a reference. This may mean creating new publishers and
-// series.
+// Fix up book data for a new reference. This may mean creating a new publisher
+// and/or series.
 async function fixupBookForCreate(
   book: BookForReference,
   transaction: Transaction
 ): Promise<BookForReference> {
-  const fixed: BookForReference = {};
-  fixed.seriesNumber = book.seriesNumber;
-  fixed.isbn = book.isbn;
+  const { isbn, seriesNumber, publisher, publisherId, series, seriesId } = book;
+  const txn = { transaction };
 
-  // Create new publisher if it doesn't exist
-  await fixupPublisher(book, fixed, transaction);
-  // Create new series if it doesn't exist
-  await fixupSeries(book, fixed, transaction);
+  // There are a number of different cases that can occur here:
+  //
+  // 0. There is no publisher or series information of either form
+  //    - This is valid, so don't need to do anything.
+  // 1. There is `publisherId`, no series information
+  //    - The book has a publisher that is already in the DB. Save the ID and
+  //      let the `seriesId` remain null/undefined.
+  // 2. There is `seriesId`, no publisher information
+  //    - A `seriesId` by itself means to use an existing series for the book.
+  //      Fetch the series record to see if it has a publisher. If so, save
+  //      `seriesId` and `publisherId`, otherwise let the `publisherId` remain
+  //      null/undefined.
+  // 3. There is `publisherId` and `seriesId`
+  //    - A `publisherId` and a `seriesId` means that the user has specified
+  //      both in the form. Fetch the series record to ensure that the series
+  //      and publisher match. If so, save `seriesId` and `publisherId`.
+  //      Otherwise throw an error.
+  // 4. There is `publisherId` and `series`
+  //    - A `publisherId` and a `series` means that a new `Series` record will
+  //      be created with the specified data and the `publisherId`.
+  // 5. There is `publisher` and `seriesId`
+  //    - A `publisher` and a `seriesId` is not allowed, as the series record
+  //      either has a `publisherId` or doesn't. Either way, a totally-new
+  //      publisher would conflict. Throw an error.
+  // 6. There is `publisher` and no `series`
+  //    - A `publisher` and no `series` means to create a new `Publisher`
+  //      record with the specified data. There will be no series data.
+  // 7. There is `series` and no `publisher`
+  //    - A `series` and no `publisher` means to create a new `Series` record
+  //      with the specified data. If the data has a `publisherId`, that
+  //      publisher will be used. Otherwise, a new publisher will be created.
+  // 8. There is `publisher` and `series`
+  //    - A `publisher` and a `series` means that first a new `Publisher`
+  //      record will be created with the specified data. Then a new `Series`
+  //      record will be created with the specified data and the `publisherId`
+  //      from the new `Publisher` record.
+  //
+  // Note that there are other combinations, but these are the only ones that
+  // are important due to precedence.
+  const pubAndSeries = await match({
+    publisherId,
+    publisher,
+    seriesId,
+    series,
+  } as BookForReferenceFixup)
+    .returnType<
+      Promise<{ publisherId: number | null; seriesId: number | null }>
+    >()
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.nullish,
+        seriesId: P.nullish,
+        series: P.nullish,
+      },
+      async () => {
+        // Case 0: No data, no worries
+        return {
+          publisherId: null,
+          seriesId: null,
+        };
+      }
+    )
+    .with(
+      {
+        publisherId: P.number,
+        publisher: P.any,
+        seriesId: P.nullish,
+        series: P.nullish,
+      },
+      () =>
+        Promise.resolve({
+          // Case 1: Publisher ID, no series info
+          publisherId: publisherId!,
+          seriesId: null,
+        })
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.nullish,
+        seriesId: P.number,
+        series: P.any,
+      },
+      async () => {
+        // Case 2: Series ID, no publisher info
+        const series = await Series.findByPk(seriesId!, txn);
+        if (!series) {
+          throw new Error("Series not found");
+        }
+        return {
+          publisherId: series.publisherId,
+          seriesId: series.id,
+        };
+      }
+    )
+    .with(
+      {
+        publisherId: P.number,
+        publisher: P.any,
+        seriesId: P.number,
+        series: P.any,
+      },
+      async () => {
+        // Case 3: Publisher ID and series ID
+        const series = await Series.findByPk(seriesId!, txn);
+        if (!series) {
+          throw new Error("Series not found");
+        }
+        if (series.publisherId !== publisherId) {
+          throw new Error("Series and publisher do not match");
+        }
+        return {
+          publisherId: publisherId!,
+          seriesId: seriesId!,
+        };
+      }
+    )
+    .with(
+      {
+        publisherId: P.number,
+        publisher: P.any,
+        seriesId: P.nullish,
+        series: {},
+      },
+      async () => {
+        // Case 4: Publisher ID and series data
+        const { name, notes } = series!;
+        if (!name) {
+          throw new Error("Missing series name");
+        }
 
+        const newSeries = await Series.create(
+          { name, notes, publisherId: publisherId! },
+          txn
+        );
+        return { publisherId: publisherId!, seriesId: newSeries.id };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.any,
+        seriesId: P.number,
+        series: P.any,
+      },
+      () =>
+        // Case 5: Publisher data and series ID, error
+        Promise.reject(
+          new Error("Cannot specify `seriesId` with new `publisher` data")
+        )
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: {},
+        seriesId: P.nullish,
+        series: P.nullish,
+      },
+      async () => {
+        // Case 6: Publisher data only, no series data
+        const { name, notes } = publisher!;
+        if (!name) {
+          throw new Error("Missing publisher name");
+        }
+
+        const newPublisher = await Publisher.create({ name, notes }, txn);
+        return { publisherId: newPublisher.id, seriesId: null };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.nullish,
+        seriesId: P.nullish,
+        series: {},
+      },
+      async () => {
+        // Case 7: Series data only, no publisher data
+        const { name, notes, publisherId } = series!;
+        if (!name) {
+          throw new Error("Missing series name");
+        }
+
+        const newSeries = await Series.create(
+          { name, notes, publisherId },
+          txn
+        );
+        return { publisherId: publisherId ?? null, seriesId: newSeries.id };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: {},
+        seriesId: P.nullish,
+        series: {},
+      },
+      async () => {
+        // Case 8: Publisher data and series data
+        const { name: publisherName, notes: publisherNotes } = publisher!;
+        const { name: seriesName, notes: seriesNotes } = series!;
+        if (!publisherName) {
+          throw new Error("Missing publisher name");
+        }
+        if (!seriesName) {
+          throw new Error("Missing series name");
+        }
+
+        const newPublisher = await Publisher.create(
+          { name: publisherName, notes: publisherNotes },
+          txn
+        );
+        const newSeries = await Series.create(
+          {
+            name: seriesName,
+            notes: seriesNotes,
+            publisherId: newPublisher.id,
+          },
+          txn
+        );
+        return { publisherId: newPublisher.id, seriesId: newSeries.id };
+      }
+    )
+    .otherwise(() => Promise.reject(new Error("Invalid book data")));
+
+  const fixed: BookForReference = { isbn, seriesNumber, ...pubAndSeries };
   return fixed;
 }
 
@@ -256,7 +349,6 @@ async function addBookReference(
 ) {
   // Note that we've already checked that the book data exists prior to this
   // function being called.
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const book = await fixupBookForCreate(data.book!, transaction);
 
   // These are the fields that are directly added to the reference.
@@ -308,12 +400,51 @@ async function fixupFeatureTags(
 }
 
 // Fix up magazine feature data for a new reference. This may mean creating new
-// magazine issue or magazine records. This function will create new records if
-// necessary. Also checks and fixes up the feature tags.
+// magazine issue and/or magazine records. Also checks and fixes up the feature
+// tags.
 async function fixupMagazineFeatureForCreate(
   magazineFeature: MagazineFeatureForNewReference,
   transaction: Transaction
 ): Promise<MagazineFeatureForNewReference> {
+  // There are a number of different cases that can occur here:
+  //
+  // 0. Nothing is provided
+  //    - If there is no `magazineId`, no `magazineIssueId`, and no new data for
+  //      either, then throw an error.
+  // 1. There is `magazineId`, no issue information
+  //    - A `magazineId` by itself is not allowed. Information on the issue is
+  //      also needed. Throw an error.
+  // 2. There is `magazineIssueId`, no magazine information
+  //    - A `magazineIssueId` by itself is fine, as it already has a magazine
+  //      referenced. Save the `magazineIssueId` in the `MagazineFeature`
+  //      record.
+  // 3. There is `magazineId` and `magazineIssueId`
+  //    - A `magazineId` and a `magazineIssueId` is not allowed, because the
+  //      `magazineId` is at best redundant and possibly conflicting with the
+  //      `magazineIssueId`. Throw an error.
+  // 4. There is `magazineId` and `magazineIssue`
+  //    - A `magazineId` and a `magazineIssue` means that a new `MagazineIssue`
+  //      record will be created, pointing to the corresponding magazine. Its
+  //      ID value will be stored in the `MagazineFeature` record.
+  // 5. There is `magazine` and `magazineIssueId`
+  //    - A `magazine` and a `magazineIssueId` is not allowed, as the magazine
+  //      issue is already associated with another magazine. Throw an error.
+  // 6. There is `magazine` and no `magazineIssue`
+  //    - A `magazine` and no `magazineIssue` is an error because there is no
+  //      way to associate the new magazine with an issue. Throw an error.
+  // 7. There is `magazineIssue` and no `magazine`
+  //    - A `magazineIssue` and no `magazine` is allowed only if the provided
+  //      data includes a `magazineId`. Create a new `MagazineIssue` record and
+  //      store its ID in the `MagazineFeature` record.
+  // 8. There is `magazine` and `magazineIssue`
+  //    - A `magazine` and a `magazineIssue` means that a new `Magazine` record
+  //      will be created, and its ID will be used when creating the new
+  //      `MagazineIssue` record. That record's ID will be stored in the
+  //      `MagazineFeature` record.
+  //
+  // Note that there are other combinations, but these are the only ones that
+  // are important due to precedence.
+
   // Create new magazine feature if it doesn't exist
   if (magazineFeature.magazine && magazineFeature.magazine.name) {
     const { name, language, aliases, notes } = magazineFeature.magazine;
@@ -374,7 +505,6 @@ async function addMagazineFeatureReference(
   // Note that we've already checked that the magazine feature data exists
   // prior to this function being called.
   const magazineFeatureData = await fixupMagazineFeatureForCreate(
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.magazineFeature!,
     transaction
   );
@@ -406,7 +536,6 @@ async function addMagazineFeatureReference(
     } else {
       // This won't be null because we just created the reference. The creation
       // would have thrown an error if it failed.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await reference.magazineFeature!.addFeatureTags(featureTags, {
         transaction,
       });
@@ -426,7 +555,6 @@ async function addPhotoCollectionReference(
 ) {
   // Note that we've already checked that the photo collection data exists prior
   // to this function being called.
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const photoCollection = data.photoCollection!;
 
   // These are the fields that are directly added to the reference.
@@ -608,6 +736,72 @@ async function updateCoreReferenceData(
   return;
 }
 
+// Fix up magazine feature data for a reference update. This may mean creating
+// new magazine issue or magazine records. This function will create new records
+// if necessary. Also checks and fixes up the feature tags.
+async function fixupBookForUpdate(
+  existingBook: Book,
+  book: BookForReference,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  transaction: Transaction
+) {
+  // There are a number of different cases that can occur here:
+  //
+  // 0. There is no publisher or series information of either form
+  //    - This is valid, so don't need to do anything.
+  // 1. There is `publisherId`, no series information
+  //    - Check if the book already has a `seriesId`. If so, read the `Series`
+  //      record to see if it has a publisher. If not, update the `Series`
+  //      record with the `publisherId` and set the `publisherId` on the book
+  //      record as well. If the series has a publisher and it matches the
+  //      `publisherId` in the form, then don't need to do anything. If they
+  //      do not match, throw an error. If there is no series, simply add the
+  //      `publisherId` to the book record for updating.
+  // 2. There is `seriesId`, no publisher information
+  //    - A `seriesId` by itself means to use an existing series for the book.
+  //      Fetch the series record to see if it has a publisher. If so, save
+  //      `seriesId` and `publisherId`, otherwise let the `publisherId` remain
+  //      null/undefined. If the book already has a `publisherId` and it is
+  //      not the same as the `publisherId` from the series, then throw an
+  //      error.
+  // 3. There is `publisherId` and `seriesId`
+  //    - A `publisherId` and a `seriesId` means that the user has specified
+  //      both in the form. Fetch the series record to ensure that the series
+  //      and publisher match. If so, save `seriesId` and `publisherId`.
+  //      Otherwise throw an error.
+  // 4. There is `publisherId` and `series`
+  //    - A `publisherId` and a `series` means that a new `Series` record will
+  //      be created with the specified data and the `publisherId`.
+  // 5. There is `publisher` and `seriesId`
+  //    - A `publisher` and a `seriesId` is not allowed, as the series record
+  //      either has a `publisherId` or doesn't. Either way, a totally-new
+  //      publisher would conflict. Throw an error.
+  // 6. There is `publisher` and no `series`
+  //    - For a `publisher` and no `series`, first check to see if the book
+  //      already has a `seriesId`. If so, the new publisher would conflict
+  //      with the series record. Throw an error. If not, create a new
+  //      `Publisher` record with the specified data. Save the ID.
+  // 7. There is `series` and no `publisher`
+  //    - For a `series` and no `publisher` check to see if the book already
+  //      has a `publisherId`. If so, check it against any potential value for
+  //      `publisherId` in the series data. If they don't match, throw an error.
+  //      If there is no conflict create a new `Series` record with the data and
+  //      save the ID.
+  // 8. There is `publisher` and `series`
+  //    - A `publisher` and a `series` means that first a new `Publisher`
+  //      record will be created with the specified data. Then a new `Series`
+  //      record will be created with the specified data and the `publisherId`
+  //      from the new `Publisher` record. These will replace any existing
+  //      values in the book record.
+  //
+  // Note that there are other combinations, but these are the only ones that
+  // are important due to precedence.
+
+  //
+
+  return book;
+}
+
 // Update the data for a book relation in the database. If the reference is
 // already a book, then the data validation is much more shallow and the
 // existing book relation is updated. If it isn't currently a book, then the
@@ -623,8 +817,9 @@ async function updateBookData(
   }
 
   // First we do a fix-up on the book data. This will create any new series or
-  // publisher if necessary.
-  const newBook = await fixupBookForCreate(book, transaction);
+  // publisher if necessary. We can use `!` here, because `reference.book` has
+  // already been validated.
+  const newBook = await fixupBookForUpdate(reference.book!, book, transaction);
 
   if (reference.referenceTypeId !== ReferenceTypes.Book) {
     // This was not a book reference previously. We don't have to check the
@@ -649,9 +844,9 @@ async function updateBookData(
   }
 }
 
-// Fix up magazine feature data for a new reference. This may mean creating new
-// magazine issue or magazine records. This function will create new records if
-// necessary. Also checks and fixes up the feature tags.
+// Fix up magazine feature data for a reference update. This may mean creating
+// new magazine issue or magazine records. This function will create new records
+// if necessary. Also checks and fixes up the feature tags.
 async function fixupMagazineFeatureForUpdate(
   existingMagazineFeature: MagazineFeature,
   magazineFeature: MagazineFeatureForUpdateReference,
@@ -663,41 +858,41 @@ async function fixupMagazineFeatureForUpdate(
 
   // There are a number of different cases that can occur here:
   //
-  // 1. There is magazineId, nothing else:
-  //    - A magazineId by itself is not allowed. It would either be a different
-  //      magazine than what the issue record points to, or it would be the
-  //      same magazine (which would be a no-op). Throw an error.
-  // 2. There is magazineIssueId, nothing else
-  //    - A magazineIssueId by itself changes the corresponding value in the
-  //      MagazineFeature record. It may or may not change what magazine the
-  //      reference is associated with.
-  // 3. There is magazineId and magazineIssueId
-  //    - A magazineId and a magazineIssueId is not allowed, because the
-  //      magazineId is at best redundant and possibly conflicting with the
-  //      magazineIssueId. Throw an error.
-  // 4. There is magazineId and magazineIssue
-  //    - A magazineId and a magazineIssue means that a new MagazineIssue
-  //      record will be created, pointing to the corresponding magazine. Its
-  //      ID value will be stored in the MagazineFeature record.
-  // 5. There is magazine and magazineIssueId
-  //    - A magazine and a magazineIssueId is not allowed, as the magazine
-  //      issue is already associated with another magazine. Throw an error.
-  // 6. There is magazine and no magazineIssue
-  //    - A magazine and no magazineIssue is an error because there is no way
-  //      to associate the new magazine with an issue. Throw an error.
-  // 7. There is magazineIssue and no magazine
-  //    - A magazineIssue and no magazine means to create a new magazine issue
-  //      record using the ID of the magazine that the record is currently
-  //      associated with. The new issue's ID will be stored in the
-  //      MagazineFeature record.
-  // 8. There is magazine and magazineIssue
-  //    - A magazine and a magazineIssue means that a new Magazine record will
-  //      be created, and its ID will be used when creating the new
-  //      MagazineIssue record. That record's ID will be stored in the
-  //      MagazineFeature record.
-  // 9. Nothing is provided:
+  // 0. Nothing is provided
   //    - If there is no magazine, no issue, and no new data for either, then do
   //      nothing.
+  // 1. There is `magazineId`, nothing else
+  //    - A `magazineId` by itself is not allowed. It would either be a
+  //      different magazine than what the issue record points to, or it would
+  //      be the same magazine (which would be a no-op). Throw an error.
+  // 2. There is `magazineIssueId`, nothing else
+  //    - A `magazineIssueId` by itself changes the corresponding value in the
+  //      `MagazineFeature` record. It may or may not change what magazine the
+  //      reference is associated with.
+  // 3. There is `magazineId` and `magazineIssueId`
+  //    - A `magazineId` and a `magazineIssueId` is not allowed, because the
+  //      `magazineId` is at best redundant and possibly conflicting with the
+  //      `magazineIssueId`. Throw an error.
+  // 4. There is `magazineId` and `magazineIssue`
+  //    - A `magazineId` and a `magazineIssue` means that a new MagazineIssue
+  //      record will be created, pointing to the corresponding magazine. Its
+  //      ID value will be stored in the `MagazineFeature` record.
+  // 5. There is `magazine` and `magazineIssueId`
+  //    - A `magazine` and a `magazineIssueId` is not allowed, as the magazine
+  //      issue is already associated with another magazine. Throw an error.
+  // 6. There is `magazine` and no `magazineIssue`
+  //    - A `magazine` and no `magazineIssue` is an error because there is no
+  //      way to associate the new magazine with an issue. Throw an error.
+  // 7. There is `magazineIssue` and no `magazine`
+  //    - A `magazineIssue` and no `magazine` means to create a new `magazine`
+  //      issue record using the ID of the magazine that the record is currently
+  //      associated with. The new issue's ID will be stored in the
+  //      `MagazineFeature` record.
+  // 8. There is `magazine` and `magazineIssue`
+  //    - A `magazine` and a `magazineIssue` means that a new `Magazine` record
+  //      will be created, and its ID will be used when creating the new
+  //      `MagazineIssue` record. That record's ID will be stored in the
+  //      `MagazineFeature` record.
   //
   // Note that there are other combinations, but these are the only ones that
   // are important due to precedence.
@@ -823,7 +1018,7 @@ async function fixupMagazineFeatureForUpdate(
       }
     }
   }
-  // Case 9. None of the four elements were present.
+  // Case 0. None of the four elements were present.
 
   // Though feature tags are optional for an update, we need to fix them up if
   // they are provided.
@@ -860,7 +1055,6 @@ async function updateMagazineFeatureData(
   const { featureTags, ...newMagazineFeature } =
     await fixupMagazineFeatureForUpdate(
       // OK to use `!` here, because `magazineFeature` is known to be defined.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       reference.magazineFeature!,
       magazineFeature,
       transaction

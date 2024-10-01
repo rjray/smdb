@@ -373,321 +373,10 @@ describe("References: Create", () => {
   });
 
   describe("Creation of Books", () => {
-    test("Add book reference, no series or publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 1",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: {},
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-    });
-
-    test("Add book reference, series and publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 2",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { publisherId: 1, seriesId: 1 },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-    });
-
-    test("Add book reference, series only with no publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 3",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { seriesId: 2 },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-    });
-
-    // None of the above tests had to do any critical handling of the book data.
-    // Now test things like series<->publisher linkage, creation, etc.
-
-    test("Add book reference, series only with publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 4",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { seriesId: 1 },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-      expect(reference.book?.seriesId).toBe(1);
-      expect(reference.book?.publisherId).toBe(1);
-    });
-
-    test("Add book reference, new publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 5",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { publisher: { name: "New Publisher 1" } },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-      expect(reference.book?.publisherId).toBeDefined();
-
-      const newReference = await References.getReferenceById(reference.id);
-      if (newReference) {
-        const cleaned = newReference.clean();
-        const { id, createdAt, updatedAt } = cleaned;
-        const { publisherId } = cleaned.book || {};
-
-        expect(cleaned).toEqual({
-          id,
-          name: "Book Reference 5",
-          language: null,
-          referenceTypeId: 1,
-          createdAt,
-          updatedAt,
-          book: {
-            referenceId: id,
-            isbn: null,
-            seriesNumber: null,
-            publisherId,
-            publisher: {
-              id: publisherId,
-              name: "New Publisher 1",
-              notes: null,
-            },
-            seriesId: null,
-            series: null,
-          },
-        });
-      } else {
-        assert.fail("New reference not found");
-      }
-    });
-
-    test("Add book reference, new series with no publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 6",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { series: { name: "New Series 1" } },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-      expect(reference.book?.seriesId).toBeDefined();
-
-      const newReference = await References.getReferenceById(reference.id);
-      if (newReference) {
-        const cleaned = newReference.clean();
-        const { id, createdAt, updatedAt } = cleaned;
-        const { seriesId } = cleaned.book || {};
-
-        expect(cleaned).toEqual({
-          id,
-          name: "Book Reference 6",
-          language: null,
-          referenceTypeId: 1,
-          createdAt,
-          updatedAt,
-          book: {
-            referenceId: id,
-            isbn: null,
-            seriesNumber: null,
-            publisherId: null,
-            publisher: null,
-            seriesId,
-            series: {
-              id: seriesId,
-              name: "New Series 1",
-              notes: null,
-              publisherId: null,
-            },
-          },
-        });
-      } else {
-        assert.fail("New reference not found");
-      }
-    });
-
-    test("Add book reference, new series with existing publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 7",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { series: { name: "New Series 2", publisherId: 1 } },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-      expect(reference.book?.seriesId).toBeDefined();
-
-      const newReference = await References.getReferenceById(reference.id);
-      if (newReference) {
-        const cleaned = newReference.clean();
-        const { id, createdAt, updatedAt } = cleaned;
-        const { seriesId } = cleaned.book || {};
-
-        expect(cleaned).toEqual({
-          id,
-          name: "Book Reference 7",
-          language: null,
-          referenceTypeId: 1,
-          createdAt,
-          updatedAt,
-          book: {
-            referenceId: id,
-            isbn: null,
-            seriesNumber: null,
-            publisherId: 1,
-            publisher: {
-              id: 1,
-              name: "Publisher 1",
-              notes: null,
-            },
-            seriesId,
-            series: {
-              id: seriesId,
-              name: "New Series 2",
-              notes: null,
-              publisherId: 1,
-            },
-          },
-        });
-      } else {
-        assert.fail("New reference not found");
-      }
-    });
-
-    test("Add book reference, new series with book.publisherId", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 8",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: { publisherId: 1, series: { name: "New Series 3" } },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-      expect(reference.book?.seriesId).toBeDefined();
-
-      const newReference = await References.getReferenceById(reference.id);
-      if (newReference) {
-        const cleaned = newReference.clean();
-        const { id, createdAt, updatedAt } = cleaned;
-        const { seriesId } = cleaned.book || {};
-
-        expect(cleaned).toEqual({
-          id,
-          name: "Book Reference 8",
-          language: null,
-          referenceTypeId: 1,
-          createdAt,
-          updatedAt,
-          book: {
-            referenceId: id,
-            isbn: null,
-            seriesNumber: null,
-            publisherId: 1,
-            publisher: {
-              id: 1,
-              name: "Publisher 1",
-              notes: null,
-            },
-            seriesId,
-            series: {
-              id: seriesId,
-              name: "New Series 3",
-              notes: null,
-              publisherId: 1,
-            },
-          },
-        });
-      } else {
-        assert.fail("New reference not found");
-      }
-    });
-
-    test("Add book reference, new series and new publisher", async () => {
-      const reference = await References.createReference({
-        name: "Book Reference 9",
-        referenceTypeId: ReferenceTypes.Book,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        book: {
-          publisher: { name: "New Publisher 3" },
-          series: { name: "New Series 4" },
-          seriesNumber: "1",
-        },
-      });
-
-      expect(reference).toBeDefined();
-      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
-      expect(reference.book).toBeDefined();
-      expect(reference.book?.seriesId).toBeDefined();
-
-      const newReference = await References.getReferenceById(reference.id);
-      if (newReference) {
-        const cleaned = newReference.clean();
-        const { id, createdAt, updatedAt } = cleaned;
-        const { publisherId, seriesId } = cleaned.book || {};
-
-        expect(cleaned).toEqual({
-          id,
-          name: "Book Reference 9",
-          language: null,
-          referenceTypeId: 1,
-          createdAt,
-          updatedAt,
-          book: {
-            referenceId: id,
-            isbn: null,
-            seriesNumber: "1",
-            publisherId,
-            publisher: {
-              id: publisherId,
-              name: "New Publisher 3",
-              notes: null,
-            },
-            seriesId,
-            series: {
-              id: seriesId,
-              name: "New Series 4",
-              notes: null,
-              publisherId,
-            },
-          },
-        });
-      } else {
-        assert.fail("New reference not found");
-      }
-    });
-
     test("Add book reference failure, missing book data", async () => {
       async function failToCreate() {
         return await References.createReference({
-          name: "Book Reference 10",
+          name: "Book Reference missing data",
           referenceTypeId: ReferenceTypes.Book,
           tags: [{ id: 1 }, { id: 2 }],
           authors: [{ id: 1 }, { id: 2 }],
@@ -699,75 +388,472 @@ describe("References: Create", () => {
       );
     });
 
-    test("Add book reference failure, mismatched publisher", async () => {
-      async function failToCreate() {
-        return await References.createReference({
-          name: "Book Reference 11",
+    test("Add book reference, minimal data (case 0)", async () => {
+      const reference = await References.createReference({
+        name: "Book Reference 0",
+        referenceTypeId: ReferenceTypes.Book,
+        tags: [{ id: 1 }, { id: 2 }],
+        authors: [{ id: 1 }, { id: 2 }],
+        book: {},
+      });
+
+      expect(reference).toBeDefined();
+      expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+      expect(reference.book).toBeDefined();
+    });
+
+    describe("Combinations of publisher/series specification", () => {
+      test("Add book reference, publisherId only (case 1)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 1",
           referenceTypeId: ReferenceTypes.Book,
           tags: [{ id: 1 }, { id: 2 }],
           authors: [{ id: 1 }, { id: 2 }],
-          book: { publisherId: 1, seriesId: 2 },
+          book: { publisherId: 1 },
         });
-      }
 
-      expect(() => failToCreate()).rejects.toThrowError(
-        "Series publisher doesn't match book-provided publisher"
-      );
-    });
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.publisherId).toBe(1);
+      });
 
-    test("Add book reference failure, mismatched publisherId", async () => {
-      async function failToCreate() {
-        return await References.createReference({
-          name: "Book Reference 12",
+      test("Add book reference, seriesId only (case 2.1)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 2.1",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { seriesId: 1 },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBe(1);
+        expect(reference.book?.publisherId).toBe(1);
+      });
+
+      test("Add book reference, seriesId only (case 2.2)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 2.2",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { seriesId: 2 },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBe(2);
+        expect(reference.book?.publisherId).toBeNull();
+      });
+
+      test("Add book reference, seriesId and publisherId (case 3.1)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 3.1",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { publisherId: 1, seriesId: 1 },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBe(1);
+        expect(reference.book?.publisherId).toBe(1);
+      });
+
+      test("Add book reference, seriesId and publisherId (case 3.2)", async () => {
+        async function failToCreate() {
+          return await References.createReference({
+            name: "Book Reference 3.2",
+            referenceTypeId: ReferenceTypes.Book,
+            tags: [{ id: 1 }, { id: 2 }],
+            authors: [{ id: 1 }, { id: 2 }],
+            book: { publisherId: 1, seriesId: 2 },
+          });
+        }
+
+        expect(() => failToCreate()).rejects.toThrowError(
+          "Series and publisher do not match"
+        );
+      });
+
+      test("Add book reference, new series with publisherId (case 4.1)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 4.1",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { series: { name: "New Series 4.1" }, publisherId: 1 },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBeDefined();
+
+        const newReference = await References.getReferenceById(reference.id);
+        if (newReference) {
+          const cleaned = newReference.clean();
+          const { id, createdAt, updatedAt } = cleaned;
+          const { seriesId } = cleaned.book || {};
+
+          expect(cleaned).toEqual({
+            id,
+            name: "Book Reference 4.1",
+            language: null,
+            referenceTypeId: 1,
+            createdAt,
+            updatedAt,
+            book: {
+              referenceId: id,
+              isbn: null,
+              seriesNumber: null,
+              publisherId: 1,
+              publisher: {
+                id: 1,
+                name: "Publisher 1",
+                notes: null,
+              },
+              seriesId,
+              series: {
+                id: seriesId,
+                name: "New Series 4.1",
+                notes: null,
+                publisherId: 1,
+              },
+            },
+          });
+        } else {
+          assert.fail("New reference not found");
+        }
+      });
+
+      test("Add book reference, new series with publisherId (case 4.2)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 4.2",
           referenceTypeId: ReferenceTypes.Book,
           tags: [{ id: 1 }, { id: 2 }],
           authors: [{ id: 1 }, { id: 2 }],
           book: {
+            series: { name: "New Series 4.2", publisherId: 2 },
             publisherId: 1,
-            series: { name: "New Series 5", publisherId: 2 },
           },
         });
-      }
 
-      expect(() => failToCreate()).rejects.toThrowError(
-        "Series publisher doesn't match book publisher"
-      );
-    });
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBeDefined();
 
-    test("Add book reference failure, missing new publisher name", async () => {
-      async function failToCreate() {
-        return await References.createReference({
-          name: "Book Reference 13",
+        const newReference = await References.getReferenceById(reference.id);
+        if (newReference) {
+          const cleaned = newReference.clean();
+          const { id, createdAt, updatedAt } = cleaned;
+          const { seriesId } = cleaned.book || {};
+
+          expect(cleaned).toEqual({
+            id,
+            name: "Book Reference 4.2",
+            language: null,
+            referenceTypeId: 1,
+            createdAt,
+            updatedAt,
+            book: {
+              referenceId: id,
+              isbn: null,
+              seriesNumber: null,
+              publisherId: 1,
+              publisher: {
+                id: 1,
+                name: "Publisher 1",
+                notes: null,
+              },
+              seriesId,
+              series: {
+                id: seriesId,
+                name: "New Series 4.2",
+                notes: null,
+                publisherId: 1,
+              },
+            },
+          });
+        } else {
+          assert.fail("New reference not found");
+        }
+      });
+
+      test("Add book reference, new series missing name (case 4.3)", async () => {
+        async function failToCreate() {
+          return await References.createReference({
+            name: "Book Reference 4.3",
+            referenceTypeId: ReferenceTypes.Book,
+            tags: [{ id: 1 }, { id: 2 }],
+            authors: [{ id: 1 }, { id: 2 }],
+            book: { series: { publisherId: 2 } },
+          });
+        }
+
+        expect(() => failToCreate()).rejects.toThrowError(
+          "Missing series name"
+        );
+      });
+
+      test("Add book reference, new publisher and seriesId (case 5)", async () => {
+        async function failToCreate() {
+          return await References.createReference({
+            name: "Book Reference 5",
+            referenceTypeId: ReferenceTypes.Book,
+            tags: [{ id: 1 }, { id: 2 }],
+            authors: [{ id: 1 }, { id: 2 }],
+            book: { publisher: { name: "New Publisher 5" }, seriesId: 2 },
+          });
+        }
+
+        expect(() => failToCreate()).rejects.toThrowError(
+          "Cannot specify `seriesId` with new `publisher` data"
+        );
+      });
+
+      test("Add book reference, new publisher no series (case 6.1)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 6.1",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { publisher: { name: "New Publisher 6.1" } },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.publisherId).toBeDefined();
+
+        const newReference = await References.getReferenceById(reference.id);
+        if (newReference) {
+          const cleaned = newReference.clean();
+          const { id, createdAt, updatedAt } = cleaned;
+          const { publisherId } = cleaned.book || {};
+
+          expect(cleaned).toEqual({
+            id,
+            name: "Book Reference 6.1",
+            language: null,
+            referenceTypeId: 1,
+            createdAt,
+            updatedAt,
+            book: {
+              referenceId: id,
+              isbn: null,
+              seriesNumber: null,
+              publisherId,
+              publisher: {
+                id: publisherId,
+                name: "New Publisher 6.1",
+                notes: null,
+              },
+              seriesId: null,
+              series: null,
+            },
+          });
+        } else {
+          assert.fail("New reference not found");
+        }
+      });
+
+      test("Add book reference, new publisher missing name (case 6.2)", async () => {
+        async function failToCreate() {
+          return await References.createReference({
+            name: "Book Reference 6.2",
+            referenceTypeId: ReferenceTypes.Book,
+            tags: [{ id: 1 }, { id: 2 }],
+            authors: [{ id: 1 }, { id: 2 }],
+            book: {
+              publisher: { notes: "New Publisher 6.2" },
+            },
+          });
+        }
+
+        expect(() => failToCreate()).rejects.toThrowError(
+          "Missing publisher name"
+        );
+      });
+
+      test("Add book reference, new series no publisher (case 7.1)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 7.1",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { series: { name: "New Series 7.1" } },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBeDefined();
+
+        const newReference = await References.getReferenceById(reference.id);
+        if (newReference) {
+          const cleaned = newReference.clean();
+          const { id, createdAt, updatedAt } = cleaned;
+          const { seriesId } = cleaned.book || {};
+
+          expect(cleaned).toEqual({
+            id,
+            name: "Book Reference 7.1",
+            language: null,
+            referenceTypeId: 1,
+            createdAt,
+            updatedAt,
+            book: {
+              referenceId: id,
+              isbn: null,
+              seriesNumber: null,
+              publisherId: null,
+              publisher: null,
+              seriesId,
+              series: {
+                id: seriesId,
+                name: "New Series 7.1",
+                notes: null,
+                publisherId: null,
+              },
+            },
+          });
+        } else {
+          assert.fail("New reference not found");
+        }
+      });
+
+      test("Add book reference, new series no publisher (case 7.2)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 7.2",
+          referenceTypeId: ReferenceTypes.Book,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          book: { series: { name: "New Series 7.2", publisherId: 1 } },
+        });
+
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBeDefined();
+
+        const newReference = await References.getReferenceById(reference.id);
+        if (newReference) {
+          const cleaned = newReference.clean();
+          const { id, createdAt, updatedAt } = cleaned;
+          const { seriesId } = cleaned.book || {};
+
+          expect(cleaned).toEqual({
+            id,
+            name: "Book Reference 7.2",
+            language: null,
+            referenceTypeId: 1,
+            createdAt,
+            updatedAt,
+            book: {
+              referenceId: id,
+              isbn: null,
+              seriesNumber: null,
+              publisherId: 1,
+              publisher: {
+                id: 1,
+                name: "Publisher 1",
+                notes: null,
+              },
+              seriesId,
+              series: {
+                id: seriesId,
+                name: "New Series 7.2",
+                notes: null,
+                publisherId: 1,
+              },
+            },
+          });
+        } else {
+          assert.fail("New reference not found");
+        }
+      });
+
+      test("Add book reference failure, new series missing name (7.3)", async () => {
+        async function failToCreate() {
+          return await References.createReference({
+            name: "Book Reference 7.3",
+            referenceTypeId: ReferenceTypes.Book,
+            tags: [{ id: 1 }, { id: 2 }],
+            authors: [{ id: 1 }, { id: 2 }],
+            book: {
+              series: { publisherId: 2 },
+            },
+          });
+        }
+
+        expect(() => failToCreate()).rejects.toThrowError(
+          "Missing series name"
+        );
+      });
+
+      test("Add book reference, new series and new publisher (case 8)", async () => {
+        const reference = await References.createReference({
+          name: "Book Reference 8",
           referenceTypeId: ReferenceTypes.Book,
           tags: [{ id: 1 }, { id: 2 }],
           authors: [{ id: 1 }, { id: 2 }],
           book: {
-            publisher: { notes: "New Publisher 5" },
+            publisher: { name: "New Publisher 8" },
+            series: { name: "New Series 8" },
+            seriesNumber: "8",
           },
         });
-      }
 
-      expect(() => failToCreate()).rejects.toThrowError(
-        "Publisher name is required to create a new publisher"
-      );
-    });
+        expect(reference).toBeDefined();
+        expect(reference.referenceTypeId).toBe(ReferenceTypes.Book);
+        expect(reference.book).toBeDefined();
+        expect(reference.book?.seriesId).toBeDefined();
+        expect(reference.book?.publisherId).toBeDefined();
 
-    test("Add book reference failure, missing new series name", async () => {
-      async function failToCreate() {
-        return await References.createReference({
-          name: "Book Reference 14",
-          referenceTypeId: ReferenceTypes.Book,
-          tags: [{ id: 1 }, { id: 2 }],
-          authors: [{ id: 1 }, { id: 2 }],
-          book: {
-            series: { publisherId: 2 },
-          },
-        });
-      }
+        const newReference = await References.getReferenceById(reference.id);
+        if (newReference) {
+          const cleaned = newReference.clean();
+          const { id, createdAt, updatedAt } = cleaned;
+          const { publisherId, seriesId } = cleaned.book || {};
 
-      expect(() => failToCreate()).rejects.toThrowError(
-        "Series name is required to create a new series"
-      );
+          expect(cleaned).toEqual({
+            id,
+            name: "Book Reference 8",
+            language: null,
+            referenceTypeId: 1,
+            createdAt,
+            updatedAt,
+            book: {
+              referenceId: id,
+              isbn: null,
+              seriesNumber: "8",
+              publisherId,
+              publisher: {
+                id: publisherId,
+                name: "New Publisher 8",
+                notes: null,
+              },
+              seriesId,
+              series: {
+                id: seriesId,
+                name: "New Series 8",
+                notes: null,
+                publisherId,
+              },
+            },
+          });
+        } else {
+          assert.fail("New reference not found");
+        }
+      });
     });
   });
 });
@@ -1369,6 +1455,7 @@ describe("References: Update", () => {
         });
 
         expect(reference).toBeDefined();
+        console.log(reference?.clean());
         if (reference) {
           expect(reference.book?.publisherId).toBe(1);
           expect(reference.book?.seriesId).toBe(1);
