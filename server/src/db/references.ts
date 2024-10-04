@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /*
   Database operations focused on the Reference model.
  */
@@ -149,15 +148,17 @@ async function fixupBookForCreate(
   //
   // Note that there are other combinations, but these are the only ones that
   // are important due to precedence.
+  type MatchResult = {
+    publisherId: number | null;
+    seriesId: number | null;
+  };
   const pubAndSeries = await match({
     publisherId,
     publisher,
     seriesId,
     series,
   } as BookForReferenceFixup)
-    .returnType<
-      Promise<{ publisherId: number | null; seriesId: number | null }>
-    >()
+    .returnType<Promise<MatchResult>>()
     .with(
       {
         publisherId: P.nullish,
@@ -176,27 +177,32 @@ async function fixupBookForCreate(
     .with(
       {
         publisherId: P.number,
-        publisher: P.any,
+        publisher: P.nullish,
         seriesId: P.nullish,
         series: P.nullish,
       },
-      () =>
-        Promise.resolve({
-          // Case 1: Publisher ID, no series info
-          publisherId: publisherId!,
+      async (m) => {
+        // Case 1: Publisher ID, no series info
+        const publisher = await Publisher.findByPk(m.publisherId, txn);
+        if (!publisher) {
+          throw new Error("Publisher not found");
+        }
+        return {
+          publisherId: m.publisherId,
           seriesId: null,
-        })
+        };
+      }
     )
     .with(
       {
         publisherId: P.nullish,
         publisher: P.nullish,
         seriesId: P.number,
-        series: P.any,
+        series: P.nullish,
       },
-      async () => {
+      async (m) => {
         // Case 2: Series ID, no publisher info
-        const series = await Series.findByPk(seriesId!, txn);
+        const series = await Series.findByPk(m.seriesId, txn);
         if (!series) {
           throw new Error("Series not found");
         }
@@ -209,71 +215,74 @@ async function fixupBookForCreate(
     .with(
       {
         publisherId: P.number,
-        publisher: P.any,
+        publisher: P.nullish,
         seriesId: P.number,
-        series: P.any,
+        series: P.nullish,
       },
-      async () => {
+      async (m) => {
         // Case 3: Publisher ID and series ID
-        const series = await Series.findByPk(seriesId!, txn);
+        const series = await Series.findByPk(m.seriesId, txn);
         if (!series) {
           throw new Error("Series not found");
         }
-        if (series.publisherId !== publisherId) {
+        if (series.publisherId !== m.publisherId) {
           throw new Error("Series and publisher do not match");
         }
         return {
-          publisherId: publisherId!,
-          seriesId: seriesId!,
+          publisherId: m.publisherId,
+          seriesId: m.seriesId,
         };
       }
     )
     .with(
       {
         publisherId: P.number,
-        publisher: P.any,
+        publisher: P.nullish,
         seriesId: P.nullish,
-        series: {},
+        series: {
+          name: P.optional(P.string),
+          notes: P.optional(P.string),
+          publisherId: P.optional(P.number),
+        },
       },
-      async () => {
+      async (m) => {
         // Case 4: Publisher ID and series data
-        const { name, notes } = series!;
+        const { name, notes } = m.series;
         if (!name) {
-          throw new Error("Missing series name");
+          throw new Error("Missing new series name");
         }
 
         const newSeries = await Series.create(
-          { name, notes, publisherId: publisherId! },
+          { name, notes, publisherId: m.publisherId },
           txn
         );
-        return { publisherId: publisherId!, seriesId: newSeries.id };
+        return { publisherId: m.publisherId, seriesId: newSeries.id };
       }
     )
     .with(
       {
         publisherId: P.nullish,
-        publisher: P.any,
+        publisher: {},
         seriesId: P.number,
-        series: P.any,
+        series: P.nullish,
       },
-      () =>
+      async () => {
         // Case 5: Publisher data and series ID, error
-        Promise.reject(
-          new Error("Cannot specify `seriesId` with new `publisher` data")
-        )
+        throw new Error("Cannot specify `seriesId` with new `publisher` data");
+      }
     )
     .with(
       {
         publisherId: P.nullish,
-        publisher: {},
+        publisher: { name: P.optional(P.string), notes: P.optional(P.string) },
         seriesId: P.nullish,
         series: P.nullish,
       },
-      async () => {
+      async (m) => {
         // Case 6: Publisher data only, no series data
-        const { name, notes } = publisher!;
+        const { name, notes } = m.publisher;
         if (!name) {
-          throw new Error("Missing publisher name");
+          throw new Error("Missing new publisher name");
         }
 
         const newPublisher = await Publisher.create({ name, notes }, txn);
@@ -285,13 +294,17 @@ async function fixupBookForCreate(
         publisherId: P.nullish,
         publisher: P.nullish,
         seriesId: P.nullish,
-        series: {},
+        series: {
+          name: P.optional(P.string),
+          notes: P.optional(P.string),
+          publisherId: P.optional(P.number),
+        },
       },
-      async () => {
+      async (m) => {
         // Case 7: Series data only, no publisher data
-        const { name, notes, publisherId } = series!;
+        const { name, notes, publisherId } = m.series;
         if (!name) {
-          throw new Error("Missing series name");
+          throw new Error("Missing new series name");
         }
 
         const newSeries = await Series.create(
@@ -304,19 +317,19 @@ async function fixupBookForCreate(
     .with(
       {
         publisherId: P.nullish,
-        publisher: {},
+        publisher: { name: P.optional(P.string), notes: P.optional(P.string) },
         seriesId: P.nullish,
-        series: {},
+        series: { name: P.optional(P.string), notes: P.optional(P.string) },
       },
-      async () => {
+      async (m) => {
         // Case 8: Publisher data and series data
-        const { name: publisherName, notes: publisherNotes } = publisher!;
-        const { name: seriesName, notes: seriesNotes } = series!;
+        const { name: publisherName, notes: publisherNotes } = m.publisher;
+        const { name: seriesName, notes: seriesNotes } = m.series;
         if (!publisherName) {
-          throw new Error("Missing publisher name");
+          throw new Error("Missing new publisher name");
         }
         if (!seriesName) {
-          throw new Error("Missing series name");
+          throw new Error("Missing new series name");
         }
 
         const newPublisher = await Publisher.create(
@@ -334,7 +347,9 @@ async function fixupBookForCreate(
         return { publisherId: newPublisher.id, seriesId: newSeries.id };
       }
     )
-    .otherwise(() => Promise.reject(new Error("Invalid book data")));
+    .otherwise(async () => {
+      throw new Error("Invalid book data");
+    });
 
   const fixed: BookForReference = { isbn, seriesNumber, ...pubAndSeries };
   return fixed;
@@ -349,6 +364,7 @@ async function addBookReference(
 ) {
   // Note that we've already checked that the book data exists prior to this
   // function being called.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const book = await fixupBookForCreate(data.book!, transaction);
 
   // These are the fields that are directly added to the reference.
@@ -505,6 +521,7 @@ async function addMagazineFeatureReference(
   // Note that we've already checked that the magazine feature data exists
   // prior to this function being called.
   const magazineFeatureData = await fixupMagazineFeatureForCreate(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.magazineFeature!,
     transaction
   );
@@ -536,6 +553,7 @@ async function addMagazineFeatureReference(
     } else {
       // This won't be null because we just created the reference. The creation
       // would have thrown an error if it failed.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await reference.magazineFeature!.addFeatureTags(featureTags, {
         transaction,
       });
@@ -555,6 +573,7 @@ async function addPhotoCollectionReference(
 ) {
   // Note that we've already checked that the photo collection data exists prior
   // to this function being called.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const photoCollection = data.photoCollection!;
 
   // These are the fields that are directly added to the reference.
@@ -742,9 +761,16 @@ async function updateCoreReferenceData(
 async function fixupBookForUpdate(
   existingBook: Book,
   book: BookForReference,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transaction: Transaction
 ) {
+  const {
+    publisherId: existingPublisherId,
+    series: existingSeries,
+    seriesId: existingSeriesId,
+  } = existingBook;
+  const { isbn, seriesNumber, publisher, publisherId, series, seriesId } = book;
+  const txn = { transaction };
+
   // There are a number of different cases that can occur here:
   //
   // 0. There is no publisher or series information of either form
@@ -796,10 +822,285 @@ async function fixupBookForUpdate(
   //
   // Note that there are other combinations, but these are the only ones that
   // are important due to precedence.
-
   //
+  // Also note that, unlike the creation logic, we can't return `null` values
+  // unless we intend to overwrite/clear-out any potential existing values.
+  type MatchResult = {
+    publisherId?: number | null;
+    seriesId?: number | null;
+  };
+  const pubAndSeries = await match({
+    publisherId,
+    publisher,
+    seriesId,
+    series,
+  } as BookForReferenceFixup)
+    .returnType<Promise<MatchResult>>()
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.nullish,
+        seriesId: P.nullish,
+        series: P.nullish,
+      },
+      async () => {
+        // Case 0: No data, no worries. But only return `null` values if that
+        // was explicitly passed in.
+        const content: MatchResult = {};
+        if (publisherId === null) {
+          content.publisherId = publisherId;
+        }
+        if (seriesId === null) {
+          content.seriesId = seriesId;
+        }
+        return content;
+      }
+    )
+    .with(
+      {
+        publisherId: P.number,
+        publisher: P.nullish,
+        seriesId: P.nullish,
+        series: P.nullish,
+      },
+      async (m) => {
+        // Case 1: Publisher ID, no series info. If there is an existing series,
+        // the new `publisherId` must match unless `series.publisherId` is null.
+        // If not, throw an error.
+        const publisher = await Publisher.findByPk(m.publisherId, txn);
+        if (!publisher) {
+          throw new Error("Publisher not found");
+        }
+        // If the book already has a series associated with it, check that the
+        // new publisher and series match. If not, throw an error.
+        if (existingSeries && existingSeries.publisherId !== m.publisherId) {
+          if (existingSeries.publisherId) {
+            throw new Error("Publisher and existing series do not match");
+          } else {
+            await existingSeries.update({ publisherId: m.publisherId }, txn);
+          }
+        } else if (existingSeriesId) {
+          const series = await Series.findByPk(existingSeriesId, txn);
+          if (series?.publisherId !== m.publisherId) {
+            if (series?.publisherId) {
+              throw new Error("Publisher and existing series do not match");
+            } else {
+              await series?.update({ publisherId: m.publisherId }, txn);
+            }
+          }
+        }
 
-  return book;
+        return {
+          publisherId: m.publisherId,
+        };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.nullish,
+        seriesId: P.number,
+        series: P.nullish,
+      },
+      async (m) => {
+        // Case 2: Series ID, no publisher info. If there is an existing
+        // publisher, the `publisherId` (if any) of the series will overwrite
+        // it.
+        const content: MatchResult = {};
+        const series = await Series.findByPk(m.seriesId, txn);
+        if (!series) {
+          throw new Error("Series not found");
+        } else {
+          content.seriesId = series.id;
+        }
+        if (existingPublisherId && series.publisherId) {
+          content.publisherId = series.publisherId;
+        }
+
+        return content;
+      }
+    )
+    .with(
+      {
+        publisherId: P.number,
+        publisher: P.nullish,
+        seriesId: P.number,
+        series: P.nullish,
+      },
+      async (m) => {
+        // Case 3: Publisher ID and series ID. The `publisherId` of the series
+        // must match. If not, throw an error.
+        const series = await Series.findByPk(m.seriesId, txn);
+        if (!series) {
+          throw new Error("Series not found");
+        }
+        if (series.publisherId !== m.publisherId) {
+          throw new Error("Series and publisher IDs do not match");
+        }
+
+        return {
+          publisherId: m.publisherId,
+          seriesId: m.seriesId,
+        };
+      }
+    )
+    .with(
+      {
+        publisherId: P.number,
+        publisher: P.nullish,
+        seriesId: P.nullish,
+        series: {
+          name: P.optional(P.string),
+          notes: P.optional(P.string),
+          publisherId: P.optional(P.number),
+        },
+      },
+      async (m) => {
+        // Case 4: Publisher ID and new series data. If the series data has a
+        // `publisherId`, it will be ignored. The given `publisherId` will be
+        // used in creating the new Series object.
+        const { name, notes } = m.series;
+        if (!name) {
+          throw new Error("Missing new series name");
+        }
+
+        const newSeries = await Series.create(
+          { name, notes, publisherId: m.publisherId },
+          txn
+        );
+
+        return { publisherId: m.publisherId, seriesId: newSeries.id };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: {},
+        seriesId: P.number,
+        series: P.nullish,
+      },
+      async () => {
+        // Case 5: New publisher data and series ID, error
+        throw new Error("Cannot specify `seriesId` with new `publisher` data");
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: { name: P.optional(P.string), notes: P.optional(P.string) },
+        seriesId: P.nullish,
+        series: P.nullish,
+      },
+      async (m) => {
+        // Case 6: Publisher data only, no series data. If there is an existing
+        // series, it must have a `null` value for `publisherId`. If not, throw
+        // an error. If there is a series with the `null` value, set its
+        // `publisherId` to the new publisher's ID.
+        const { name, notes } = m.publisher;
+        let series;
+
+        if (!name) {
+          throw new Error("Missing new publisher name");
+        }
+        if (existingSeriesId) {
+          // We check the ID first because it will always be set even if the
+          // Series record is `null`.
+          if (existingSeries) {
+            if (existingSeries.publisherId) {
+              throw new Error(
+                "Existing series is already associated with a publisher"
+              );
+            }
+          } else {
+            series = await Series.findByPk(existingSeriesId, txn);
+            if (series && series.publisherId) {
+              throw new Error(
+                "Existing series is already associated with a publisher"
+              );
+            }
+          }
+        }
+
+        const newPublisher = await Publisher.create({ name, notes }, txn);
+        if (series) {
+          await series.update({ publisherId: newPublisher.id }, txn);
+        }
+
+        return { publisherId: newPublisher.id };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: P.nullish,
+        seriesId: P.nullish,
+        series: {
+          name: P.optional(P.string),
+          notes: P.optional(P.string),
+          publisherId: P.optional(P.number),
+        },
+      },
+      async (m) => {
+        // Case 7: Series data only, no publisher data. If there is an existing
+        // publisher and the series data has no `publisherId`, set the series'
+        // data to the existing `publisherId`. If the series data has a
+        // `publisherId`, it will be used in creating the new Series object and
+        // will replace the existing `publisherId`.
+        let pubIdToUse: number | null = null;
+        const { name, notes, publisherId } = m.series;
+        if (!name) {
+          throw new Error("Missing new series name");
+        }
+        if (existingPublisherId && !publisherId) {
+          pubIdToUse = existingPublisherId;
+        }
+
+        const newSeries = await Series.create({ name, notes, pubIdToUse }, txn);
+
+        return { publisherId: newSeries.publisherId, seriesId: newSeries.id };
+      }
+    )
+    .with(
+      {
+        publisherId: P.nullish,
+        publisher: { name: P.optional(P.string), notes: P.optional(P.string) },
+        seriesId: P.nullish,
+        series: { name: P.optional(P.string), notes: P.optional(P.string) },
+      },
+      async (m) => {
+        // Case 8: Publisher data and series data. Here, there is no need for
+        // additional checks. These will both replace any existing data.
+        const { name: publisherName, notes: publisherNotes } = m.publisher;
+        const { name: seriesName, notes: seriesNotes } = m.series;
+        if (!publisherName) {
+          throw new Error("Missing new publisher name");
+        }
+        if (!seriesName) {
+          throw new Error("Missing new series name");
+        }
+
+        const newPublisher = await Publisher.create(
+          { name: publisherName, notes: publisherNotes },
+          txn
+        );
+        const newSeries = await Series.create(
+          {
+            name: seriesName,
+            notes: seriesNotes,
+            publisherId: newPublisher.id,
+          },
+          txn
+        );
+
+        return { publisherId: newPublisher.id, seriesId: newSeries.id };
+      }
+    )
+    .otherwise(async () => {
+      throw new Error("Invalid book data");
+    });
+
+  const updated: BookForReference = { isbn, seriesNumber, ...pubAndSeries };
+  return updated;
 }
 
 // Update the data for a book relation in the database. If the reference is
@@ -819,6 +1120,7 @@ async function updateBookData(
   // First we do a fix-up on the book data. This will create any new series or
   // publisher if necessary. We can use `!` here, because `reference.book` has
   // already been validated.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const newBook = await fixupBookForUpdate(reference.book!, book, transaction);
 
   if (reference.referenceTypeId !== ReferenceTypes.Book) {
@@ -1055,6 +1357,7 @@ async function updateMagazineFeatureData(
   const { featureTags, ...newMagazineFeature } =
     await fixupMagazineFeatureForUpdate(
       // OK to use `!` here, because `magazineFeature` is known to be defined.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       reference.magazineFeature!,
       magazineFeature,
       transaction

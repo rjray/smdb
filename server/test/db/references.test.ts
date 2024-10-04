@@ -25,6 +25,7 @@ import {
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
 import { Magazine, PhotoCollection, Reference } from "models";
+import { BookForReference } from "types/book";
 
 // Need to have this here in case the test file is an actual file rather than
 // an in-memory database.
@@ -184,7 +185,7 @@ describe("References: Create", () => {
       }
     });
 
-    test("Add photo collection reference failure, missing collection data", async () => {
+    test("Add photo collection reference, missing collection data", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Photo Collection Reference 4",
@@ -199,7 +200,7 @@ describe("References: Create", () => {
       );
     });
 
-    test("Add photo collection reference failure, missing tags", async () => {
+    test("Add photo collection reference, missing tags", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Photo Collection Reference 5",
@@ -336,7 +337,7 @@ describe("References: Create", () => {
       }
     });
 
-    test("Add magazine feature reference failure, missing feature data", async () => {
+    test("Add magazine feature reference, missing feature data", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Magazine Feature Reference",
@@ -351,7 +352,7 @@ describe("References: Create", () => {
       );
     });
 
-    test("Add magazine feature reference failure, missing feature tags", async () => {
+    test("Add magazine feature reference, missing feature tags", async () => {
       async function failToCreate() {
         await References.createReference({
           name: "Magazine Feature Reference 1",
@@ -373,7 +374,7 @@ describe("References: Create", () => {
   });
 
   describe("Creation of Books", () => {
-    test("Add book reference failure, missing book data", async () => {
+    test("Add book reference, missing book data", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Book Reference missing data",
@@ -599,7 +600,7 @@ describe("References: Create", () => {
         }
 
         expect(() => failToCreate()).rejects.toThrowError(
-          "Missing series name"
+          "Missing new series name"
         );
       });
 
@@ -679,7 +680,7 @@ describe("References: Create", () => {
         }
 
         expect(() => failToCreate()).rejects.toThrowError(
-          "Missing publisher name"
+          "Missing new publisher name"
         );
       });
 
@@ -781,7 +782,7 @@ describe("References: Create", () => {
         }
       });
 
-      test("Add book reference failure, new series missing name (7.3)", async () => {
+      test("Add book reference, new series missing name (7.3)", async () => {
         async function failToCreate() {
           return await References.createReference({
             name: "Book Reference 7.3",
@@ -795,7 +796,7 @@ describe("References: Create", () => {
         }
 
         expect(() => failToCreate()).rejects.toThrowError(
-          "Missing series name"
+          "Missing new series name"
         );
       });
 
@@ -1196,7 +1197,7 @@ describe("References: Update", () => {
       }
     });
 
-    test("Update feature failure, empty feature tags", async () => {
+    test("Update feature, empty feature tags", async () => {
       async function failToUpdate() {
         await References.updateReferenceById(magazineFeatureId, {
           magazineFeature: {
@@ -1217,7 +1218,7 @@ describe("References: Update", () => {
       // details.
 
       // 1. `magazineId` only: Should be an error.
-      test("Update feature failure, magazine ID only", async () => {
+      test("Update feature, magazine ID only", async () => {
         async function failToUpdate() {
           await References.updateReferenceById(magazineFeatureId, {
             magazineFeature: {
@@ -1250,7 +1251,7 @@ describe("References: Update", () => {
       });
 
       // 3. `magazineId` and `magazineIssueId`: Should be an error.
-      test("Update feature failure, magazine ID & issue ID", async () => {
+      test("Update feature, magazine ID & issue ID", async () => {
         async function failToUpdate() {
           await References.updateReferenceById(magazineFeatureId, {
             magazineFeature: {
@@ -1289,7 +1290,7 @@ describe("References: Update", () => {
       });
 
       // 5. `magazine` and `magazineIssueId`: Should be an error.
-      test("Update feature failure, magazine data & issue ID", async () => {
+      test("Update feature, magazine data & issue ID", async () => {
         async function failToUpdate() {
           await References.updateReferenceById(magazineFeatureId, {
             magazineFeature: {
@@ -1307,7 +1308,7 @@ describe("References: Update", () => {
       });
 
       // 6. `magazine` and no `magazineIssue`: Should be an error.
-      test("Update feature failure, magazine data & no issue data", async () => {
+      test("Update feature, magazine data & no issue data", async () => {
         async function failToUpdate() {
           await References.updateReferenceById(magazineFeatureId, {
             magazineFeature: {
@@ -1423,46 +1424,83 @@ describe("References: Update", () => {
 
   describe("Update of Books", () => {
     let bookIdx: number = 0;
-    let bookId: number = 0;
-    let baselineBook: Reference;
 
-    beforeEach(async () => {
-      // Create a baseline book reference for each test. Use `bookIdx` to keep
-      // track of which reference we are creating.
+    async function createBookReference(
+      book: BookForReference
+    ): Promise<[number, Reference]> {
       bookIdx++;
-
-      baselineBook = await References.createReference({
-        name: `Baseline Book Reference ${bookIdx}`,
+      const bookReference = await References.createReference({
+        name: `Book Reference ${bookIdx}`,
         referenceTypeId: ReferenceTypes.Book,
         tags: [{ id: 1 }, { id: 2 }],
         authors: [{ id: 1 }, { id: 2 }],
+        book,
+      });
+
+      return [bookReference.id, bookReference];
+    }
+
+    test("Update book, change nothing (case 0.1)", async () => {
+      const [bookId] = await createBookReference({
+        isbn: "123456789",
+        seriesNumber: `Test ${bookIdx}`,
+        publisher: { name: `Baseline Publisher ${bookIdx}` },
+        series: { name: `Baseline Series ${bookIdx}` },
+      });
+      const reference = await References.updateReferenceById(bookId, {});
+
+      expect(reference).toBeDefined();
+      if (reference) {
+        expect(reference.book?.isbn).toBe("123456789");
+      }
+    });
+
+    test("Update book, change ISBN but nothing else (case 0.2)", async () => {
+      const [bookId] = await createBookReference({
+        isbn: "123456789",
+        seriesNumber: `Test ${bookIdx}`,
+        publisher: { name: `Baseline Publisher ${bookIdx}` },
+        series: { name: `Baseline Series ${bookIdx}` },
+      });
+      const reference = await References.updateReferenceById(bookId, {
         book: {
-          isbn: "123456789",
-          seriesNumber: `Test ${bookIdx}`,
-          publisher: { name: `Baseline Publisher ${bookIdx}` },
-          series: { name: `Baseline Series ${bookIdx}` },
+          isbn: "987654321",
         },
       });
-      bookId = baselineBook.id;
+
+      expect(reference).toBeDefined();
+      if (reference) {
+        expect(reference.book?.isbn).toBe("987654321");
+      }
     });
 
     describe("Combinations of publisher/series updates", () => {
-      test("Update book, changing series changes publisher", async () => {
+      test("Update book, publisherId no series or info (case 1.1)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+        });
         const reference = await References.updateReferenceById(bookId, {
           book: {
-            seriesId: 1,
+            publisherId: 1,
           },
         });
 
         expect(reference).toBeDefined();
-        console.log(reference?.clean());
         if (reference) {
           expect(reference.book?.publisherId).toBe(1);
-          expect(reference.book?.seriesId).toBe(1);
+          expect(reference.book?.seriesId).toBeNull();
         }
       });
 
-      test("Update book failure, changing publisher without series", async () => {
+      test("Update book, publisherId with existing series (case 1.2)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
         async function failToUpdate() {
           await References.updateReferenceById(bookId, {
             book: {
@@ -1472,8 +1510,55 @@ describe("References: Update", () => {
         }
 
         expect(() => failToUpdate()).rejects.toThrowError(
-          "Cannot change publisher when series is already set"
+          "updateReference: Publisher and existing series do not match"
         );
+      });
+
+      test("Update book, publisherId with existing series (case 1.3)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisherId: 1,
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisherId).toBe(1);
+          if (reference.book?.series) {
+            expect(reference.book.series.publisherId).toBe(1);
+          } else {
+            throw new Error("No series found");
+          }
+        }
+      });
+
+      test("Update book, publisherId matches series (case 1.4)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisherId: 1,
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisherId: 1,
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisherId).toBe(1);
+          if (reference.book?.series) {
+            expect(reference.book.series.publisherId).toBe(1);
+          } else {
+            throw new Error("No series found");
+          }
+        }
       });
     });
   });
