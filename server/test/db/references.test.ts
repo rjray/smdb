@@ -1560,6 +1560,316 @@ describe("References: Update", () => {
           }
         }
       });
+
+      test("Update book, seriesId no publisher or info (case 2.1)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            seriesId: 1,
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.seriesId).toBe(1);
+          expect(reference.book?.publisherId).toBe(1);
+        }
+      });
+
+      test("Update book, seriesId no publisher or info (case 2.2)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            seriesId: 2,
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.seriesId).toBe(2);
+          expect(reference.book?.publisherId).toBeNull();
+        }
+      });
+
+      test("Update book, seriesId with existing publisher (case 2.3)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        async function failToUpdate() {
+          await References.updateReferenceById(bookId, {
+            book: {
+              seriesId: 1,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "updateReference: Series and publisher IDs do not match"
+        );
+      });
+
+      test("Update book, publisherId and seriesId (case 3.1)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisherId: 1,
+            seriesId: 1,
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisherId).toBe(1);
+          expect(reference.book?.seriesId).toBe(1);
+        }
+      });
+
+      test("Update book, publisherId and seriesId mismatch (case 3.2)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        async function failToUpdate() {
+          await References.updateReferenceById(bookId, {
+            book: {
+              publisherId: 1,
+              seriesId: 2,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "updateReference: Series and publisher IDs do not match"
+        );
+      });
+
+      test("Update book, publisherId and series data (case 4.1)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisherId: 1,
+            series: { name: `Updated Series ${bookIdx}` },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisherId).toBe(1);
+          if (reference.book?.series) {
+            expect(reference.book.series.name).toBe(
+              `Updated Series ${bookIdx}`
+            );
+          } else {
+            throw new Error("No series found");
+          }
+        }
+      });
+
+      test("Update book, publisherId and bad series data (case 4.2)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        async function failToUpdate() {
+          await References.updateReferenceById(bookId, {
+            book: {
+              publisherId: 1,
+              series: {},
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "updateReference: Missing new series name"
+        );
+      });
+
+      test("Update book, seriesId and publisher data (case 5)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        async function failToUpdate() {
+          await References.updateReferenceById(bookId, {
+            book: {
+              publisher: { name: `Updated Publisher ${bookIdx}` },
+              seriesId: 1,
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "updateReference: Cannot specify `seriesId` with new `publisher` data"
+        );
+      });
+
+      test("Update book, publisher data, no series info, conflict (case 6.1)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        async function failToUpdate() {
+          await References.updateReferenceById(bookId, {
+            book: {
+              publisher: { name: `Updated Publisher ${bookIdx}` },
+            },
+          });
+        }
+
+        expect(() => failToUpdate()).rejects.toThrowError(
+          "updateReference: Existing series is already associated with a publisher"
+        );
+      });
+
+      test("Update book, publisher data, no series info (case 6.2)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisher: { name: `Updated Publisher ${bookIdx}` },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisher.name).toBe(
+            `Updated Publisher ${bookIdx}`
+          );
+          expect(reference.book?.series.publisherId).toBe(
+            reference.book?.publisher.id
+          );
+        }
+      });
+
+      test("Update book, publisher data, no prior data (case 6.3)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisher: { name: `Updated Publisher ${bookIdx}` },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.publisher.name).toBe(
+            `Updated Publisher ${bookIdx}`
+          );
+          expect(reference.book?.series).toBeNull();
+        }
+      });
+
+      test("Update book, series data, no publisher info (case 7.1)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            series: { name: `Updated Series ${bookIdx}` },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.series.name).toBe(`Updated Series ${bookIdx}`);
+          expect(reference.book?.publisher).toBeNull();
+        }
+      });
+
+      test("Update book, series data, publisherId, no publisher info (case 7.2)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            series: { name: `Updated Series ${bookIdx}`, publisherId: 1 },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.series.name).toBe(`Updated Series ${bookIdx}`);
+          expect(reference.book?.publisher.id).toBe(1);
+        }
+      });
+
+      test("Update book, series data, existing publisher (case 7.3)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisherId: 1,
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            series: { name: `Updated Series ${bookIdx}` },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.series.name).toBe(`Updated Series ${bookIdx}`);
+          expect(reference.book?.series.publisherId).toBe(1);
+        }
+      });
+
+      test("Update book, series data and publisher data (case 8)", async () => {
+        const [bookId] = await createBookReference({
+          isbn: "123456789",
+          seriesNumber: `Test ${bookIdx}`,
+          publisher: { name: `Baseline Publisher ${bookIdx}` },
+          series: { name: `Baseline Series ${bookIdx}` },
+        });
+        const reference = await References.updateReferenceById(bookId, {
+          book: {
+            publisher: { name: `Updated Publisher ${bookIdx}` },
+            series: { name: `Updated Series ${bookIdx}` },
+          },
+        });
+
+        expect(reference).toBeDefined();
+        if (reference) {
+          expect(reference.book?.series.name).toBe(`Updated Series ${bookIdx}`);
+          expect(reference.book?.publisher.name).toBe(
+            `Updated Publisher ${bookIdx}`
+          );
+        }
+      });
     });
   });
 

@@ -755,9 +755,9 @@ async function updateCoreReferenceData(
   return;
 }
 
-// Fix up magazine feature data for a reference update. This may mean creating
-// new magazine issue or magazine records. This function will create new records
-// if necessary. Also checks and fixes up the feature tags.
+// Fix up book data for a reference update. This may mean creating new magazine
+// issue or magazine records. This function will create new records if
+// necessary. Also checks and fixes up the feature tags.
 async function fixupBookForUpdate(
   existingBook: Book,
   book: BookForReference,
@@ -804,9 +804,10 @@ async function fixupBookForUpdate(
   //      publisher would conflict. Throw an error.
   // 6. There is `publisher` and no `series`
   //    - For a `publisher` and no `series`, first check to see if the book
-  //      already has a `seriesId`. If so, the new publisher would conflict
-  //      with the series record. Throw an error. If not, create a new
-  //      `Publisher` record with the specified data. Save the ID.
+  //      already has a series with a `publisherId`. If so, the new publisher
+  //      would conflict with the series record. Throw an error. If not, create
+  //      a new `Publisher` record with the specified data. Save the ID, also
+  //      updating the series record if necessary.
   // 7. There is `series` and no `publisher`
   //    - For a `series` and no `publisher` check to see if the book already
   //      has a `publisherId`. If so, check it against any potential value for
@@ -913,8 +914,12 @@ async function fixupBookForUpdate(
         } else {
           content.seriesId = series.id;
         }
-        if (existingPublisherId && series.publisherId) {
-          content.publisherId = series.publisherId;
+        if (series.publisherId) {
+          if (!existingPublisherId) {
+            content.publisherId = series.publisherId;
+          } else if (series.publisherId !== existingPublisherId) {
+            throw new Error("Series and publisher IDs do not match");
+          }
         }
 
         return content;
@@ -1003,13 +1008,15 @@ async function fixupBookForUpdate(
           throw new Error("Missing new publisher name");
         }
         if (existingSeriesId) {
-          // We check the ID first because it will always be set even if the
-          // Series record is `null`.
+          // We check the ID because it will always be set even if the series
+          // record is `null`.
           if (existingSeries) {
             if (existingSeries.publisherId) {
               throw new Error(
                 "Existing series is already associated with a publisher"
               );
+            } else {
+              series = existingSeries;
             }
           } else {
             series = await Series.findByPk(existingSeriesId, txn);
@@ -1046,8 +1053,8 @@ async function fixupBookForUpdate(
         // data to the existing `publisherId`. If the series data has a
         // `publisherId`, it will be used in creating the new Series object and
         // will replace the existing `publisherId`.
-        let pubIdToUse: number | null = null;
         const { name, notes, publisherId } = m.series;
+        let pubIdToUse: number | null = publisherId ?? null;
         if (!name) {
           throw new Error("Missing new series name");
         }
@@ -1055,7 +1062,10 @@ async function fixupBookForUpdate(
           pubIdToUse = existingPublisherId;
         }
 
-        const newSeries = await Series.create({ name, notes, pubIdToUse }, txn);
+        const newSeries = await Series.create(
+          { name, notes, publisherId: pubIdToUse },
+          txn
+        );
 
         return { publisherId: newSeries.publisherId, seriesId: newSeries.id };
       }
