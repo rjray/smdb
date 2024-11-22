@@ -3,22 +3,14 @@
  */
 
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
-import fs from "fs";
 
-import setupDatabase from "database/setup";
+import { setupTestDatabase, tearDownTestDatabase } from "../database";
 import { ReferenceTypes, References } from "db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes as ReferenceTypesEnum } from "../../src/constants";
 
-// Need to have this here in case the test file is an actual file rather than
-// an in-memory database.
-const file = process.env.DATABASE_FILE || ":memory:";
-
 beforeAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
-  await setupDatabase("src");
+  await setupTestDatabase();
 
   // Create a few references for the "Book" reference type.
   for (const referenceId of [1, 2, 3, 4, 5]) {
@@ -31,9 +23,7 @@ beforeAll(async () => {
   }
 });
 afterAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
+  await tearDownTestDatabase();
 });
 
 describe("ReferenceTypes: Create", () => {

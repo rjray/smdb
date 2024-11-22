@@ -11,9 +11,8 @@ import {
   test,
   assert,
 } from "vitest";
-import fs from "fs";
 
-import setupDatabase from "database/setup";
+import { setupTestDatabase, tearDownTestDatabase } from "../database";
 import {
   Authors,
   Magazines,
@@ -27,15 +26,8 @@ import { ReferenceTypes } from "../../src/constants";
 import { Magazine, PhotoCollection, Reference } from "models";
 import { BookForReference } from "types/book";
 
-// Need to have this here in case the test file is an actual file rather than
-// an in-memory database.
-const file = process.env.DATABASE_FILE || ":memory:";
-
 beforeAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
-  await setupDatabase("src");
+  await setupTestDatabase();
 
   // Create some baseline data here, before tests run. This way, if only a
   // single test runs, it will still have basic data on hand.
@@ -102,9 +94,7 @@ beforeAll(async () => {
   });
 });
 afterAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
+  await tearDownTestDatabase();
 });
 
 describe("References: Create", () => {

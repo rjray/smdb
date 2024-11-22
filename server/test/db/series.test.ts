@@ -3,22 +3,14 @@
  */
 
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
-import fs from "fs";
 
-import setupDatabase from "database/setup";
+import { setupTestDatabase, tearDownTestDatabase } from "../database";
 import { Publishers, References, Series } from "db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
 
-// Need to have this here in case the test file is an actual file rather than
-// an in-memory database.
-const file = process.env.DATABASE_FILE || ":memory:";
-
 beforeAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
-  await setupDatabase("src");
+  await setupTestDatabase();
 
   // Create one publisher here for use in the tests.
   await Publishers.createPublisher({
@@ -26,9 +18,7 @@ beforeAll(async () => {
   });
 });
 afterAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
+  await tearDownTestDatabase();
 });
 
 describe("Series: Create", () => {

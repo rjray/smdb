@@ -3,23 +3,15 @@
  */
 
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
-import fs from "fs";
 
-import setupDatabase from "database/setup";
+import { setupTestDatabase, tearDownTestDatabase } from "../database";
 import { Magazines, MagazineIssues, References } from "db";
 import { MagazineFeature } from "models";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
 
-// Need to have this here in case the test file is an actual file rather than
-// an in-memory database.
-const file = process.env.DATABASE_FILE || ":memory:";
-
 beforeAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
-  await setupDatabase("src");
+  await setupTestDatabase();
 
   // Create some magazines and issues here, before tests run. This way, if only
   // a single test runs, it will still have the data on hand.
@@ -38,9 +30,7 @@ beforeAll(async () => {
   }
 });
 afterAll(async () => {
-  if (fs.existsSync(file)) {
-    fs.unlinkSync(file);
-  }
+  await tearDownTestDatabase();
 });
 
 describe("MagazineIssues: Create", () => {
