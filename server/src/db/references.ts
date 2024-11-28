@@ -767,7 +767,7 @@ async function fixupBookForUpdate(
     publisherId: existingPublisherId,
     series: existingSeries,
     seriesId: existingSeriesId,
-  } = existingBook;
+  } = existingBook ?? {};
   const { isbn, seriesNumber, publisher, publisherId, series, seriesId } = book;
   const txn = { transaction };
 
