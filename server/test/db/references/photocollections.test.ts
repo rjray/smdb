@@ -73,7 +73,7 @@ describe("References: Photo Collections: Create", () => {
     expect(reference.photoCollection).toBeDefined();
   });
 
-  test("Add photo collection reference, no authors", async () => {
+  test("No authors", async () => {
     const reference = await References.createReference({
       name: "Photo Collection Reference 2",
       referenceTypeId: ReferenceTypes.PhotoCollection,
@@ -89,7 +89,7 @@ describe("References: Photo Collections: Create", () => {
     expect(reference.photoCollection).toBeDefined();
   });
 
-  test("Add photo collection reference, new tags/authors", async () => {
+  test("New tags/authors", async () => {
     const reference = await References.createReference({
       name: "Photo Collection Reference 3",
       referenceTypeId: ReferenceTypes.PhotoCollection,
@@ -129,7 +129,7 @@ describe("References: Photo Collections: Create", () => {
     }
   });
 
-  test("Add photo collection reference, missing collection data", async () => {
+  test("Missing collection data", async () => {
     async function failToCreate() {
       return await References.createReference({
         name: "Photo Collection Reference 4",
@@ -144,7 +144,7 @@ describe("References: Photo Collections: Create", () => {
     );
   });
 
-  test("Add photo collection reference, missing tags", async () => {
+  test("Missing tags", async () => {
     async function failToCreate() {
       return await References.createReference({
         name: "Photo Collection Reference 5",
@@ -281,7 +281,7 @@ describe("References: Photo Collections: Update", () => {
     ).id;
   });
 
-  test("Update collection, basic photo collection update", async () => {
+  test("Basic photo collection update", async () => {
     const reference = await References.updateReferenceById(photoCollectionId, {
       photoCollection: {
         location: "Updated Location",
@@ -299,7 +299,7 @@ describe("References: Photo Collections: Update", () => {
   // are things that only need to be done once. They won't be different for
   // the other reference types.
 
-  test("Update collection, update authors and tags", async () => {
+  test("Update authors and tags", async () => {
     const reference = await References.updateReferenceById(photoCollectionId, {
       authors: [{ id: 3 }, { id: 4 }],
       tags: [{ id: 3 }, { id: 4 }],
@@ -371,7 +371,7 @@ describe("References: Photo Collections: Update", () => {
     }
   });
 
-  test("Update collection, no changes", async () => {
+  test("No changes", async () => {
     const reference = await References.getReferenceById(1);
     expect(reference).toBeDefined();
     const initialUpdatedAt = reference?.updatedAt;

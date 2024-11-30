@@ -92,7 +92,7 @@ describe("References: Books: Create", () => {
   });
 
   describe("Combinations of publisher/series specification", () => {
-    test("Add book reference, publisherId only (case 1)", async () => {
+    test("publisherId only (case 1)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 1",
         referenceTypeId: ReferenceTypes.Book,
@@ -107,7 +107,7 @@ describe("References: Books: Create", () => {
       expect(reference.book?.publisherId).toBe(1);
     });
 
-    test("Add book reference, seriesId only (case 2.1)", async () => {
+    test("seriesId only (case 2.1)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 2.1",
         referenceTypeId: ReferenceTypes.Book,
@@ -123,7 +123,7 @@ describe("References: Books: Create", () => {
       expect(reference.book?.publisherId).toBe(1);
     });
 
-    test("Add book reference, seriesId only (case 2.2)", async () => {
+    test("seriesId only (case 2.2)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 2.2",
         referenceTypeId: ReferenceTypes.Book,
@@ -139,7 +139,7 @@ describe("References: Books: Create", () => {
       expect(reference.book?.publisherId).toBeNull();
     });
 
-    test("Add book reference, seriesId and publisherId (case 3.1)", async () => {
+    test("seriesId and publisherId (case 3.1)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 3.1",
         referenceTypeId: ReferenceTypes.Book,
@@ -155,7 +155,7 @@ describe("References: Books: Create", () => {
       expect(reference.book?.publisherId).toBe(1);
     });
 
-    test("Add book reference, seriesId and publisherId (case 3.2)", async () => {
+    test("seriesId and publisherId (case 3.2)", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Book Reference 3.2",
@@ -171,7 +171,7 @@ describe("References: Books: Create", () => {
       );
     });
 
-    test("Add book reference, new series with publisherId (case 4.1)", async () => {
+    test("New series with publisherId (case 4.1)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 4.1",
         referenceTypeId: ReferenceTypes.Book,
@@ -222,7 +222,7 @@ describe("References: Books: Create", () => {
       }
     });
 
-    test("Add book reference, new series with publisherId (case 4.2)", async () => {
+    test("New series with publisherId (case 4.2)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 4.2",
         referenceTypeId: ReferenceTypes.Book,
@@ -276,7 +276,7 @@ describe("References: Books: Create", () => {
       }
     });
 
-    test("Add book reference, new series missing name (case 4.3)", async () => {
+    test("New series missing name (case 4.3)", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Book Reference 4.3",
@@ -292,7 +292,7 @@ describe("References: Books: Create", () => {
       );
     });
 
-    test("Add book reference, new publisher and seriesId (case 5)", async () => {
+    test("New publisher and seriesId (case 5)", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Book Reference 5",
@@ -308,7 +308,7 @@ describe("References: Books: Create", () => {
       );
     });
 
-    test("Add book reference, new publisher no series (case 6.1)", async () => {
+    test("New publisher with no series (case 6.1)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 6.1",
         referenceTypeId: ReferenceTypes.Book,
@@ -354,7 +354,7 @@ describe("References: Books: Create", () => {
       }
     });
 
-    test("Add book reference, new publisher missing name (case 6.2)", async () => {
+    test("New publisher missing name (case 6.2)", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Book Reference 6.2",
@@ -372,7 +372,7 @@ describe("References: Books: Create", () => {
       );
     });
 
-    test("Add book reference, new series no publisher (case 7.1)", async () => {
+    test("New series no publisher (case 7.1)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 7.1",
         referenceTypeId: ReferenceTypes.Book,
@@ -419,7 +419,7 @@ describe("References: Books: Create", () => {
       }
     });
 
-    test("Add book reference, new series no publisher (case 7.2)", async () => {
+    test("New series no publisher (case 7.2)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 7.2",
         referenceTypeId: ReferenceTypes.Book,
@@ -470,7 +470,7 @@ describe("References: Books: Create", () => {
       }
     });
 
-    test("Add book reference, new series missing name (7.3)", async () => {
+    test("New series missing name (7.3)", async () => {
       async function failToCreate() {
         return await References.createReference({
           name: "Book Reference 7.3",
@@ -488,7 +488,7 @@ describe("References: Books: Create", () => {
       );
     });
 
-    test("Add book reference, new series and new publisher (case 8)", async () => {
+    test("New series and new publisher (case 8)", async () => {
       const reference = await References.createReference({
         name: "Book Reference 8",
         referenceTypeId: ReferenceTypes.Book,
@@ -701,7 +701,7 @@ describe("References: Books: Update", () => {
   });
 
   describe("Combinations of publisher/series updates", () => {
-    test("Update book, publisherId no series or info (case 1.1)", async () => {
+    test("publisherId, no series or info (case 1.1)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -720,7 +720,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, publisherId with existing series (case 1.2)", async () => {
+    test("publisherId with existing series (case 1.2)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -740,7 +740,7 @@ describe("References: Books: Update", () => {
       );
     });
 
-    test("Update book, publisherId with existing series (case 1.3)", async () => {
+    test("publisherId with existing series (case 1.3)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -758,12 +758,12 @@ describe("References: Books: Update", () => {
         if (reference.book?.series) {
           expect(reference.book.series.publisherId).toBe(1);
         } else {
-          throw new Error("No series found");
+          assert.fail("No series found");
         }
       }
     });
 
-    test("Update book, publisherId matches series (case 1.4)", async () => {
+    test("publisherId matches series (case 1.4)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -782,12 +782,12 @@ describe("References: Books: Update", () => {
         if (reference.book?.series) {
           expect(reference.book.series.publisherId).toBe(1);
         } else {
-          throw new Error("No series found");
+          assert.fail("No series found");
         }
       }
     });
 
-    test("Update book, seriesId no publisher or info (case 2.1)", async () => {
+    test("seriesId, no publisher or info (case 2.1)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -805,7 +805,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, seriesId no publisher or info (case 2.2)", async () => {
+    test("seriesId, no publisher or info (case 2.2)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -823,7 +823,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, seriesId with existing publisher (case 2.3)", async () => {
+    test("seriesId with existing publisher (case 2.3)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -843,7 +843,7 @@ describe("References: Books: Update", () => {
       );
     });
 
-    test("Update book, publisherId and seriesId (case 3.1)", async () => {
+    test("publisherId and seriesId (case 3.1)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -864,7 +864,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, publisherId and seriesId mismatch (case 3.2)", async () => {
+    test("publisherId and seriesId mismatch (case 3.2)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -885,7 +885,7 @@ describe("References: Books: Update", () => {
       );
     });
 
-    test("Update book, publisherId and series data (case 4.1)", async () => {
+    test("publisherId and series data (case 4.1)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -905,12 +905,12 @@ describe("References: Books: Update", () => {
         if (reference.book?.series) {
           expect(reference.book.series.name).toBe(`Updated Series ${bookIdx}`);
         } else {
-          throw new Error("No series found");
+          assert.fail("No series found");
         }
       }
     });
 
-    test("Update book, publisherId and bad series data (case 4.2)", async () => {
+    test("publisherId and bad series data (case 4.2)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -931,7 +931,7 @@ describe("References: Books: Update", () => {
       );
     });
 
-    test("Update book, seriesId and publisher data (case 5)", async () => {
+    test("seriesId and publisher data (case 5)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -952,7 +952,7 @@ describe("References: Books: Update", () => {
       );
     });
 
-    test("Update book, publisher data, no series info, conflict (case 6.1)", async () => {
+    test("publisher data, no series info, conflict (case 6.1)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -972,7 +972,7 @@ describe("References: Books: Update", () => {
       );
     });
 
-    test("Update book, publisher data, no series info (case 6.2)", async () => {
+    test("publisher data, no series info (case 6.2)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -995,7 +995,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, publisher data, no prior data (case 6.3)", async () => {
+    test("publisher data, no prior data (case 6.3)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
       });
@@ -1014,7 +1014,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, series data, no publisher info (case 7.1)", async () => {
+    test("series data, no publisher info (case 7.1)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -1033,7 +1033,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, series data, publisherId, no publisher info (case 7.2)", async () => {
+    test("series data, publisherId, no publisher info (case 7.2)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -1052,7 +1052,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, series data, existing publisher (case 7.3)", async () => {
+    test("series data, existing publisher (case 7.3)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
@@ -1072,7 +1072,7 @@ describe("References: Books: Update", () => {
       }
     });
 
-    test("Update book, series data and publisher data (case 8)", async () => {
+    test("series data and publisher data (case 8)", async () => {
       const [bookId] = await createBookReference({
         isbn: "123456789",
         seriesNumber: `Test ${bookIdx}`,
