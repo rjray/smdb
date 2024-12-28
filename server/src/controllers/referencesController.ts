@@ -62,7 +62,7 @@ export function getReferenceById(context: ExegesisContext) {
 
   const opts = queryToRequestOpts(query);
 
-  return References.getOneReferenceById(id, opts).then((reference) => {
+  return References.getReferenceById(id, opts).then((reference) => {
     if (reference) return res.status(200).pureJson(reference.clean());
     else return res.status(404).end();
   });
