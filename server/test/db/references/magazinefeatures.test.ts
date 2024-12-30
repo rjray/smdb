@@ -4,21 +4,14 @@
  * This suite covers the `MagazineFeature` type of reference.
  */
 
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  assert,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../../database";
 import { Authors, Magazines, MagazineIssues, References } from "db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../../src/constants";
 import { Magazine, MagazineFeature, Reference } from "models";
+import { MagazineFeatureForNewReference } from "types/magazinefeature";
 
 beforeAll(async () => {
   await setupTestDatabase();
@@ -49,8 +42,7 @@ beforeAll(async () => {
     });
   }
 
-  // Create a single baseline magazine feature for testing an empty update
-  // later on.
+  // Create a single baseline magazine feature for testing.
   await References.createReference({
     name: "Baseline Magazine Feature Reference 1",
     referenceTypeId: ReferenceTypes.MagazineFeature,
@@ -72,121 +64,10 @@ describe("References: Magazine Features: Create", () => {
   // testing of things like author and tag auto-creation will be done in that
   // suite.
 
-  test("Add magazine feature reference", async () => {
-    const reference = await References.createReference({
-      name: "Magazine Feature Reference 1",
-      referenceTypeId: ReferenceTypes.MagazineFeature,
-      tags: [{ id: 1 }, { id: 2 }],
-      authors: [{ id: 1 }, { id: 2 }],
-      magazineFeature: {
-        magazineId: 1,
-        magazineIssueId: 1,
-        featureTags: [{ id: 1 }, { id: 2 }],
-      },
-    });
-
-    expect(reference).toBeDefined();
-    expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
-    expect(reference.magazineFeature).toBeDefined();
-  });
-
-  test("Add magazine feature reference, no authors", async () => {
-    const reference = await References.createReference({
-      name: "Magazine Feature Reference 2",
-      referenceTypeId: ReferenceTypes.MagazineFeature,
-      tags: [{ id: 1 }, { id: 2 }],
-      magazineFeature: {
-        magazineId: 1,
-        magazineIssueId: 1,
-        featureTags: [{ id: 1 }, { id: 2 }],
-      },
-    });
-
-    expect(reference).toBeDefined();
-    expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
-    expect(reference.magazineFeature).toBeDefined();
-  });
-
-  test("Add magazine feature reference, new issue", async () => {
-    const reference = await References.createReference({
-      name: "Magazine Feature Reference 3",
-      referenceTypeId: ReferenceTypes.MagazineFeature,
-      tags: [{ id: 1 }, { id: 2 }],
-      magazineFeature: {
-        magazineId: 1,
-        magazineIssue: {
-          issue: "6",
-        },
-        featureTags: [{ id: 1 }, { id: 2 }],
-      },
-    });
-
-    expect(reference).toBeDefined();
-    expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
-    expect(reference.magazineFeature).toBeDefined();
-
-    const clean = reference.clean();
-    if (clean.magazineFeature) {
-      const { magazineIssueId } = clean.magazineFeature;
-      expect(magazineIssueId).toBeDefined();
-      expect(magazineIssueId > 25).toBe(true);
-      const issue = await MagazineIssues.getMagazineIssueById(magazineIssueId, {
-        magazine: true,
-      });
-      if (issue) {
-        expect(issue.magazineId).toBe(1);
-        expect(issue.issue).toBe("6");
-      } else {
-        assert.fail("New magazine issue not found");
-      }
-    } else {
-      assert.fail("No magazine issue data found");
-    }
-  });
-
-  test("Add magazine feature reference, new magazine & issue", async () => {
-    const reference = await References.createReference({
-      name: "Magazine Feature Reference 4",
-      referenceTypeId: ReferenceTypes.MagazineFeature,
-      tags: [{ id: 1 }, { id: 2 }],
-      magazineFeature: {
-        magazine: {
-          name: "New Magazine 1",
-        },
-        magazineIssue: {
-          issue: "1",
-        },
-        featureTags: [{ id: 1 }, { id: 2 }],
-      },
-    });
-
-    expect(reference).toBeDefined();
-    expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
-    expect(reference.magazineFeature).toBeDefined();
-
-    const clean = reference.clean();
-    if (clean.magazineFeature) {
-      const { magazineIssueId } = clean.magazineFeature;
-      expect(magazineIssueId).toBeDefined();
-      expect(magazineIssueId > 25).toBe(true);
-      const issue = await MagazineIssues.getMagazineIssueById(magazineIssueId, {
-        magazine: true,
-      });
-      if (issue) {
-        expect(issue.magazineId > 5).toBe(true);
-        expect(issue.issue).toBe("1");
-      } else {
-        assert.fail("New magazine issue not found");
-      }
-    } else {
-      assert.fail("No magazine issue data found");
-    }
-  });
-
-  test("Add magazine feature reference, missing feature data", async () => {
+  test("Add magazine feature reference, missing magazine feature data", async () => {
     async function failToCreate() {
       return await References.createReference({
-        name: "Magazine Feature Reference",
+        name: "Magazine Feature Reference Fail (1)",
         referenceTypeId: ReferenceTypes.MagazineFeature,
         tags: [{ id: 1 }, { id: 2 }],
         authors: [{ id: 1 }, { id: 2 }],
@@ -201,7 +82,7 @@ describe("References: Magazine Features: Create", () => {
   test("Add magazine feature reference, missing feature tags", async () => {
     async function failToCreate() {
       await References.createReference({
-        name: "Magazine Feature Reference 1",
+        name: "Magazine Feature Reference Fail (2)",
         referenceTypeId: ReferenceTypes.MagazineFeature,
         tags: [{ id: 1 }, { id: 2 }],
         authors: [{ id: 1 }, { id: 2 }],
@@ -216,6 +97,433 @@ describe("References: Magazine Features: Create", () => {
     expect(() => failToCreate()).rejects.toThrowError(
       "featureTags cannot be an empty array"
     );
+  });
+
+  test("Add magazine feature reference, empty data (case 0)", async () => {
+    async function failToCreate() {
+      return await References.createReference({
+        name: "Magazine Feature Reference 0",
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        tags: [{ id: 1 }, { id: 2 }],
+        magazineFeature: {
+          featureTags: [{ id: 1 }, { id: 2 }],
+        },
+      });
+    }
+
+    expect(() => failToCreate()).rejects.toThrowError(
+      "magazineIssueId is required"
+    );
+  });
+
+  describe("Combinations of magazine/issue specification", () => {
+    test("magazineId only, no issue information (case 1)", async () => {
+      async function failToCreate() {
+        return await References.createReference({
+          name: "Magazine Feature Reference 1",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          tags: [{ id: 1 }, { id: 2 }],
+          magazineFeature: {
+            magazineId: 1,
+            featureTags: [{ id: 1 }, { id: 2 }],
+          },
+        });
+      }
+
+      expect(() => failToCreate()).rejects.toThrowError(
+        "magazineId by itself is not allowed"
+      );
+    });
+
+    test("magazineIssueId only, no magazine information (case 2)", async () => {
+      const reference = await References.createReference({
+        name: "Magazine Feature Reference 2",
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        tags: [{ id: 1 }, { id: 2 }],
+        magazineFeature: {
+          magazineIssueId: 1,
+          featureTags: [{ id: 1 }, { id: 2 }],
+        },
+      });
+
+      expect(reference).toBeDefined();
+      expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
+      expect(reference.magazineFeature).toBeDefined();
+
+      const newReference = await References.getReferenceById(reference.id);
+      if (newReference) {
+        const cleaned = newReference.clean();
+        const { id, createdAt, updatedAt } = cleaned;
+        const { createdAt: magazineCreatedAt, updatedAt: magazineUpdatedAt } =
+          cleaned.magazineFeature?.magazineIssue ?? {};
+
+        expect(cleaned).toEqual({
+          id,
+          createdAt,
+          updatedAt,
+          name: "Magazine Feature Reference 2",
+          language: null,
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          magazineFeature: {
+            magazineIssueId: 1,
+            referenceId: 2,
+            featureTags: [
+              {
+                id: 1,
+                description: "Subject illustrations (in color)",
+                name: "color illustrations",
+              },
+              {
+                id: 2,
+                description: "Color plates",
+                name: "color plates",
+              },
+            ],
+            magazineIssue: {
+              createdAt: magazineCreatedAt,
+              id: 1,
+              issue: "1",
+              magazineId: 1,
+              updatedAt: magazineUpdatedAt,
+            },
+          },
+        });
+      } else {
+        assert.fail("New reference not found");
+      }
+    });
+
+    test("magazineId and magazineIssueId (case 3.1)", async () => {
+      async function failToCreate() {
+        return await References.createReference({
+          name: "Magazine Feature Reference 3.1",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          tags: [{ id: 1 }, { id: 2 }],
+          magazineFeature: {
+            magazineId: 2,
+            magazineIssueId: 1,
+            featureTags: [{ id: 1 }, { id: 2 }],
+          },
+        });
+      }
+
+      expect(() => failToCreate()).rejects.toThrowError(
+        "magazineId conflicts with magazineIssueId"
+      );
+    });
+
+    test("magazineId and magazineIssueId (case 3.2)", async () => {
+      const reference = await References.createReference({
+        name: "Magazine Feature Reference 3.2",
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        tags: [{ id: 1 }, { id: 2 }],
+        magazineFeature: {
+          magazineId: 1,
+          magazineIssueId: 1,
+          featureTags: [{ id: 1 }, { id: 2 }],
+        },
+      });
+
+      expect(reference).toBeDefined();
+      expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
+      expect(reference.magazineFeature).toBeDefined();
+
+      const newReference = await References.getReferenceById(reference.id);
+      if (newReference) {
+        const cleaned = newReference.clean();
+        const { id, createdAt, updatedAt } = cleaned;
+        const { createdAt: issueCreatedAt, updatedAt: issueUpdatedAt } =
+          cleaned.magazineFeature?.magazineIssue ?? {};
+
+        expect(cleaned).toEqual({
+          id,
+          createdAt,
+          updatedAt,
+          language: null,
+          name: "Magazine Feature Reference 3.2",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          magazineFeature: {
+            magazineIssueId: 1,
+            referenceId: id,
+            featureTags: [
+              {
+                id: 1,
+                description: "Subject illustrations (in color)",
+                name: "color illustrations",
+              },
+              { id: 2, description: "Color plates", name: "color plates" },
+            ],
+            magazineIssue: {
+              id: 1,
+              issue: "1",
+              magazineId: 1,
+              createdAt: issueCreatedAt,
+              updatedAt: issueUpdatedAt,
+            },
+          },
+        });
+      } else {
+        assert.fail("New reference not found");
+      }
+    });
+
+    test("magazineId and magazineIssue data (case 4)", async () => {
+      const reference = await References.createReference({
+        name: "Magazine Feature Reference 4",
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        tags: [{ id: 1 }, { id: 2 }],
+        authors: [{ id: 1 }, { id: 2 }],
+        magazineFeature: {
+          magazineId: 1,
+          magazineIssue: {
+            issue: "10",
+          },
+          featureTags: [{ id: 1 }, { id: 2 }],
+        },
+      });
+
+      expect(reference).toBeDefined();
+      expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
+      expect(reference.magazineFeature).toBeDefined();
+
+      const newReference = await References.getReferenceById(reference.id);
+      if (newReference) {
+        const cleaned = newReference.clean();
+        const { id, createdAt, updatedAt } = cleaned;
+        const { magazineIssueId } = reference.magazineFeature ?? {};
+        const { createdAt: issueCreatedAt, updatedAt: issueUpdatedAt } =
+          cleaned.magazineFeature?.magazineIssue ?? {};
+
+        expect(cleaned).toEqual({
+          id,
+          createdAt,
+          updatedAt,
+          name: "Magazine Feature Reference 4",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          language: null,
+          magazineFeature: {
+            magazineIssueId,
+            referenceId: id,
+            featureTags: [
+              {
+                id: 1,
+                description: "Subject illustrations (in color)",
+                name: "color illustrations",
+              },
+              { id: 2, description: "Color plates", name: "color plates" },
+            ],
+            magazineIssue: {
+              id: magazineIssueId,
+              issue: "10",
+              magazineId: 1,
+              createdAt: issueCreatedAt,
+              updatedAt: issueUpdatedAt,
+            },
+          },
+        });
+      } else {
+        assert.fail("New reference not found");
+      }
+    });
+
+    test("magazine data and magazineIssueId (case 5)", async () => {
+      function failToCreate() {
+        return References.createReference({
+          name: "Magazine Feature Reference 5",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          magazineFeature: {
+            magazineIssueId: 1,
+            magazine: {
+              name: "Magazine Fail 1",
+            },
+            featureTags: [{ id: 1 }, { id: 2 }],
+          },
+        });
+      }
+
+      expect(() => failToCreate()).rejects.toThrowError(
+        "magazine with magazineIssueId is not allowed"
+      );
+    });
+
+    test("magazine data and no magazineIssue data (case 6)", async () => {
+      function failToCreate() {
+        return References.createReference({
+          name: "Magazine Feature Reference 6",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          magazineFeature: {
+            magazine: {
+              name: "Magazine Fail 2",
+            },
+            featureTags: [{ id: 1 }, { id: 2 }],
+          },
+        });
+      }
+
+      expect(() => failToCreate()).rejects.toThrowError(
+        "magazine requires either magazineIssue or magazineIssueId"
+      );
+    });
+
+    test("magazineIssue data and no magazine data (case 7.1)", async () => {
+      const reference = await References.createReference({
+        name: "Magazine Feature Reference 7.1",
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        tags: [{ id: 1 }, { id: 2 }],
+        authors: [{ id: 1 }, { id: 2 }],
+        magazineFeature: {
+          magazineIssue: {
+            magazineId: 1,
+            issue: "11",
+          },
+          featureTags: [{ id: 1 }, { id: 2 }],
+        },
+      });
+
+      expect(reference).toBeDefined();
+      expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
+      expect(reference.magazineFeature).toBeDefined();
+
+      const newReference = await References.getReferenceById(reference.id);
+      if (newReference) {
+        const cleaned = newReference.clean();
+        const { id, createdAt, updatedAt } = cleaned;
+        const { magazineIssueId } = reference.magazineFeature ?? {};
+        const { createdAt: issueCreatedAt, updatedAt: issueUpdatedAt } =
+          cleaned.magazineFeature?.magazineIssue ?? {};
+
+        expect(cleaned).toEqual({
+          id,
+          createdAt,
+          updatedAt,
+          name: "Magazine Feature Reference 7.1",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          language: null,
+          magazineFeature: {
+            magazineIssueId,
+            referenceId: id,
+            featureTags: [
+              {
+                id: 1,
+                description: "Subject illustrations (in color)",
+                name: "color illustrations",
+              },
+              { id: 2, description: "Color plates", name: "color plates" },
+            ],
+            magazineIssue: {
+              id: magazineIssueId,
+              issue: "11",
+              magazineId: 1,
+              createdAt: issueCreatedAt,
+              updatedAt: issueUpdatedAt,
+            },
+          },
+        });
+      } else {
+        assert.fail("New reference not found");
+      }
+    });
+
+    test("magazineIssue data and no magazine data (case 7.2)", async () => {
+      function failToCreate() {
+        return References.createReference({
+          name: "Magazine Feature Reference 7.2",
+          referenceTypeId: ReferenceTypes.MagazineFeature,
+          tags: [{ id: 1 }, { id: 2 }],
+          authors: [{ id: 1 }, { id: 2 }],
+          magazineFeature: {
+            magazineIssue: {
+              issue: "12",
+            },
+            featureTags: [{ id: 1 }, { id: 2 }],
+          },
+        });
+      }
+
+      expect(() => failToCreate()).rejects.toThrowError(
+        "magazineIssue requires either magazine or magazineId"
+      );
+    });
+
+    test("magazineIssue data and magazine data (case 8)", async () => {
+      const reference = await References.createReference({
+        name: "Magazine Feature Reference 8",
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        tags: [{ id: 1 }, { id: 2 }],
+        authors: [{ id: 1 }, { id: 2 }],
+        magazineFeature: {
+          magazineIssue: {
+            issue: "13",
+          },
+          magazine: {
+            name: "New Magazine 1",
+          },
+          featureTags: [{ id: 1 }, { id: 2 }],
+        },
+      });
+
+      expect(reference).toBeDefined();
+      expect(reference.referenceTypeId).toBe(ReferenceTypes.MagazineFeature);
+      expect(reference.magazineFeature).toBeDefined();
+
+      const newReference = await References.getReferenceById(reference.id);
+      if (newReference) {
+        const cleaned = newReference.clean();
+        const { id, createdAt, updatedAt, magazineFeature } = cleaned;
+
+        if (magazineFeature && magazineFeature.magazineIssue) {
+          const { magazineIssueId } = magazineFeature;
+          const {
+            createdAt: issueCreatedAt,
+            updatedAt: issueUpdatedAt,
+            magazineId,
+          } = magazineFeature.magazineIssue ?? {};
+
+          expect(cleaned).toEqual({
+            id,
+            createdAt,
+            updatedAt,
+            name: "Magazine Feature Reference 8",
+            referenceTypeId: ReferenceTypes.MagazineFeature,
+            language: null,
+            magazineFeature: {
+              magazineIssueId,
+              referenceId: id,
+              featureTags: [
+                {
+                  id: 1,
+                  description: "Subject illustrations (in color)",
+                  name: "color illustrations",
+                },
+                { id: 2, description: "Color plates", name: "color plates" },
+              ],
+              magazineIssue: {
+                id: magazineIssueId,
+                issue: "13",
+                magazineId,
+                createdAt: issueCreatedAt,
+                updatedAt: issueUpdatedAt,
+              },
+            },
+          });
+
+          const magazine = await Magazines.getMagazineById(magazineId);
+          if (magazine) {
+            expect(magazine.name).toBe("New Magazine 1");
+          } else {
+            assert.fail("Magazine not found");
+          }
+        } else {
+          assert.fail("magazineFeature data missing or incomplete");
+        }
+      } else {
+        assert.fail("New reference not found");
+      }
+    });
   });
 });
 
@@ -362,44 +670,29 @@ describe("References: Magazine Features: Retrieve", () => {
 });
 
 describe("References: Magazine Features: Update", () => {
-  let magazineFeatureId: number;
+  let magazineFeatureIdx: number = 0;
 
-  beforeEach(async () => {
-    magazineFeatureId = (
-      await References.createReference({
-        name: "Magazine Feature Reference",
-        referenceTypeId: ReferenceTypes.MagazineFeature,
-        tags: [{ id: 1 }, { id: 2 }],
-        authors: [{ id: 1 }, { id: 2 }],
-        magazineFeature: {
-          magazineId: 1,
-          magazineIssueId: 1,
-          featureTags: [{ id: 1 }, { id: 2 }],
-        },
-      })
-    ).id;
-  });
-
-  test("Update feature, issue ID & feature tags", async () => {
-    const reference = await References.updateReferenceById(magazineFeatureId, {
-      magazineFeature: {
-        magazineIssueId: 2,
-        featureTags: [{ id: 3 }, { id: 4 }],
-      },
+  async function createMagazineFeatureReference(
+    magazineFeature: MagazineFeatureForNewReference
+  ): Promise<[number, Reference]> {
+    magazineFeatureIdx++;
+    const magazineFeatureReference = await References.createReference({
+      name: `Magazine Feature Reference ${magazineFeatureIdx}`,
+      referenceTypeId: ReferenceTypes.MagazineFeature,
+      tags: [{ id: 1 }, { id: 2 }],
+      authors: [{ id: 1 }, { id: 2 }],
+      magazineFeature,
     });
 
-    if (reference) {
-      expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(1);
-      expect(reference.magazineFeature?.magazineIssue?.issue).toBe("2");
-      if (reference.magazineFeature?.featureTags) {
-        expect(reference.magazineFeature?.featureTags?.length).toBe(2);
-        expect(reference.magazineFeature?.featureTags[0].id).toBe(3);
-        expect(reference.magazineFeature?.featureTags[1].id).toBe(4);
-      }
-    }
-  });
+    return [magazineFeatureReference.id, magazineFeatureReference];
+  }
 
-  test("Update feature, feature tags only", async () => {
+  test("Feature tags only", async () => {
+    const [magazineFeatureId] = await createMagazineFeatureReference({
+      magazineId: 1,
+      magazineIssueId: 1,
+      featureTags: [{ id: 3 }, { id: 4 }],
+    });
     const reference = await References.updateReferenceById(magazineFeatureId, {
       magazineFeature: {
         featureTags: [{ id: 3 }, { id: 4 }],
@@ -416,8 +709,13 @@ describe("References: Magazine Features: Update", () => {
     }
   });
 
-  test("Update feature, empty feature tags", async () => {
+  test("Empty feature tags", async () => {
     async function failToUpdate() {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 3 }, { id: 4 }],
+      });
       await References.updateReferenceById(magazineFeatureId, {
         magazineFeature: {
           featureTags: [],
@@ -426,8 +724,50 @@ describe("References: Magazine Features: Update", () => {
     }
 
     expect(() => failToUpdate()).rejects.toThrowError(
-      "featureTags cannot be empty"
+      "featureTags cannot be empty if given"
     );
+  });
+
+  test("Empty update (case 0)", async () => {
+    const [, reference] = await createMagazineFeatureReference({
+      magazineId: 1,
+      magazineIssueId: 1,
+      featureTags: [{ id: 3 }, { id: 4 }],
+    });
+    const newReference = await References.updateReferenceById(reference.id, {});
+
+    if (newReference) {
+      const cleaned = newReference.clean();
+      const { id, createdAt, updatedAt } = cleaned;
+      const { createdAt: issueCreatedAt, updatedAt: issueUpdatedAt } =
+        cleaned.magazineFeature?.magazineIssue ?? {};
+
+      expect(cleaned).toEqual({
+        id,
+        createdAt,
+        updatedAt,
+        name: reference.name,
+        referenceTypeId: ReferenceTypes.MagazineFeature,
+        language: null,
+        magazineFeature: {
+          magazineIssueId: 1,
+          referenceId: id,
+          featureTags: [
+            { id: 3, description: "Color profiles", name: "color profiles" },
+            { id: 4, description: "Coloring guides", name: "coloring guides" },
+          ],
+          magazineIssue: {
+            id: 1,
+            issue: "1",
+            magazineId: 1,
+            createdAt: issueCreatedAt,
+            updatedAt: issueUpdatedAt,
+          },
+        },
+      });
+    } else {
+      assert.fail("New reference not found");
+    }
   });
 
   describe("Combinations of magazine/issue updates", () => {
@@ -436,9 +776,13 @@ describe("References: Magazine Features: Update", () => {
     // block in db/references.ts (`fixupMagazineFeatureForUpdate`) for more
     // details.
 
-    // 1. `magazineId` only: Should be an error.
-    test("Update feature, magazine ID only", async () => {
+    test("magazineId only (case 1)", async () => {
       async function failToUpdate() {
+        const [magazineFeatureId] = await createMagazineFeatureReference({
+          magazineId: 1,
+          magazineIssueId: 1,
+          featureTags: [{ id: 1 }, { id: 2 }],
+        });
         await References.updateReferenceById(magazineFeatureId, {
           magazineFeature: {
             magazineId: 2,
@@ -447,30 +791,64 @@ describe("References: Magazine Features: Update", () => {
       }
 
       expect(() => failToUpdate()).rejects.toThrowError(
-        "magazineId without magazineIssue data is not allowed"
+        "magazineId by itself is not allowed"
       );
     });
 
-    // 2. `magazineIssueId` only: Should work as intended.
-    test("Update feature, issue ID only", async () => {
+    test("magazineIssueId only (case 2.1)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       const reference = await References.updateReferenceById(
         magazineFeatureId,
         {
           magazineFeature: {
-            magazineIssueId: 6,
+            magazineIssueId: 2,
           },
         }
       );
 
       expect(reference).toBeDefined();
-      if (reference) {
-        expect(reference.magazineFeature?.magazineIssue?.issue).toBe("1");
-        expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(2);
+      if (reference?.magazineFeature?.magazineIssue) {
+        expect(reference.magazineFeature.magazineIssue.issue).toBe("2");
+        expect(reference.magazineFeature.magazineIssue.magazineId).toBe(1);
+      } else {
+        assert.fail("Updated reference magazineFeature not found");
       }
     });
 
-    // 3. `magazineId` and `magazineIssueId`: Should be an error.
-    test("Update feature, magazine ID & issue ID", async () => {
+    test("magazineIssueId only (case 2.2)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
+      const reference = await References.updateReferenceById(
+        magazineFeatureId,
+        {
+          magazineFeature: {
+            magazineIssueId: 7,
+          },
+        }
+      );
+
+      expect(reference).toBeDefined();
+      if (reference?.magazineFeature?.magazineIssue) {
+        expect(reference.magazineFeature.magazineIssue.issue).toBe("2");
+        expect(reference.magazineFeature.magazineIssue.magazineId).toBe(2);
+      } else {
+        assert.fail("Updated reference magazineFeature not found");
+      }
+    });
+
+    test("magazineId and magazineIssueId (case 3.1)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       async function failToUpdate() {
         await References.updateReferenceById(magazineFeatureId, {
           magazineFeature: {
@@ -481,12 +859,41 @@ describe("References: Magazine Features: Update", () => {
       }
 
       expect(() => failToUpdate()).rejects.toThrowError(
-        "magazineId and magazineIssueId cannot both be provided"
+        "magazineId conflicts with the ID of the given magazineIssueId"
       );
     });
 
-    // 4. `magazineId` and `magazineIssue`: Should work as intended.
-    test("Update feature, magazine ID & issue data", async () => {
+    test("magazineId and magazineIssueId (case 3.2)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
+      const reference = await References.updateReferenceById(
+        magazineFeatureId,
+        {
+          magazineFeature: {
+            magazineId: 2,
+            magazineIssueId: 7,
+          },
+        }
+      );
+
+      expect(reference).toBeDefined();
+      if (reference?.magazineFeature?.magazineIssue) {
+        expect(reference.magazineFeature.magazineIssue.issue).toBe("2");
+        expect(reference.magazineFeature.magazineIssue.magazineId).toBe(2);
+      } else {
+        assert.fail("Updated reference magazineFeature not found");
+      }
+    });
+
+    test("magazineId and magazineIssue data (case 4)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       const reference = await References.updateReferenceById(
         magazineFeatureId,
         {
@@ -500,14 +907,20 @@ describe("References: Magazine Features: Update", () => {
       );
 
       expect(reference).toBeDefined();
-      if (reference) {
-        expect(reference.magazineFeature?.magazineIssue?.issue).toBe("4 test");
-        expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(1);
+      if (reference?.magazineFeature?.magazineIssue) {
+        expect(reference.magazineFeature.magazineIssue.issue).toBe("4 test");
+        expect(reference.magazineFeature.magazineIssue.magazineId).toBe(1);
+      } else {
+        assert.fail("Updated reference magazineFeature not found");
       }
     });
 
-    // 5. `magazine` and `magazineIssueId`: Should be an error.
-    test("Update feature, magazine data & issue ID", async () => {
+    test("magazine data and issue ID (case 5)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       async function failToUpdate() {
         await References.updateReferenceById(magazineFeatureId, {
           magazineFeature: {
@@ -520,12 +933,16 @@ describe("References: Magazine Features: Update", () => {
       }
 
       expect(() => failToUpdate()).rejects.toThrowError(
-        "magazineIssueId cannot be provided with magazine data"
+        "new magazine data with existing magazineIssueId is not allowed"
       );
     });
 
-    // 6. `magazine` and no `magazineIssue`: Should be an error.
-    test("Update feature, magazine data & no issue data", async () => {
+    test("magazine data and no issue data (case 6)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       async function failToUpdate() {
         await References.updateReferenceById(magazineFeatureId, {
           magazineFeature: {
@@ -537,12 +954,16 @@ describe("References: Magazine Features: Update", () => {
       }
 
       expect(() => failToUpdate()).rejects.toThrowError(
-        "magazine data without magazineIssue data is not allowed"
+        "new magazine data with no magazineIssue data is not allowed"
       );
     });
 
-    // 7. `magazineIssue` and no `magazine`: Should work as intended.
-    test("Update feature, issue data & no magazine data (1)", async () => {
+    test("magazineIssue data and no magazine data (case 7.1)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       const reference = await References.updateReferenceById(
         magazineFeatureId,
         {
@@ -555,38 +976,42 @@ describe("References: Magazine Features: Update", () => {
       );
 
       expect(reference).toBeDefined();
-      if (reference) {
-        expect(reference.magazineFeature?.magazineIssue?.issue).toBe(
-          "7.1 test"
-        );
-        expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(1);
+      if (reference?.magazineFeature?.magazineIssue) {
+        expect(reference.magazineFeature.magazineIssue.issue).toBe("7.1 test");
+        expect(reference.magazineFeature.magazineIssue.magazineId).toBe(1);
+      } else {
+        assert.fail("Updated reference magazineFeature not found");
       }
     });
 
-    test("Update feature, issue data & no magazine data (2)", async () => {
-      const reference = await References.updateReferenceById(
-        magazineFeatureId,
-        {
+    test("magazineIssue data and no magazine data (case 7.2)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
+      async function failToUpdate() {
+        await References.updateReferenceById(magazineFeatureId, {
           magazineFeature: {
             magazineIssue: {
               issue: "7.2 test",
               magazineId: 2,
             },
           },
-        }
-      );
-
-      expect(reference).toBeDefined();
-      if (reference) {
-        expect(reference.magazineFeature?.magazineIssue?.issue).toBe(
-          "7.2 test"
-        );
-        expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(2);
+        });
       }
+
+      expect(() => failToUpdate()).rejects.toThrowError(
+        "new magazineIssue data magazineId conflicts with existing magazineId"
+      );
     });
 
-    // 8. `magazineIssue` and `magazine`: Should work as intended.
-    test("Update feature, issue data & magazine data", async () => {
+    test("magazineIssue data & magazine data (case 8)", async () => {
+      const [magazineFeatureId] = await createMagazineFeatureReference({
+        magazineId: 1,
+        magazineIssueId: 1,
+        featureTags: [{ id: 1 }, { id: 2 }],
+      });
       const reference = await References.updateReferenceById(
         magazineFeatureId,
         {
@@ -602,36 +1027,20 @@ describe("References: Magazine Features: Update", () => {
       );
 
       expect(reference).toBeDefined();
-      if (reference) {
+      if (reference?.magazineFeature?.magazineIssue) {
         const magazine = await Magazine.findOne({
           where: { name: "Test 8" },
         });
-        expect(reference.magazineFeature?.magazineIssue?.issue).toBe("8 test");
-        expect(reference.magazineFeature?.magazineIssue?.magazineId).toBe(
-          magazine?.id
-        );
-      }
-    });
-    // 9. Nothing is provided: No update should happen.
-    test("Update feature, no data provided", async () => {
-      const baselineFeature = await Reference.findOne({
-        where: { name: "Magazine Feature Reference 1" },
-      });
-
-      if (baselineFeature) {
-        const oldUpdatedAt = baselineFeature.updatedAt;
-
-        const reference = await References.updateReferenceById(
-          baselineFeature.id,
-          {
-            magazineFeature: {},
-          }
-        );
-
-        expect(reference).toBeDefined();
-        expect(reference?.updatedAt).toStrictEqual(oldUpdatedAt);
+        if (!magazine) {
+          assert.fail("Newly-created Magazine not found");
+        } else {
+          expect(reference.magazineFeature.magazineIssue.issue).toBe("8 test");
+          expect(reference.magazineFeature.magazineIssue.magazineId).toBe(
+            magazine?.id
+          );
+        }
       } else {
-        throw new Error("Baseline magazine feature not found");
+        assert.fail("Updated reference magazineFeature not found");
       }
     });
   });

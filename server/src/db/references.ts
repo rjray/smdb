@@ -35,6 +35,10 @@ import { RequestOpts, getScopeFromParams } from "utils";
 
 // A local type for use in the fix-up functions for book references.
 type BookForReferenceFixup = Omit<BookForReference, "isbn" | "seriesNumber">;
+type MagazineFeatureForReferenceFixup = Omit<
+  MagazineFeatureForNewReference,
+  "featureTags"
+>;
 
 // The scopes that can be fetched for references.
 const referenceScopes = ["authors", "tags"];
@@ -422,6 +426,10 @@ async function fixupMagazineFeatureForCreate(
   magazineFeature: MagazineFeatureForNewReference,
   transaction: Transaction
 ): Promise<MagazineFeatureForNewReference> {
+  const { magazineId, magazine, magazineIssueId, magazineIssue } =
+    magazineFeature;
+  const txn = { transaction };
+
   // There are a number of different cases that can occur here:
   //
   // 0. Nothing is provided
@@ -435,9 +443,9 @@ async function fixupMagazineFeatureForCreate(
   //      referenced. Save the `magazineIssueId` in the `MagazineFeature`
   //      record.
   // 3. There is `magazineId` and `magazineIssueId`
-  //    - A `magazineId` and a `magazineIssueId` is not allowed, because the
+  //    - A `magazineId` and a `magazineIssueId` is allowed, though the
   //      `magazineId` is at best redundant and possibly conflicting with the
-  //      `magazineIssueId`. Throw an error.
+  //      `magazineIssueId`. Throw an error if it conflicts, otherwise succeed.
   // 4. There is `magazineId` and `magazineIssue`
   //    - A `magazineId` and a `magazineIssue` means that a new `MagazineIssue`
   //      record will be created, pointing to the corresponding magazine. Its
@@ -460,54 +468,193 @@ async function fixupMagazineFeatureForCreate(
   //
   // Note that there are other combinations, but these are the only ones that
   // are important due to precedence.
-
-  // Create new magazine feature if it doesn't exist
-  if (magazineFeature.magazine && magazineFeature.magazine.name) {
-    const { name, language, aliases, notes } = magazineFeature.magazine;
-    const newMagazine = await Magazine.create(
+  const newMagazineIssueId = await match({
+    magazineId,
+    magazineIssueId,
+    magazine,
+    magazineIssue,
+  } as const as MagazineFeatureForReferenceFixup)
+    .returnType<Promise<number>>()
+    .with(
       {
-        name,
-        language,
-        aliases,
-        notes,
+        magazineId: P.nullish,
+        magazineIssueId: P.nullish,
+        magazine: P.nullish,
+        magazineIssue: P.nullish,
       },
-      { transaction }
-    );
-    magazineFeature.magazineId = newMagazine.id;
-    delete magazineFeature.magazine;
-  }
-  if (!magazineFeature.magazineId) {
-    throw new Error("fixupMagazineFeatureForCreate: magazineId is required");
-  }
-
-  // Create new magazine issue if it doesn't exist
-  if (magazineFeature.magazineIssue && magazineFeature.magazineIssue.issue) {
-    const { issue } = magazineFeature.magazineIssue;
-    const magazineId = magazineFeature.magazineId;
-    const newMagazineIssue = await MagazineIssue.create(
+      async () => {
+        // Case 0: Nothing is provided
+        throw new Error("magazineIssueId is required");
+      }
+    )
+    .with(
       {
-        issue,
-        magazineId,
+        magazineId: P.number,
+        magazineIssueId: P.nullish,
+        magazine: P.nullish,
+        magazineIssue: P.nullish,
       },
-      { transaction }
-    );
-    magazineFeature.magazineIssueId = newMagazineIssue.id;
-    delete magazineFeature.magazineIssue;
-  }
-  if (!magazineFeature.magazineIssueId) {
-    throw new Error(
-      "fixupMagazineFeatureForCreate: magazineIssueId is required"
-    );
-  }
+      async () => {
+        // Case 1: There is `magazineId`, no issue information
+        throw new Error("magazineId by itself is not allowed");
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazineIssueId: P.number,
+        magazine: P.nullish,
+        magazineIssue: P.nullish,
+      },
+      async (m) => {
+        // Case 2: There is `magazineIssueId`, no magazine information
+        return m.magazineIssueId;
+      }
+    )
+    .with(
+      {
+        magazineId: P.number,
+        magazineIssueId: P.number,
+        magazine: P.nullish,
+        magazineIssue: P.nullish,
+      },
+      async (m) => {
+        // Case 3: There is `magazineId` and `magazineIssueId`
+        const magazineIssue = await MagazineIssue.findByPk(m.magazineIssueId);
+        if (!magazineIssue) {
+          throw new Error(
+            "magazineIssueId " + `${m.magazineIssueId} not found`
+          );
+        }
+        if (magazineIssue.magazineId !== m.magazineId) {
+          throw new Error("magazineId conflicts with magazineIssueId");
+        }
+
+        return m.magazineIssueId;
+      }
+    )
+    .with(
+      {
+        magazineId: P.number,
+        magazineIssueId: P.nullish,
+        magazine: P.nullish,
+        magazineIssue: {
+          issue: P.string,
+        },
+      },
+      async (m) => {
+        // Case 4: There is `magazineId` and `magazineIssue` data
+        const newMagazineIssue = await MagazineIssue.create(
+          {
+            issue: m.magazineIssue.issue,
+            magazineId: m.magazineId,
+          },
+          txn
+        );
+
+        return newMagazineIssue.id;
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazineIssueId: P.number,
+        magazine: { name: P.string },
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 5: There is `magazine` data and `magazineIssueId`
+        throw new Error("magazine with magazineIssueId is not allowed");
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazineIssueId: P.nullish,
+        magazine: { name: P.string },
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 6: There is `magazine` data but no `magazineIssue` data
+        throw new Error(
+          "magazine requires either magazineIssue or magazineIssueId"
+        );
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazineIssueId: P.nullish,
+        magazine: P.nullish,
+        magazineIssue: { issue: P.string },
+      },
+      async (m) => {
+        // Case 7: There is `magazineIssue` data but no `magazine` data
+        if (m.magazineIssue.magazineId) {
+          const newMagazineIssue = await MagazineIssue.create(
+            {
+              issue: m.magazineIssue.issue,
+              magazineId: m.magazineIssue.magazineId,
+            },
+            txn
+          );
+
+          return newMagazineIssue.id;
+        } else {
+          throw new Error(
+            "magazineIssue requires either magazine or magazineId"
+          );
+        }
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: {
+          name: P.string,
+          language: P.optional(P.string),
+          aliases: P.optional(P.string),
+          notes: P.optional(P.string),
+        },
+        magazineIssueId: P.nullish,
+        magazineIssue: {
+          issue: P.string,
+        },
+      },
+      async (m) => {
+        // Case 8: There is `magazine` and `magazineIssue` data
+        const newMagazine = await Magazine.create(
+          {
+            name: m.magazine.name,
+            language: m.magazine.language,
+            aliases: m.magazine.aliases,
+            notes: m.magazine.notes,
+          },
+          txn
+        );
+        const newMagazineIssue = await MagazineIssue.create(
+          {
+            issue: m.magazineIssue.issue,
+            magazineId: newMagazine.id,
+          },
+          txn
+        );
+
+        return newMagazineIssue.id;
+      }
+    )
+
+    .otherwise(async () => {
+      throw new Error("Invalid magazine feature data");
+    });
 
   // Create any feature tags that don't exist
   const featureTags = await fixupFeatureTags(
     magazineFeature.featureTags,
     transaction
   );
-  magazineFeature.featureTags = featureTags;
 
-  return magazineFeature;
+  return { magazineIssueId: newMagazineIssueId, featureTags };
 }
 
 // Add a magazine feature reference to the database. This requires checking of
@@ -1164,9 +1311,11 @@ async function fixupMagazineFeatureForUpdate(
   magazineFeature: MagazineFeatureForUpdateReference,
   transaction: Transaction
 ): Promise<MagazineFeatureForUpdateReference> {
-  const newMagazineFeature: MagazineFeatureForUpdateReference = {};
+  const { magazineIssue: existingMagazineIssue } =
+    existingMagazineFeature ?? {};
   const { featureTags, magazine, magazineId, magazineIssue, magazineIssueId } =
     magazineFeature;
+  const txn = { transaction };
 
   // There are a number of different cases that can occur here:
   //
@@ -1182,9 +1331,9 @@ async function fixupMagazineFeatureForUpdate(
   //      `MagazineFeature` record. It may or may not change what magazine the
   //      reference is associated with.
   // 3. There is `magazineId` and `magazineIssueId`
-  //    - A `magazineId` and a `magazineIssueId` is not allowed, because the
+  //    - A `magazineId` and a `magazineIssueId` is allowed, though the
   //      `magazineId` is at best redundant and possibly conflicting with the
-  //      `magazineIssueId`. Throw an error.
+  //      `magazineIssueId`. Throw an error if it conflicts, otherwise succeed.
   // 4. There is `magazineId` and `magazineIssue`
   //    - A `magazineId` and a `magazineIssue` means that a new MagazineIssue
   //      record will be created, pointing to the corresponding magazine. Its
@@ -1196,10 +1345,12 @@ async function fixupMagazineFeatureForUpdate(
   //    - A `magazine` and no `magazineIssue` is an error because there is no
   //      way to associate the new magazine with an issue. Throw an error.
   // 7. There is `magazineIssue` and no `magazine`
-  //    - A `magazineIssue` and no `magazine` means to create a new `magazine`
-  //      issue record using the ID of the magazine that the record is currently
-  //      associated with. The new issue's ID will be stored in the
-  //      `MagazineFeature` record.
+  //    - A `magazineIssue` and no `magazine` (or `magazineId`) means to create
+  //      a new magazine issue record using the ID of the magazine that the
+  //      existing issue record is currently associated with. If the data given
+  //      includes a `magazineId`, check that against the existing magazine's ID
+  //      and throw an error if they don't match. The new issue's ID will be
+  //      stored in the `MagazineFeature` record.
   // 8. There is `magazine` and `magazineIssue`
   //    - A `magazine` and a `magazineIssue` means that a new `Magazine` record
   //      will be created, and its ID will be used when creating the new
@@ -1208,145 +1359,260 @@ async function fixupMagazineFeatureForUpdate(
   //
   // Note that there are other combinations, but these are the only ones that
   // are important due to precedence.
+  type MatchResult = {
+    magazineIssueId?: number;
+  };
+  const newMagazineFeature = await match({
+    magazine,
+    magazineId,
+    magazineIssue,
+    magazineIssueId,
+  } as MagazineFeatureForReferenceFixup)
+    .returnType<Promise<MatchResult>>()
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: P.nullish,
+        magazineIssueId: P.nullish,
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 0. Nothing is provided.
+        return {};
+      }
+    )
+    .with(
+      {
+        magazineId: P.number,
+        magazine: P.nullish,
+        magazineIssueId: P.nullish,
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 1. Error, `magazineId` by itself is not allowed.
+        throw new Error("magazineId by itself is not allowed");
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: P.nullish,
+        magazineIssueId: P.number,
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 2. `magazineIssueId` by itself is allowed.
+        return {
+          magazineIssueId,
+        };
+      }
+    )
+    .with(
+      {
+        magazineId: P.number,
+        magazine: P.nullish,
+        magazineIssueId: P.number,
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 3. This is OK if `magazineId` does not conflict with the ID of
+        // the magazine that the issue is associated with.
+        const currentMagazineIssue = await MagazineIssue.findByPk(
+          magazineIssueId,
+          txn
+        );
+        if (currentMagazineIssue) {
+          const currentMagazineId = currentMagazineIssue.magazineId;
+          if (magazineId !== currentMagazineId) {
+            // Error, `magazineId` conflicts with the ID.
+            throw new Error(
+              "magazineId conflicts with the ID of the given magazineIssueId"
+            );
+          }
+        } else {
+          // Error, `magazineIssueId` is not associated with any magazine.
+          throw new Error(
+            "magazineIssueId is not associated with any magazine issue"
+          );
+        }
+        // OK.
 
-  // Check for `magazineId` first.
-  if (magazineId) {
-    if (magazineIssueId) {
-      // Case 3. Error.
-      throw new Error(
-        "fixupMagazineFeatureForUpdate: magazineId and magazineIssueId " +
-          "cannot both be provided"
-      );
-    } else if (magazineIssue) {
-      // Case 4. Create new magazine issue, using the provided `magazineId`.
-      const { issue } = magazineIssue;
-      if (issue) {
+        return {
+          magazineIssueId,
+        };
+      }
+    )
+    .with(
+      {
+        magazineId: P.number,
+        magazine: P.nullish,
+        magazineIssueId: P.nullish,
+        magazineIssue: {
+          issue: P.string,
+        },
+      },
+      async () => {
+        // Case 4. Create new magazine issue, using the provided `magazineId`.
+        const { issue } = magazineIssue ?? {};
+        if (!issue) {
+          // Absence of `issue`, cannot proceed.
+          throw new Error("magazineIssue is missing the required issue field");
+        }
+
         const newMagazineIssue = await MagazineIssue.create(
           {
             issue,
             magazineId,
           },
-          { transaction }
+          txn
         );
-        newMagazineFeature.magazineIssueId = newMagazineIssue.id;
-      } else {
-        // Absence of `issue`, cannot proceed.
+        return {
+          magazineIssueId: newMagazineIssue.id,
+        };
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: P.nonNullable,
+        magazineIssueId: P.number,
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 5. New magazine data with existing `magazineIssueId` is an
+        // error.
         throw new Error(
-          "fixupMagazineFeatureForUpdate: magazineId without magazineIssue " +
-            "`issue`data is not allowed"
+          "new magazine data with existing magazineIssueId is not allowed"
         );
       }
-    } else {
-      // Case 1. Error.
-      throw new Error(
-        "fixupMagazineFeatureForUpdate: magazineId without magazineIssue " +
-          "data is not allowed"
-      );
-    }
-  } else if (magazineIssueId) {
-    if (magazine) {
-      // Case 5. Error.
-      throw new Error(
-        "fixupMagazineFeatureForUpdate: magazineIssueId cannot be provided " +
-          "with magazine data"
-      );
-    } else {
-      // Case 2. Simply set up the update of the feature.
-      newMagazineFeature.magazineIssueId = magazineIssueId;
-    }
-  } else if (magazine) {
-    if (magazineIssue) {
-      // Case 8. Create new Magazine, using the provided data. Use the new ID
-      // in the creation of a new MagazineIssue record.
-      const { name, language, aliases, notes } = magazine;
-      const newMagazine = await Magazine.create(
-        {
-          name,
-          language,
-          aliases,
-          notes,
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: P.nonNullable,
+        magazineIssueId: P.nullish,
+        magazineIssue: P.nullish,
+      },
+      async () => {
+        // Case 6. New magazine data with no `magazineIssue` data is an error.
+        throw new Error(
+          "new magazine data with no magazineIssue data is not allowed"
+        );
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: P.nullish,
+        magazineIssueId: P.nullish,
+        magazineIssue: {
+          issue: P.string,
+          magazineId: P.optional(P.number),
         },
-        { transaction }
-      );
-      const { issue } = magazineIssue;
-      if (issue) {
+      },
+      async (m) => {
+        // Case 7. Create new magazine issue, using the provided `magazineIssue`
+        // data and the original `magazineId` ()
+        const { issue, magazineId } = m.magazineIssue;
+        if (!issue) {
+          // Absence of `issue`, cannot proceed.
+          throw new Error(
+            "magazineIssue is missing the required `issue` field"
+          );
+        }
+        if (!existingMagazineIssue.magazineId) {
+          // Absence of `magazineId` on the existing `magazineIssue` is an
+          // error.
+          throw new Error(
+            "magazineIssue is missing the required `magazineId` field"
+          );
+        }
+        if (magazineId && magazineId !== existingMagazineIssue.magazineId) {
+          // `magazineId` on the existing `magazineIssue` does not match the
+          // `magazineId` from the new `magazineIssue` data.
+          throw new Error(
+            "new magazineIssue data magazineId conflicts with existing magazineId"
+          );
+        }
+        const newMagazineIssue = await MagazineIssue.create(
+          {
+            issue,
+            magazineId: existingMagazineIssue.magazineId,
+          },
+          txn
+        );
+        return {
+          magazineIssueId: newMagazineIssue.id,
+        };
+      }
+    )
+    .with(
+      {
+        magazineId: P.nullish,
+        magazine: {
+          name: P.string,
+          language: P.optional(P.string),
+          aliases: P.optional(P.string),
+          notes: P.optional(P.string),
+        },
+        magazineIssueId: P.nullish,
+        magazineIssue: {
+          issue: P.string,
+        },
+      },
+      async () => {
+        // Case 8. Create a new magazine, using the provided `magazine` data and
+        // a new magazine issue, using the provided `magazineIssue` data with
+        // the ID from the new magazine.
+        const { name, language, aliases, notes } = magazine ?? {};
+        const { issue } = magazineIssue ?? {};
+        if (!issue) {
+          // Absence of `issue`, cannot proceed.
+          throw new Error(
+            "magazineIssue is missing the required `issue` field"
+          );
+        }
+        const newMagazine = await Magazine.create(
+          {
+            name,
+            language,
+            aliases,
+            notes,
+          },
+          txn
+        );
         const newMagazineIssue = await MagazineIssue.create(
           {
             issue,
             magazineId: newMagazine.id,
           },
-          { transaction }
+          txn
         );
-        newMagazineFeature.magazineIssueId = newMagazineIssue.id;
+        return {
+          magazineIssueId: newMagazineIssue.id,
+        };
       }
-    } else {
-      // Case 6. Error.
-      throw new Error(
-        "fixupMagazineFeatureForUpdate: magazine data without magazineIssue " +
-          "data is not allowed"
-      );
-    }
-  } else if (magazineIssue) {
-    // Case 7. By default, we know that there is no `magazine` or `magazineId`
-    // provided. Create a new issue using the data in `magazineIssue`. If the
-    // data does not include `magazineId`, then use the ID of the magazine the
-    // record is currently associated with.
-    const { issue, magazineId } = magazineIssue;
-    if (!issue) {
-      throw new Error(
-        "fixupMagazineFeatureForUpdate: magazineIssue without issue data " +
-          "is not allowed"
-      );
-    } else {
-      if (magazineId) {
-        const newMagazineIssue = await MagazineIssue.create(
-          {
-            issue,
-            magazineId,
-          },
-          { transaction }
-        );
-        newMagazineFeature.magazineIssueId = newMagazineIssue.id;
-      } else {
-        // If there is no `magazineId`, then the issue is associated with the
-        // magazine that the feature is currently associated with. We just have
-        // to get that.
-        if (existingMagazineFeature.magazineIssue?.magazineId) {
-          const { magazineId } = existingMagazineFeature.magazineIssue;
-          const newMagazineIssue = await MagazineIssue.create(
-            {
-              issue,
-              magazineId,
-            },
-            { transaction }
-          );
-          newMagazineFeature.magazineIssueId = newMagazineIssue.id;
-        } else {
-          throw new Error(
-            "fixupMagazineFeatureForUpdate: Unable to derive `magazineId` " +
-              "from `magazineIssue`"
-          );
-        }
-      }
-    }
-  }
-  // Case 0. None of the four elements were present.
+    )
+    .otherwise(async () => {
+      throw new Error("Invalid magazine feature data");
+    });
 
+  const returnMagazineFeature: MagazineFeatureForUpdateReference = {
+    ...newMagazineFeature,
+  };
   // Though feature tags are optional for an update, we need to fix them up if
   // they are provided.
   if (featureTags) {
     // If present, `featureTags` cannot be empty.
     if (featureTags.length) {
       const newFeatureTags = await fixupFeatureTags(featureTags, transaction);
-      newMagazineFeature.featureTags = newFeatureTags;
+      returnMagazineFeature.featureTags = newFeatureTags;
     } else {
-      throw new Error(
-        "fixupMagazineFeatureForUpdate: featureTags cannot be empty"
-      );
+      throw new Error("featureTags cannot be empty if given");
     }
   }
 
-  return newMagazineFeature;
+  return returnMagazineFeature;
 }
 
 // Update a magazine feature reference in the database. If this is already a
@@ -1582,7 +1848,7 @@ export async function updateReferenceById(
       }
     })
     .catch((error: BaseError) => {
-      throw new Error(`updateReference: ${error.message}`);
+      throw error;
     });
 }
 
