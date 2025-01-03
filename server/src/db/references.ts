@@ -187,12 +187,13 @@ async function fixupBookForCreate(
       },
       async (m) => {
         // Case 1: Publisher ID, no series info
-        const publisher = await Publisher.findByPk(m.publisherId, txn);
+        const { publisherId } = m;
+        const publisher = await Publisher.findByPk(publisherId, txn);
         if (!publisher) {
           throw new Error("Publisher not found");
         }
         return {
-          publisherId: m.publisherId,
+          publisherId,
           seriesId: null,
         };
       }
@@ -206,13 +207,16 @@ async function fixupBookForCreate(
       },
       async (m) => {
         // Case 2: Series ID, no publisher info
-        const series = await Series.findByPk(m.seriesId, txn);
+        const { seriesId } = m;
+        const series = await Series.findByPk(seriesId, txn);
+
         if (!series) {
           throw new Error("Series not found");
         }
+
         return {
           publisherId: series.publisherId,
-          seriesId: series.id,
+          seriesId,
         };
       }
     )
@@ -225,16 +229,19 @@ async function fixupBookForCreate(
       },
       async (m) => {
         // Case 3: Publisher ID and series ID
-        const series = await Series.findByPk(m.seriesId, txn);
+        const { publisherId, seriesId } = m;
+        const series = await Series.findByPk(seriesId, txn);
+
         if (!series) {
           throw new Error("Series not found");
         }
-        if (series.publisherId !== m.publisherId) {
+        if (series.publisherId !== publisherId) {
           throw new Error("Series and publisher do not match");
         }
+
         return {
-          publisherId: m.publisherId,
-          seriesId: m.seriesId,
+          publisherId,
+          seriesId,
         };
       }
     )
@@ -252,15 +259,17 @@ async function fixupBookForCreate(
       async (m) => {
         // Case 4: Publisher ID and series data
         const { name, notes } = m.series;
+        const { publisherId } = m;
+
         if (!name) {
           throw new Error("Missing new series name");
         }
 
         const newSeries = await Series.create(
-          { name, notes, publisherId: m.publisherId },
+          { name, notes, publisherId: publisherId },
           txn
         );
-        return { publisherId: m.publisherId, seriesId: newSeries.id };
+        return { publisherId, seriesId: newSeries.id };
       }
     )
     .with(
@@ -520,17 +529,17 @@ async function fixupMagazineFeatureForCreate(
       },
       async (m) => {
         // Case 3: There is `magazineId` and `magazineIssueId`
-        const magazineIssue = await MagazineIssue.findByPk(m.magazineIssueId);
+        const { magazineIssueId } = m;
+
+        const magazineIssue = await MagazineIssue.findByPk(magazineIssueId);
         if (!magazineIssue) {
-          throw new Error(
-            "magazineIssueId " + `${m.magazineIssueId} not found`
-          );
+          throw new Error("magazineIssueId " + `${magazineIssueId} not found`);
         }
-        if (magazineIssue.magazineId !== m.magazineId) {
+        if (magazineIssue.magazineId !== magazineId) {
           throw new Error("magazineId conflicts with magazineIssueId");
         }
 
-        return m.magazineIssueId;
+        return magazineIssueId;
       }
     )
     .with(
@@ -544,10 +553,13 @@ async function fixupMagazineFeatureForCreate(
       },
       async (m) => {
         // Case 4: There is `magazineId` and `magazineIssue` data
+        const { issue } = m.magazineIssue;
+        const { magazineId } = m;
+
         const newMagazineIssue = await MagazineIssue.create(
           {
-            issue: m.magazineIssue.issue,
-            magazineId: m.magazineId,
+            issue,
+            magazineId,
           },
           txn
         );
@@ -586,15 +598,20 @@ async function fixupMagazineFeatureForCreate(
         magazineId: P.nullish,
         magazineIssueId: P.nullish,
         magazine: P.nullish,
-        magazineIssue: { issue: P.string },
+        magazineIssue: {
+          issue: P.string,
+          magazineId: P.optional(P.number),
+        },
       },
       async (m) => {
         // Case 7: There is `magazineIssue` data but no `magazine` data
-        if (m.magazineIssue.magazineId) {
+        const { issue, magazineId } = m.magazineIssue;
+
+        if (magazineId) {
           const newMagazineIssue = await MagazineIssue.create(
             {
-              issue: m.magazineIssue.issue,
-              magazineId: m.magazineIssue.magazineId,
+              issue,
+              magazineId,
             },
             txn
           );
@@ -623,18 +640,20 @@ async function fixupMagazineFeatureForCreate(
       },
       async (m) => {
         // Case 8: There is `magazine` and `magazineIssue` data
+        const { name, language, aliases, notes } = m.magazine;
+        const { issue } = m.magazineIssue;
         const newMagazine = await Magazine.create(
           {
-            name: m.magazine.name,
-            language: m.magazine.language,
-            aliases: m.magazine.aliases,
-            notes: m.magazine.notes,
+            name,
+            language,
+            aliases,
+            notes,
           },
           txn
         );
         const newMagazineIssue = await MagazineIssue.create(
           {
-            issue: m.magazineIssue.issue,
+            issue,
             magazineId: newMagazine.id,
           },
           txn
@@ -991,9 +1010,11 @@ async function fixupBookForUpdate(
         seriesId: P.nullish,
         series: P.nullish,
       },
-      async () => {
+      async (m) => {
         // Case 0: No data, no worries. But only return `null` values if that
         // was explicitly passed in.
+        const { publisherId, seriesId } = m;
+
         const content: MatchResult = {};
         if (publisherId === null) {
           content.publisherId = publisherId;
@@ -1001,6 +1022,7 @@ async function fixupBookForUpdate(
         if (seriesId === null) {
           content.seriesId = seriesId;
         }
+
         return content;
       }
     )
@@ -1015,31 +1037,33 @@ async function fixupBookForUpdate(
         // Case 1: Publisher ID, no series info. If there is an existing series,
         // the new `publisherId` must match unless `series.publisherId` is null.
         // If not, throw an error.
-        const publisher = await Publisher.findByPk(m.publisherId, txn);
+        const { publisherId } = m;
+
+        const publisher = await Publisher.findByPk(publisherId, txn);
         if (!publisher) {
           throw new Error("Publisher not found");
         }
         // If the book already has a series associated with it, check that the
         // new publisher and series match. If not, throw an error.
-        if (existingSeries && existingSeries.publisherId !== m.publisherId) {
+        if (existingSeries && existingSeries.publisherId !== publisherId) {
           if (existingSeries.publisherId) {
             throw new Error("Publisher and existing series do not match");
           } else {
-            await existingSeries.update({ publisherId: m.publisherId }, txn);
+            await existingSeries.update({ publisherId }, txn);
           }
         } else if (existingSeriesId) {
           const series = await Series.findByPk(existingSeriesId, txn);
-          if (series?.publisherId !== m.publisherId) {
-            if (series?.publisherId) {
+          if (series && series.publisherId !== publisherId) {
+            if (series.publisherId) {
               throw new Error("Publisher and existing series do not match");
             } else {
-              await series?.update({ publisherId: m.publisherId }, txn);
+              await series.update({ publisherId }, txn);
             }
           }
         }
 
         return {
-          publisherId: m.publisherId,
+          publisherId,
         };
       }
     )
@@ -1054,12 +1078,14 @@ async function fixupBookForUpdate(
         // Case 2: Series ID, no publisher info. If there is an existing
         // publisher, the `publisherId` (if any) of the series will overwrite
         // it.
+        const { seriesId } = m;
         const content: MatchResult = {};
-        const series = await Series.findByPk(m.seriesId, txn);
+
+        const series = await Series.findByPk(seriesId, txn);
         if (!series) {
           throw new Error("Series not found");
         } else {
-          content.seriesId = series.id;
+          content.seriesId = seriesId;
         }
         if (series.publisherId) {
           if (!existingPublisherId) {
@@ -1082,18 +1108,17 @@ async function fixupBookForUpdate(
       async (m) => {
         // Case 3: Publisher ID and series ID. The `publisherId` of the series
         // must match. If not, throw an error.
-        const series = await Series.findByPk(m.seriesId, txn);
+        const { publisherId, seriesId } = m;
+
+        const series = await Series.findByPk(seriesId, txn);
         if (!series) {
           throw new Error("Series not found");
         }
-        if (series.publisherId !== m.publisherId) {
+        if (series.publisherId !== publisherId) {
           throw new Error("Series and publisher IDs do not match");
         }
 
-        return {
-          publisherId: m.publisherId,
-          seriesId: m.seriesId,
-        };
+        return { publisherId, seriesId };
       }
     )
     .with(
@@ -1111,17 +1136,18 @@ async function fixupBookForUpdate(
         // Case 4: Publisher ID and new series data. If the series data has a
         // `publisherId`, it will be ignored. The given `publisherId` will be
         // used in creating the new Series object.
+        const { publisherId } = m;
         const { name, notes } = m.series;
         if (!name) {
           throw new Error("Missing new series name");
         }
 
         const newSeries = await Series.create(
-          { name, notes, publisherId: m.publisherId },
+          { name, notes, publisherId },
           txn
         );
 
-        return { publisherId: m.publisherId, seriesId: newSeries.id };
+        return { publisherId, seriesId: newSeries.id };
       }
     )
     .with(
@@ -1400,8 +1426,9 @@ async function fixupMagazineFeatureForUpdate(
         magazineIssueId: P.number,
         magazineIssue: P.nullish,
       },
-      async () => {
+      async (m) => {
         // Case 2. `magazineIssueId` by itself is allowed.
+        const { magazineIssueId } = m;
         return {
           magazineIssueId,
         };
@@ -1414,9 +1441,10 @@ async function fixupMagazineFeatureForUpdate(
         magazineIssueId: P.number,
         magazineIssue: P.nullish,
       },
-      async () => {
+      async (m) => {
         // Case 3. This is OK if `magazineId` does not conflict with the ID of
         // the magazine that the issue is associated with.
+        const { magazineIssueId, magazineId } = m;
         const currentMagazineIssue = await MagazineIssue.findByPk(
           magazineIssueId,
           txn
@@ -1451,13 +1479,10 @@ async function fixupMagazineFeatureForUpdate(
           issue: P.string,
         },
       },
-      async () => {
+      async (m) => {
         // Case 4. Create new magazine issue, using the provided `magazineId`.
-        const { issue } = magazineIssue ?? {};
-        if (!issue) {
-          // Absence of `issue`, cannot proceed.
-          throw new Error("magazineIssue is missing the required issue field");
-        }
+        const { issue } = m.magazineIssue;
+        const { magazineId } = m;
 
         const newMagazineIssue = await MagazineIssue.create(
           {
@@ -1560,18 +1585,13 @@ async function fixupMagazineFeatureForUpdate(
           issue: P.string,
         },
       },
-      async () => {
+      async (m) => {
         // Case 8. Create a new magazine, using the provided `magazine` data and
         // a new magazine issue, using the provided `magazineIssue` data with
         // the ID from the new magazine.
-        const { name, language, aliases, notes } = magazine ?? {};
-        const { issue } = magazineIssue ?? {};
-        if (!issue) {
-          // Absence of `issue`, cannot proceed.
-          throw new Error(
-            "magazineIssue is missing the required `issue` field"
-          );
-        }
+        const { name, language, aliases, notes } = m.magazine;
+        const { issue } = m.magazineIssue;
+
         const newMagazine = await Magazine.create(
           {
             name,
