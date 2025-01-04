@@ -139,7 +139,7 @@ describe("References: Photo Collections: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError(
+    await expect(() => failToCreate()).rejects.toThrowError(
       "Reference must have photo collection data"
     );
   });
@@ -154,7 +154,7 @@ describe("References: Photo Collections: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError(
+    await expect(() => failToCreate()).rejects.toThrowError(
       "Reference must have at least one tag"
     );
   });

@@ -74,7 +74,7 @@ describe("References: Magazine Features: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError(
+    await expect(() => failToCreate()).rejects.toThrowError(
       "Reference must have magazine feature data"
     );
   });
@@ -94,7 +94,7 @@ describe("References: Magazine Features: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError(
+    await expect(() => failToCreate()).rejects.toThrowError(
       "featureTags cannot be an empty array"
     );
   });
@@ -111,7 +111,7 @@ describe("References: Magazine Features: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError(
+    await expect(() => failToCreate()).rejects.toThrowError(
       "magazineIssueId is required"
     );
   });
@@ -130,7 +130,7 @@ describe("References: Magazine Features: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "magazineId by itself is not allowed"
       );
     });
@@ -207,7 +207,7 @@ describe("References: Magazine Features: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "magazineId conflicts with magazineIssueId"
       );
     });
@@ -343,7 +343,7 @@ describe("References: Magazine Features: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "magazine with magazineIssueId is not allowed"
       );
     });
@@ -364,7 +364,7 @@ describe("References: Magazine Features: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "magazine requires either magazineIssue or magazineIssueId"
       );
     });
@@ -444,7 +444,7 @@ describe("References: Magazine Features: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "magazineIssue requires either magazine or magazineId"
       );
     });
@@ -723,7 +723,7 @@ describe("References: Magazine Features: Update", () => {
       });
     }
 
-    expect(() => failToUpdate()).rejects.toThrowError(
+    await expect(() => failToUpdate()).rejects.toThrowError(
       "featureTags cannot be empty if given"
     );
   });
@@ -790,7 +790,7 @@ describe("References: Magazine Features: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "magazineId by itself is not allowed"
       );
     });
@@ -858,7 +858,7 @@ describe("References: Magazine Features: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "magazineId conflicts with the ID of the given magazineIssueId"
       );
     });
@@ -932,7 +932,7 @@ describe("References: Magazine Features: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "new magazine data with existing magazineIssueId is not allowed"
       );
     });
@@ -953,7 +953,7 @@ describe("References: Magazine Features: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "new magazine data with no magazineIssue data is not allowed"
       );
     });
@@ -1001,7 +1001,7 @@ describe("References: Magazine Features: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "new magazineIssue data magazineId conflicts with existing magazineId"
       );
     });

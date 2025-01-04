@@ -72,7 +72,7 @@ describe("References: Books: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError(
+    await expect(() => failToCreate()).rejects.toThrowError(
       "Reference must have book data"
     );
   });
@@ -166,7 +166,7 @@ describe("References: Books: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "Series and publisher do not match"
       );
     });
@@ -287,7 +287,7 @@ describe("References: Books: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "Missing new series name"
       );
     });
@@ -303,7 +303,7 @@ describe("References: Books: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "Cannot specify `seriesId` with new `publisher` data"
       );
     });
@@ -367,7 +367,7 @@ describe("References: Books: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "Missing new publisher name"
       );
     });
@@ -483,7 +483,7 @@ describe("References: Books: Create", () => {
         });
       }
 
-      expect(() => failToCreate()).rejects.toThrowError(
+      await expect(() => failToCreate()).rejects.toThrowError(
         "Missing new series name"
       );
     });
@@ -735,7 +735,7 @@ describe("References: Books: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "Publisher and existing series do not match"
       );
     });
@@ -838,7 +838,7 @@ describe("References: Books: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "Series and publisher IDs do not match"
       );
     });
@@ -880,7 +880,7 @@ describe("References: Books: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "Series and publisher IDs do not match"
       );
     });
@@ -926,7 +926,7 @@ describe("References: Books: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "Missing new series name"
       );
     });
@@ -947,7 +947,7 @@ describe("References: Books: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "Cannot specify `seriesId` with new `publisher` data"
       );
     });
@@ -967,7 +967,7 @@ describe("References: Books: Update", () => {
         });
       }
 
-      expect(() => failToUpdate()).rejects.toThrowError(
+      await expect(() => failToUpdate()).rejects.toThrowError(
         "Existing series is already associated with a publisher"
       );
     });

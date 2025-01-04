@@ -39,7 +39,7 @@ describe("Series: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError("Validation error");
+    await expect(() => failToCreate()).rejects.toThrowError("Validation error");
   });
 
   test("Create series with publisher", async () => {
@@ -61,7 +61,7 @@ describe("Series: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError("Validation error");
+    await expect(() => failToCreate()).rejects.toThrowError("Validation error");
   });
 
   test("Create series with conflicting name (3)", async () => {

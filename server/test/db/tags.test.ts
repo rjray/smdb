@@ -60,7 +60,7 @@ describe("Tags: Create", () => {
       });
     }
 
-    expect(() => failToCreate()).rejects.toThrowError("Validation error");
+    await expect(() => failToCreate()).rejects.toThrowError("Validation error");
   });
 });
 
