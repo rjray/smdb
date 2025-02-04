@@ -2,8 +2,37 @@ openapi: 3.0.3
 info:
   title: SMDB Server API
   version: "0.1.0"
+  description: Documentation for the SMDB Server API
+  contact:
+    name: Randy J. Randy
+    email: rjray@blackperl.com
 servers:
   - url: /api
+tags:
+  - name: Authors
+    description: Author management
+  - name: Books
+    description: Book management
+  - name: FeatureTags
+    description: Feature tag management
+  - name: Magazines
+    description: Magazine management
+  - name: MagazineIssues
+    description: Magazine issue management
+  - name: MagazineFeatures
+    description: Magazine feature management
+  - name: PhotoCollections
+    description: Photo collection management
+  - name: Publishers
+    description: Publisher management
+  - name: References
+    description: Reference management
+  - name: ReferenceTypes
+    description: Reference type management
+  - name: Series
+    description: Series management
+  - name: Tags
+    description: Tag management
 components:
   parameters:
     authorsAliasesParam:
@@ -108,31 +137,6 @@ components:
         type: integer
         format: int64
         minimum: 1
-    limitParam:
-      name: limit
-      in: query
-      description: Number of items to return
-      required: false
-      schema:
-        type: integer
-        format: int64
-        minimum: 1
-    offsetParam:
-      name: offset
-      in: query
-      description: Number of items to skip
-      required: false
-      schema:
-        type: integer
-        format: int64
-        minimum: 0
-    sortByParam:
-      name: sortBy
-      in: query
-      description: Field to sort by
-      required: false
-      schema:
-        type: string
   schemas:
     idType:
       type: integer
@@ -143,11 +147,6 @@ components:
       format: int64
       minimum: 1
       nullable: true
-    readonlyIdType:
-      type: integer
-      format: int64
-      minimum: 1
-      readOnly: true
     countType:
       type: integer
       format: int64
@@ -894,6 +893,8 @@ paths:
                 $ref: "#/components/schemas/authorType"
         "404":
           $ref: "#/components/responses/generalError404Response"
+      tags:
+        - Authors
     delete:
       summary: Delete an author by ID
       description: Delete the specified author. Removes the author from
@@ -1101,7 +1102,6 @@ paths:
           content:
             "application/json":
               schema:
-                type: object
                 $ref: "#/components/schemas/magazineType"
         "404":
           $ref: "#/components/responses/generalError404Response"
@@ -1190,7 +1190,6 @@ paths:
           content:
             "application/json":
               schema:
-                type: object
                 $ref: "#/components/schemas/magazineIssueType"
         "404":
           $ref: "#/components/responses/generalError404Response"
