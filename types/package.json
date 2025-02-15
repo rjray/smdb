@@ -1,0 +1,7 @@
+{
+  "name": "types",
+  "version": "0.1.0",
+  "description": "Shared types for the client and server modules",
+  "main": "index.js",
+  "license": "MIT"
+}
