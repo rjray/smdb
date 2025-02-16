@@ -1,17 +1,11 @@
 {
   "root": true,
-  "env": {
-    "jest/globals": true
-  },
   "extends": [
     "eslint:recommended",
-    "plugin:promise/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
   "plugins": [
-    "@typescript-eslint",
-    "promise",
-    "jest"
+    "@typescript-eslint"
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn"
