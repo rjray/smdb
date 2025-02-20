@@ -11,6 +11,7 @@ export * from "./magazine-issues";
 export * from "./magazines";
 export * from "./photo-collections";
 export * from "./publishers";
+export * from "./reference-types";
 export * from "./references";
 export * from "./series";
 export * from "./tags";
