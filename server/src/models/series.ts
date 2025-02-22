@@ -14,27 +14,9 @@ import {
   AllowNull,
 } from "sequelize-typescript";
 
-import Book, { BookRecord } from "./book";
-import Publisher, { PublisherRecord } from "./publisher";
-
-/**
- * JSON representation of a series record.
- *
- * @property {number} id - The ID of the series.
- * @property {string} name - The name of the series.
- * @property {string|null} notes - Additional notes about the series (optional).
- * @property {number|null} publisherId - The ID of the publisher (optional).
- * @property {PublisherRecord} [publisher] - The publisher record (optional).
- * @property {BookRecord[]} [books] - An array of book records (optional).
- */
-export type SeriesRecord = {
-  id: number;
-  name: string;
-  notes: string | null;
-  publisherId: number | null;
-  publisher?: PublisherRecord;
-  books?: Array<BookRecord>;
-};
+import Book from "./book";
+import Publisher from "./publisher";
+import { SeriesData } from "@smdb-types/series";
 
 @Scopes(() => ({
   books: { include: [Book] },
@@ -59,7 +41,7 @@ class Series extends Model {
   @HasMany(() => Book)
   books?: Book[];
 
-  clean(): SeriesRecord {
+  clean(): SeriesData {
     const result = this.get();
 
     if (result.publisher) result.publisher = result.publisher.clean();
