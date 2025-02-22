@@ -13,35 +13,10 @@ import {
   BelongsToMany,
 } from "sequelize-typescript";
 
-import AuthorAlias, { AuthorAliasRecord } from "./authoralias";
+import AuthorAlias from "./authoralias";
 import AuthorsReferences from "./authorsreferences";
-import Reference, { ReferenceRecord } from "./reference";
-
-/**
- * JSON representation of an author record.
- *
- * @property {number} id - The unique identifier of the author.
- * @property {string} name - The name of the author.
- * @property {string} createdAt - The date and time when the author record was
- * created.
- * @property {string} updatedAt - The date and time when the author record was
- * last updated.
- * @property {number} [referenceCount] - The number of references associated
- * with the author (optional).
- * @property {Array<AuthorAliasRecord>} [aliases] - An array of author alias
- * records associated with the author (optional).
- * @property {Array<ReferenceRecord>} [references] - An array of reference
- * records associated with the author (optional).
- */
-export type AuthorRecord = {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  referenceCount?: number;
-  aliases?: Array<AuthorAliasRecord>;
-  references?: Array<ReferenceRecord>;
-};
+import Reference from "./reference";
+import { AuthorData } from "@smdb-types/authors";
 
 @Scopes(() => ({
   references: { include: [Reference] },
@@ -62,7 +37,7 @@ class Author extends Model {
   @BelongsToMany(() => Reference, () => AuthorsReferences)
   references?: Reference[];
 
-  clean(): AuthorRecord {
+  clean(): AuthorData {
     const result = { ...this.get() };
     delete result.AuthorsReferences;
 
@@ -77,7 +52,7 @@ class Author extends Model {
     if (result.references)
       result.references = result.references.map((r: Reference) => r.clean());
 
-    return result;
+    return result as AuthorData;
   }
 
   /**
