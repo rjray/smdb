@@ -6,16 +6,11 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { Tag } from "models";
+import { TagNewData, TagUpdateData } from "@smdb-types/tags";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for tags.
 const tagScopes = ["references"];
-
-type TagData = {
-  name: string;
-  type?: string | null;
-  description?: string | null;
-};
 
 /**
  * Adds a tag to the database.
@@ -23,7 +18,7 @@ type TagData = {
  * @param data - The tag data to be added.
  * @returns A promise that resolves to the created tag.
  */
-export function createTag(data: TagData): Promise<Tag> {
+export function createTag(data: TagNewData): Promise<Tag> {
   return Tag.create(data);
 }
 
@@ -105,7 +100,7 @@ export function getTagById(
  * @returns A promise that resolves to the updated tag.
  * @throws If the tag is not found.
  */
-export function updateTagById(id: number, data: TagData): Promise<Tag> {
+export function updateTagById(id: number, data: TagUpdateData): Promise<Tag> {
   return Tag.findByPk(id)
     .then((tag) => {
       if (!tag) {

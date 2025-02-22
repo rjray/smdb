@@ -6,6 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Tags } from "db";
 import { Tag } from "models";
+import { TagNewData, TagUpdateData } from "@smdb-types/tags";
 import { queryToRequestOpts } from "utils";
 
 /**
@@ -19,7 +20,7 @@ import { queryToRequestOpts } from "utils";
 export function createTag(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return Tags.createTag(body).then((tag) =>
+  return Tags.createTag(body as TagNewData).then((tag) =>
     res.status(201).pureJson(tag.clean())
   );
 }
@@ -77,7 +78,7 @@ export function updateTagById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return Tags.updateTagById(id, body).then((tag) => {
+  return Tags.updateTagById(id, body as TagUpdateData).then((tag) => {
     if (tag) return res.status(200).pureJson(tag.clean());
     else return res.status(404).end();
   });
