@@ -5,7 +5,7 @@
 import { BaseError } from "sequelize";
 
 import { Publisher } from "models";
-import { PublisherUpdateData, PublisherNewData } from "types/publisher";
+import { PublisherUpdateData, PublisherNewData } from "@smdb-types/publishers";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for publishers.
