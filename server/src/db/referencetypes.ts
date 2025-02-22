@@ -1,5 +1,8 @@
 /*
   Database operations focused on the ReferenceType model.
+
+  There are no create, update, or delete operations for reference types. They
+  are created when the database is initialized, and are immutable.
  */
 
 import { BaseError, FindOptions } from "sequelize";
@@ -7,25 +10,9 @@ import { BaseError, FindOptions } from "sequelize";
 import { Sequelize } from "database";
 import { ReferenceType } from "models";
 import { RequestOpts, getScopeFromParams } from "utils";
-import {
-  ReferenceTypeNewData,
-  ReferenceTypeUpdateData,
-} from "../types/referencetype";
 
-/// The scopes that can be fetched for feature tags.
+// The scopes that can be fetched for feature tags.
 const referenceTypeScopes = ["references"];
-
-/**
- * Adds a reference type to the database.
- *
- * @param data - The reference type data to be added.
- * @returns A promise that resolves to the created reference type.
- */
-export function createReferenceType(
-  data: ReferenceTypeNewData
-): Promise<ReferenceType> {
-  return ReferenceType.create(data);
-}
 
 /**
  * Fetches all reference types with additional data based on the provided
@@ -96,31 +83,6 @@ export function getReferenceTypeById(
   return ReferenceType.scope(scope)
     .findByPk(id, queryOpts)
     .then((referenceType) => referenceType)
-    .catch((error: BaseError) => {
-      throw new Error(error.message);
-    });
-}
-
-/**
- * Updates a single reference type in the database based on the provided ID and
- * data.
- *
- * @param id - The ID of the reference type to update.
- * @param data - The updated reference type data.
- * @returns A promise that resolves to the updated reference type.
- * @throws If there is an error while updating the reference type.
- */
-export function updateReferenceTypeById(
-  id: number,
-  data: ReferenceTypeUpdateData
-): Promise<ReferenceType> {
-  return ReferenceType.findByPk(id)
-    .then((referenceType) => {
-      if (!referenceType) {
-        throw new Error("Reference type not found");
-      }
-      return referenceType.update(data);
-    })
     .catch((error: BaseError) => {
       throw new Error(error.message);
     });
