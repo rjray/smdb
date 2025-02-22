@@ -13,31 +13,13 @@ import {
   BelongsTo,
   BelongsToMany,
 } from "sequelize-typescript";
+import { MagazineFeatureData } from "@smdb-types/magazine-features";
 
-import FeatureTag, { FeatureTagRecord } from "./featuretag";
+import FeatureTag from "./featuretag";
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
-import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
-import Reference, { ReferenceRecord } from "./reference";
+import MagazineIssue from "./magazineissue";
+import Reference from "./reference";
 import { FeatureTagForReference } from "types/featuretag";
-
-/**
- * JSON representation of a magazine feature record.
- *
- * @property {number} referenceId - The ID of the reference.
- * @property {number} magazineIssueId - The ID of the magazine issue.
- * @property {MagazineIssueRecord} [magazineIssue] - The magazine issue record
- * (optional).
- * @property {ReferenceRecord} [reference] - The reference record (optional).
- * @property {FeatureTagRecord[]} [featureTags] - An array of feature tag
- * records (optional).
- */
-export type MagazineFeatureRecord = {
-  referenceId: number;
-  magazineIssueId: number;
-  magazineIssue?: MagazineIssueRecord;
-  reference?: ReferenceRecord;
-  featureTags?: Array<FeatureTagRecord>;
-};
 
 @DefaultScope(() => ({ include: [MagazineIssue, FeatureTag] }))
 @Table({ timestamps: false })
@@ -60,7 +42,7 @@ class MagazineFeature extends Model {
   @BelongsToMany(() => FeatureTag, () => FeatureTagsMagazineFeatures)
   featureTags!: FeatureTag[];
 
-  clean(): MagazineFeatureRecord {
+  clean(): MagazineFeatureData {
     const result = this.get();
     delete result.FeatureTagsMagazineFeatures;
 
