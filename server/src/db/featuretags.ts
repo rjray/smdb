@@ -6,15 +6,14 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { FeatureTag } from "models";
+import {
+  FeatureTagNewData,
+  FeatureTagUpdateData,
+} from "@smdb-types/feature-tags";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for feature tags.
 const featureTagScopes = ["features"];
-
-type FeatureTagData = {
-  name: string;
-  description?: string | null;
-};
 
 /**
  * Adds a feature tag to the database.
@@ -22,7 +21,7 @@ type FeatureTagData = {
  * @param data - The feature tag data to be added.
  * @returns A promise that resolves to the created feature tag.
  */
-export function createFeatureTag(data: FeatureTagData): Promise<FeatureTag> {
+export function createFeatureTag(data: FeatureTagNewData): Promise<FeatureTag> {
   return FeatureTag.create(data);
 }
 
@@ -109,7 +108,7 @@ export function getFeatureTagById(
  */
 export function updateFeatureTagById(
   id: number,
-  data: FeatureTagData
+  data: FeatureTagUpdateData
 ): Promise<FeatureTag> {
   return FeatureTag.findByPk(id)
     .then((featureTag) => {

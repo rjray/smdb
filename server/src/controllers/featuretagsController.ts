@@ -6,6 +6,10 @@ import { ExegesisContext } from "exegesis-express";
 
 import { FeatureTags } from "db";
 import { FeatureTag } from "models";
+import {
+  FeatureTagUpdateData,
+  FeatureTagNewData,
+} from "@smdb-types/feature-tags";
 import { queryToRequestOpts } from "utils";
 
 /**
@@ -19,8 +23,8 @@ import { queryToRequestOpts } from "utils";
 export function createFeatureTag(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return FeatureTags.createFeatureTag(body).then((featuretag) =>
-    res.status(201).pureJson(featuretag.clean())
+  return FeatureTags.createFeatureTag(body as FeatureTagNewData).then(
+    (featuretag) => res.status(201).pureJson(featuretag.clean())
   );
 }
 
@@ -80,7 +84,10 @@ export function updateFeatureTagById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return FeatureTags.updateFeatureTagById(id, body).then((featuretag) => {
+  return FeatureTags.updateFeatureTagById(
+    id,
+    body as FeatureTagUpdateData
+  ).then((featuretag) => {
     if (featuretag) return res.status(200).pureJson(featuretag.clean());
     else return res.status(404).end();
   });
