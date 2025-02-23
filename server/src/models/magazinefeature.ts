@@ -14,12 +14,12 @@ import {
   BelongsToMany,
 } from "sequelize-typescript";
 import { MagazineFeatureData } from "@smdb-types/magazine-features";
+import { FeatureTagForReference } from "@smdb-types/feature-tags";
 
 import FeatureTag from "./featuretag";
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
 import MagazineIssue from "./magazineissue";
 import Reference from "./reference";
-import { FeatureTagForReference } from "types/featuretag";
 
 @DefaultScope(() => ({ include: [MagazineIssue, FeatureTag] }))
 @Table({ timestamps: false })
