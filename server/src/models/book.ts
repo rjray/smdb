@@ -12,34 +12,11 @@ import {
   ForeignKey,
   PrimaryKey,
 } from "sequelize-typescript";
+import { BookData } from "@smdb-types/books";
 
-import Publisher, { PublisherRecord } from "./publisher";
-import Reference, { ReferenceRecord } from "./reference";
-import Series, { SeriesRecord } from "./series";
-
-/**
- * JSON representation of a book record.
- *
- * @property {number} referenceId - The ID of the reference.
- * @property {string|null} [isbn] - The ISBN of the book (optional).
- * @property {string|null} [seriesNumber] - The series number of the book
- * (optional).
- * @property {number|null} [publisherId] - The ID of the publisher (optional).
- * @property {number|null} [seriesId] - The ID of the series (optional).
- * @property {ReferenceRecord} [reference] - The reference record (optional).
- * @property {PublisherRecord} [publisher] - The publisher record (optional).
- * @property {SeriesRecord} [series] - The series record (optional).
- */
-export type BookRecord = {
-  referenceId: number;
-  isbn: string | null;
-  seriesNumber: string | null;
-  publisherId: number | null;
-  seriesId: number | null;
-  reference?: ReferenceRecord;
-  publisher?: PublisherRecord;
-  series?: SeriesRecord;
-};
+import Publisher from "./publisher";
+import Reference from "./reference";
+import Series from "./series";
 
 @DefaultScope(() => ({ include: [Publisher, Series] }))
 @Table({ timestamps: false })
@@ -72,7 +49,7 @@ class Book extends Model {
   @BelongsTo(() => Series, { onDelete: "SET NULL" })
   series!: Series;
 
-  clean(): BookRecord {
+  clean(): BookData {
     const result = this.get();
 
     if (result.publisher) result.publisher = result.publisher.clean();

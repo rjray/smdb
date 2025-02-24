@@ -6,6 +6,6 @@ import { AuthorAliasForNewAuthor } from "../author-aliases";
 
 export type AuthorNewData = {
   id?: number;
-  name: string;
+  name?: string;
   aliases?: Array<AuthorAliasForNewAuthor>;
 };

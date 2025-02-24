@@ -4,6 +4,6 @@
 
 export type PublisherNewData = {
   id?: number;
-  name: string;
+  name?: string;
   notes?: string | null;
 };

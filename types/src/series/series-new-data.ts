@@ -3,7 +3,8 @@
  */
 
 export type SeriesNewData = {
-  name: string;
+  id?: number;
+  name?: string;
   notes?: string | null;
   publisherId?: number | null;
 };

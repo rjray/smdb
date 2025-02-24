@@ -11,25 +11,9 @@ import {
   ForeignKey,
   PrimaryKey,
 } from "sequelize-typescript";
+import { PhotoCollectionData } from "@smdb-types/photo-collections";
 
-import Reference, { ReferenceRecord } from "./reference";
-
-/**
- * JSON representation of a photo collection record.
- *
- * @property {number} referenceId - The ID of the reference associated with the
- * photo collection.
- * @property {string} location - The location of the photo collection.
- * @property {string} media - The media of the photo collection.
- * @property {ReferenceRecord} [reference] - The reference record associated
- * with the photo collection (optional).
- */
-export type PhotoCollectionRecord = {
-  referenceId: number;
-  location: string;
-  media: string;
-  reference?: ReferenceRecord;
-};
+import Reference from "./reference";
 
 @Table({ timestamps: false })
 class PhotoCollection extends Model {
@@ -47,7 +31,7 @@ class PhotoCollection extends Model {
   @Column(DataType.STRING)
   media!: string;
 
-  clean(): PhotoCollectionRecord {
+  clean(): PhotoCollectionData {
     const result = this.get();
 
     if (result.reference) result.reference = result.reference.clean();

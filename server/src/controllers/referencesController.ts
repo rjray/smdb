@@ -3,10 +3,10 @@
  */
 
 import { ExegesisContext } from "exegesis-express";
+import { ReferenceUpdateData, ReferenceNewData } from "@smdb-types/references";
 
 import { References } from "db";
 import { Reference } from "models";
-import { ReferenceUpdateData, ReferenceNewData } from "types/reference";
 import { queryToRequestOpts } from "utils";
 
 /**

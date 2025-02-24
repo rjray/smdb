@@ -14,7 +14,7 @@ import {
   BelongsToMany,
 } from "sequelize-typescript";
 import { MagazineFeatureData } from "@smdb-types/magazine-features";
-import { FeatureTagForReference } from "@smdb-types/feature-tags";
+import { FeatureTagNewData } from "@smdb-types/feature-tags";
 
 import FeatureTag from "./featuretag";
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
@@ -65,7 +65,7 @@ class MagazineFeature extends Model {
    * @param opts - Options for bulkCreate
    * @returns Promise<number> - count of added tags
    */
-  addFeatureTags(tags: FeatureTagForReference[], opts = {}): Promise<number> {
+  addFeatureTags(tags: FeatureTagNewData[], opts = {}): Promise<number> {
     const newTags = tags.map((tag) => ({
       featureTagId: tag.id,
       magazineFeatureId: this.referenceId,

@@ -5,7 +5,7 @@
 import { AuthorNewData } from "../authors";
 import { BookNewData } from "../books";
 import { MagazineFeatureNewData } from "../magazine-features";
-import { PhotoCollectionForNewReference } from "../photo-collections";
+import { PhotoCollectionNewData } from "../photo-collections";
 import { TagNewData } from "../tags";
 
 export type ReferenceNewData = {
@@ -15,6 +15,6 @@ export type ReferenceNewData = {
   authors?: Array<AuthorNewData>;
   tags: Array<TagNewData>;
   book?: BookNewData;
-  MagazineFeature?: MagazineFeatureNewData;
-  photoCollection?: PhotoCollectionForNewReference;
+  magazineFeature?: MagazineFeatureNewData;
+  photoCollection?: PhotoCollectionNewData;
 };

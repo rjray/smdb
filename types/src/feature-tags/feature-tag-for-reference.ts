@@ -5,5 +5,5 @@
 export type FeatureTagForReference = {
   id: number;
   name: string;
-  description: string | null;
+  description?: string | null;
 };

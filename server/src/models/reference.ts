@@ -15,51 +15,18 @@ import {
   HasOne,
   ForeignKey,
 } from "sequelize-typescript";
+import { ReferenceData } from "@smdb-types/references";
+import { AuthorNewData } from "@smdb-types/authors";
+import { TagNewData } from "@smdb-types/tags";
 
-import Author, { AuthorRecord } from "./author";
+import Author from "./author";
 import AuthorsReferences from "./authorsreferences";
-import Book, { BookRecord } from "./book";
-import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
-import PhotoCollection, { PhotoCollectionRecord } from "./photocollection";
-import ReferenceType, { ReferenceTypeRecord } from "./referencetype";
-import Tag, { TagRecord } from "./tag";
+import Book from "./book";
+import MagazineFeature from "./magazinefeature";
+import PhotoCollection from "./photocollection";
+import ReferenceType from "./referencetype";
+import Tag from "./tag";
 import TagsReferences from "./tagsreferences";
-import { AuthorForReference } from "types/author";
-import { TagForReference } from "types/tag";
-
-/**
- * JSON representation of a reference record.
- *
- * @property {number} id - The ID of the reference.
- * @property {string} name - The name of the reference.
- * @property {string|null} language - The language of the reference (optional).
- * @property {number} referenceTypeId - The ID of the reference type.
- * @property {ReferenceTypeRecord} [referenceType] - The reference type record.
- * (optional).
- * @property {string} createdAt - The creation date of the reference.
- * @property {string} updatedAt - The last update date of the reference.
- * @property {AuthorRecord[]} [authors] - An array of author records (optional).
- * @property {TagRecord[]} [tags] - An array of tag records (optional).
- * @property {BookRecord} [book] - The book record (optional).
- * @property {MagazineFeatureRecord} [magazineFeature] - The magazine feature
- * record (optional).
- * @property {PhotoCollectionRecord} [photoCollection] - The photo collection
- * record (optional).
- */
-export type ReferenceRecord = {
-  id: number;
-  name: string;
-  language: string | null;
-  referenceTypeId: number;
-  referenceType?: ReferenceTypeRecord;
-  createdAt: string;
-  updatedAt: string;
-  authors?: Array<AuthorRecord>;
-  tags?: Array<TagRecord>;
-  book?: BookRecord;
-  magazineFeature?: MagazineFeatureRecord;
-  photoCollection?: PhotoCollectionRecord;
-};
 
 @DefaultScope(() => ({
   include: [Book, MagazineFeature, PhotoCollection],
@@ -99,7 +66,7 @@ class Reference extends Model {
   @HasOne(() => PhotoCollection)
   photoCollection?: PhotoCollection;
 
-  clean(): ReferenceRecord {
+  clean(): ReferenceData {
     const result = { ...this.get() };
     delete result.AuthorsReferences;
     delete result.TagsReferences;
@@ -153,7 +120,7 @@ class Reference extends Model {
    * @param opts - Options for bulkCreate
    * @returns Promise<number> - count of added authors
    */
-  addAuthors(authors: AuthorForReference[], opts = {}): Promise<number> {
+  addAuthors(authors: AuthorNewData[], opts = {}): Promise<number> {
     const newAuthors = authors.map((a) => ({
       authorId: a.id,
       referenceId: this.id,
@@ -184,7 +151,7 @@ class Reference extends Model {
    * @param opts - Options for bulkCreate
    * @returns Promise<number> - count of added tags
    */
-  addTags(tags: TagForReference[], opts = {}): Promise<number> {
+  addTags(tags: TagNewData[], opts = {}): Promise<number> {
     const newTags = tags.map((tag) => ({
       tagId: tag.id,
       referenceId: this.id,

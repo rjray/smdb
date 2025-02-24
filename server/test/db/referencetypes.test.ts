@@ -26,34 +26,11 @@ afterAll(async () => {
   await tearDownTestDatabase();
 });
 
-describe("ReferenceTypes: Create", () => {
-  test("Create basic reference type", async () => {
-    const referenceType = await ReferenceTypes.createReferenceType({
-      name: "Reference Type 1",
-      description: "Description 1",
-    });
-
-    expect(referenceType.id).toBe(4);
-    expect(referenceType.name).toBe("Reference Type 1");
-  });
-
-  test("Create reference type with conflicting name", async () => {
-    async function failToCreate() {
-      return await ReferenceTypes.createReferenceType({
-        name: "Reference Type 1",
-        description: "Description 1",
-      });
-    }
-
-    await expect(() => failToCreate()).rejects.toThrowError("Validation error");
-  });
-});
-
 describe("ReferenceTypes: Retrieve", () => {
   test("Get all reference types", async () => {
     const referenceTypes = await ReferenceTypes.getAllReferenceTypes();
 
-    expect(referenceTypes.length).toBe(4);
+    expect(referenceTypes.length).toBe(3);
     expect(referenceTypes[0].id).toBe(1);
     expect(referenceTypes[0].name).toBe("book");
   });
@@ -99,21 +76,4 @@ describe("ReferenceTypes: Retrieve", () => {
   });
 });
 
-describe("ReferenceTypes: Update", () => {
-  test("Update reference type", async () => {
-    const referenceType = await ReferenceTypes.getReferenceTypeById(4);
-    if (referenceType) {
-      expect(referenceType.id).toBe(4);
-      expect(referenceType.name).toBe("Reference Type 1");
-      const result = await ReferenceTypes.updateReferenceTypeById(4, {
-        name: "Reference Type 1 Updated",
-      });
-      expect(result.id).toBe(4);
-      expect(result.name).toBe("Reference Type 1 Updated");
-    } else {
-      assert.fail("No reference type found");
-    }
-  });
-});
-
-// There is currently no delete feature for reference types.
+// There are no delete or update features for reference types.

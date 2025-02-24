@@ -4,6 +4,6 @@
 
 export type FeatureTagNewData = {
   id?: number;
-  name: string;
+  name?: string;
   description?: string | null;
 };

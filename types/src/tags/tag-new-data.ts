@@ -4,7 +4,7 @@
 
 export type TagNewData = {
   id?: number;
-  name: string;
+  name?: string;
   type?: string | null;
   description?: string | null;
 };
