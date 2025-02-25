@@ -6,6 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Series as SeriesDB } from "db";
 import { Series } from "models";
+import { SeriesUpdateData, SeriesNewData } from "@smdb-types/series";
 import { queryToRequestOpts } from "utils";
 
 /*
@@ -19,7 +20,7 @@ import { queryToRequestOpts } from "utils";
 export function createSeries(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return SeriesDB.createSeries(body).then((series) =>
+  return SeriesDB.createSeries(body as SeriesNewData).then((series) =>
     res.status(201).pureJson(series.clean())
   );
 }
@@ -82,10 +83,12 @@ export function updateSeriesById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return SeriesDB.updateSeriesById(id, body).then((series) => {
-    if (series) return res.status(200).pureJson(series.clean());
-    else return res.status(404).end();
-  });
+  return SeriesDB.updateSeriesById(id, body as SeriesUpdateData).then(
+    (series) => {
+      if (series) return res.status(200).pureJson(series.clean());
+      else return res.status(404).end();
+    }
+  );
 }
 
 /**

@@ -13,7 +13,8 @@
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --run --coverage"
+    "test:coverage": "vitest --run --coverage",
+    "prepare": "rm -f node_modules/@smdb-types && ln -s ../../types/src node_modules/@smdb-types"
   },
   "dependencies": {
     "compression": "^1.7.5",

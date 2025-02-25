@@ -6,7 +6,7 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "database";
 import { Author, AuthorAlias } from "models";
-import { AuthorUpdateData, AuthorNewData } from "types/author";
+import { AuthorUpdateData, AuthorNewData } from "@smdb-types/authors";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for authors.

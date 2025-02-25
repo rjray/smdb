@@ -13,27 +13,8 @@ import {
 } from "sequelize-typescript";
 
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
-import MagazineFeature, { MagazineFeatureRecord } from "./magazinefeature";
-
-/**
- * JSON representation of a feature tag record.
- *
- * @property {number} id - The ID of the feature tag.
- * @property {string} name - The name of the feature tag.
- * @property {string|null} description - The description of the feature
- * tag (optional).
- * @property {number} [referenceCount] - The number of references associated
- * with the feature tag (optional).
- * @property {MagazineFeatureRecord[]} [magazineFeatures] - An array of magazine
- * feature records associated with the feature tag (optional).
- */
-export type FeatureTagRecord = {
-  id: number;
-  name: string;
-  description: string;
-  referenceCount?: number;
-  magazineFeatures?: Array<MagazineFeatureRecord>;
-};
+import { FeatureTagData } from "@smdb-types/feature-tags";
+import MagazineFeature from "./magazinefeature";
 
 @Scopes(() => ({ features: { include: [MagazineFeature] } }))
 @Table({ timestamps: false })
@@ -51,7 +32,7 @@ class FeatureTag extends Model {
   @BelongsToMany(() => MagazineFeature, () => FeatureTagsMagazineFeatures)
   magazineFeatures?: MagazineFeature[];
 
-  clean(): FeatureTagRecord {
+  clean(): FeatureTagData {
     const result = this.get();
     delete result.FeatureTagsMagazineFeatures;
 

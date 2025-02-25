@@ -3,6 +3,7 @@
  */
 
 import { BaseError, FindOptions, QueryTypes } from "sequelize";
+import { MagazineNewData, MagazineUpdateData } from "@smdb-types/magazines";
 
 import { Sequelize, connection } from "database";
 import { Magazine } from "models";
@@ -11,21 +12,13 @@ import { RequestOpts, getScopeFromParams } from "utils";
 /// The scopes that can be fetched for magazines.
 const magazineScopes = ["issues"];
 
-type MagazineData = {
-  id?: number;
-  name: string;
-  language?: string | null;
-  aliases?: string | null;
-  notes?: string | null;
-};
-
 /**
  * Adds a magazine to the database.
  *
  * @param data - The magazine data to be added.
  * @returns A promise that resolves to the created magazine.
  */
-export function createMagazine(data: MagazineData): Promise<Magazine> {
+export function createMagazine(data: MagazineNewData): Promise<Magazine> {
   return Magazine.create(data);
 }
 
@@ -152,7 +145,7 @@ export function getRecentlyUpdatedMagazines(
  */
 export function updateMagazineById(
   id: number,
-  data: MagazineData
+  data: MagazineUpdateData
 ): Promise<Magazine> {
   return Magazine.findByPk(id)
     .then((magazine) => {

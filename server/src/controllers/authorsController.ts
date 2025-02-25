@@ -6,7 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Authors } from "db";
 import { Author } from "models";
-import { AuthorUpdateData, AuthorNewData } from "types/author";
+import { AuthorUpdateData, AuthorNewData } from "@smdb-types/authors";
 import { queryToRequestOpts } from "utils";
 
 /**

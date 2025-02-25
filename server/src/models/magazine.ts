@@ -11,36 +11,9 @@ import {
   HasMany,
   AllowNull,
 } from "sequelize-typescript";
+import { MagazineData } from "@smdb-types/magazines";
 
-import MagazineIssue, { MagazineIssueRecord } from "./magazineissue";
-
-/**
- * JSON representation of a magazine record.
- *
- * @property {number} id - The unique identifier of the magazine.
- * @property {string} name - The name of the magazine.
- * @property {string|null} language - The language of the magazine (optional).
- * @property {string|null} aliases - The aliases of the magazine (optional).
- * @property {string|null} notes - Additional notes about the magazine
- * (optional).
- * @property {string} createdAt - The timestamp when the magazine record was
- * created.
- * @property {string} updatedAt - The timestamp when the magazine record was
- * last updated.
- * @property {Array<MagazineIssueRecord>} [issues] - An array of magazine issue
- * records (optional).
- */
-export type MagazineRecord = {
-  id: number;
-  name: string;
-  language: string | null;
-  aliases: string | null;
-  notes: string | null;
-  createdAt: string;
-  updatedAt: string;
-  issueCount?: number;
-  issues?: Array<MagazineIssueRecord>;
-};
+import MagazineIssue from "./magazineissue";
 
 @Scopes(() => ({ issues: { include: [MagazineIssue] } }))
 @Table
@@ -64,7 +37,7 @@ class Magazine extends Model {
   @HasMany(() => MagazineIssue)
   issues?: MagazineIssue[];
 
-  clean(): MagazineRecord {
+  clean(): MagazineData {
     const result = { ...this.get() };
 
     // The two dates are Date objects, convert them to ISO strings so that

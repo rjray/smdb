@@ -6,6 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Publishers } from "db";
 import { Publisher } from "models";
+import { PublisherUpdateData, PublisherNewData } from "@smdb-types/publishers";
 import { queryToRequestOpts } from "utils";
 
 /**
@@ -19,8 +20,8 @@ import { queryToRequestOpts } from "utils";
 export function createPublisher(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return Publishers.createPublisher(body).then((publisher) =>
-    res.status(201).pureJson(publisher.clean())
+  return Publishers.createPublisher(body as PublisherNewData).then(
+    (publisher) => res.status(201).pureJson(publisher.clean())
   );
 }
 
@@ -80,10 +81,12 @@ export function updatePublisherById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return Publishers.updatePublisherById(id, body).then((publisher) => {
-    if (publisher) return res.status(200).pureJson(publisher.clean());
-    else return res.status(404).end();
-  });
+  return Publishers.updatePublisherById(id, body as PublisherUpdateData).then(
+    (publisher) => {
+      if (publisher) return res.status(200).pureJson(publisher.clean());
+      else return res.status(404).end();
+    }
+  );
 }
 
 /**

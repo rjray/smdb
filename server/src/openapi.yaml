@@ -1429,33 +1429,13 @@ paths:
         - PhotoCollections
   "/referencetypes":
     x-exegesis-controller: referencetypesController
-    post:
-      summary: Create a new reference type
-      description: Create a new reference type.
-      operationId: createReferenceType
-      requestBody:
-        required: true
-        content:
-          "application/json":
-            schema:
-              $ref: "#/components/schemas/newReferenceTypeType"
-      responses:
-        "201":
-          description: Reference type created
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/referenceTypeType"
-        default:
-          $ref: "#/components/responses/generalErrorResponse"
-      tags:
-        - ReferenceTypes
     get:
       summary: Fetch all reference types
       description: Fetch an array of all reference types.
       operationId: getAllReferenceTypes
       parameters:
         - $ref: "#/components/parameters/referenceCountParam"
+        - $ref: "#/components/parameters/referencesParam"
       responses:
         "200":
           description: All reference type data
@@ -1480,33 +1460,10 @@ paths:
       operationId: getReferenceTypeById
       parameters:
         - $ref: "#/components/parameters/referenceCountParam"
+        - $ref: "#/components/parameters/referencesParam"
       responses:
         "200":
           description: Reference type data
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/referenceTypeType"
-        "404":
-          $ref: "#/components/responses/generalError404Response"
-        default:
-          $ref: "#/components/responses/generalErrorResponse"
-      tags:
-        - ReferenceTypes
-    put:
-      summary: Update a reference type by ID
-      description: Update the specified reference type. Does not affect any
-        relational links.
-      operationId: updateReferenceTypeById
-      requestBody:
-        required: true
-        content:
-          "application/json":
-            schema:
-              $ref: "#/components/schemas/newReferenceTypeType"
-      responses:
-        "200":
-          description: Reference type updated
           content:
             "application/json":
               schema:

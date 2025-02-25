@@ -3,6 +3,10 @@
  */
 
 import { ExegesisContext } from "exegesis-express";
+import {
+  MagazineIssueNewData,
+  MagazineIssueUpdateData,
+} from "@smdb-types/magazine-issues";
 
 import { MagazineIssues } from "db";
 import { queryToRequestOpts } from "utils";
@@ -18,8 +22,8 @@ import { queryToRequestOpts } from "utils";
 export function createMagazineIssue(context: ExegesisContext) {
   const { res, requestBody: body } = context;
 
-  return MagazineIssues.createMagazineIssue(body).then((issue) =>
-    res.status(201).pureJson(issue.clean())
+  return MagazineIssues.createMagazineIssue(body as MagazineIssueNewData).then(
+    (issue) => res.status(201).pureJson(issue.clean())
   );
 }
 
@@ -61,7 +65,10 @@ export function updateMagazineIssueById(context: ExegesisContext) {
   const { id } = context.params.path;
   const { res, requestBody: body } = context;
 
-  return MagazineIssues.updateMagazineIssueById(id, body).then((issue) => {
+  return MagazineIssues.updateMagazineIssueById(
+    id,
+    body as MagazineIssueUpdateData
+  ).then((issue) => {
     if (issue) return res.status(200).pureJson(issue.clean());
     else return res.status(404).end();
   });

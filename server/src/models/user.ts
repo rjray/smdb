@@ -2,6 +2,8 @@
   User model definition.
  */
 
+import { UserData } from "@smdb-types/users";
+
 import {
   PrimaryKey,
   Table,
@@ -12,27 +14,6 @@ import {
   Unique,
   DataType,
 } from "sequelize-typescript";
-
-/**
- * JSON representation of a user record.
- *
- * @property {number} id - The ID of the user.
- * @property {string} name - The name of the user.
- * @property {string} email - The email of the user.
- * @property {string} username - The username of the user.
- * @property {string} password - The password of the user.
- * @property {string} createdAt - The creation date of the reference.
- * @property {string} updatedAt - The last update date of the reference.
- */
-export type UserRecord = {
-  id: number;
-  name: string;
-  email: string;
-  username: string;
-  password: string;
-  createdAt: string;
-  updatedAt: string;
-};
 
 @Table
 class User extends Model {
@@ -60,7 +41,7 @@ class User extends Model {
   @Column(DataType.STRING)
   password!: string;
 
-  clean(): UserRecord {
+  clean(): UserData {
     return { ...this.get() };
   }
 }

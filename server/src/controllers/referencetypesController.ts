@@ -1,5 +1,8 @@
 /*
   Exegesis controller for all operations under /api/referencetypes.
+
+  There are no POST, PUT or DELETE endpoints for reference types. Reference
+  types are created when the database is initialized, and are immutable.
  */
 
 import { ExegesisContext } from "exegesis-express";
@@ -7,22 +10,6 @@ import { ExegesisContext } from "exegesis-express";
 import { ReferenceTypes } from "db";
 import { ReferenceType } from "models";
 import { queryToRequestOpts } from "utils";
-
-/**
- * POST /referencetypes
- *
- * Create a new reference type based on the provided request body.
- *
- * @param context - The Exegesis context.
- * @returns A promise that resolves to the created reference type.
- */
-export function createReferenceType(context: ExegesisContext) {
-  const { res, requestBody: body } = context;
-
-  return ReferenceTypes.createReferenceType(body).then((referenceType) =>
-    res.status(201).pureJson(referenceType.clean())
-  );
-}
 
 /**
  * GET /referencetypes
@@ -65,26 +52,4 @@ export function getReferenceTypeById(context: ExegesisContext) {
     if (referenceType) return res.status(200).pureJson(referenceType.clean());
     else return res.status(404).end();
   });
-}
-
-/**
- * PUT /referencetypes/{id}
- *
- * Updates a reference type in the database based on the provided ID and form
- * data.
- *
- * @param context - The Exegesis context object.
- * @returns A promise that sets the response status and body.
- * @throws If an error occurs while updating the reference type.
- */
-export function updateReferenceTypeById(context: ExegesisContext) {
-  const { id } = context.params.path;
-  const { res, requestBody: body } = context;
-
-  return ReferenceTypes.updateReferenceTypeById(id, body).then(
-    (referenceType) => {
-      if (referenceType) return res.status(200).pureJson(referenceType.clean());
-      else return res.status(404).end();
-    }
-  );
 }

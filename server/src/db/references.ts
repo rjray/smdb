@@ -4,6 +4,18 @@
 
 import { BaseError, Transaction } from "sequelize";
 import { match, P } from "ts-pattern";
+import {
+  AuthorNewData,
+  BookNewData,
+  BookUpdateData,
+  FeatureTagNewData,
+  MagazineFeatureNewData,
+  MagazineFeatureUpdateData,
+  PhotoCollectionUpdateData,
+  ReferenceUpdateData,
+  ReferenceNewData,
+  TagNewData,
+} from "@smdb-types";
 
 import { connection } from "database";
 import {
@@ -19,24 +31,14 @@ import {
   Magazine,
   MagazineIssue,
 } from "models";
-import { ReferenceUpdateData, ReferenceNewData } from "types/reference";
-import { AuthorForReference } from "types/author";
-import { TagForReference } from "types/tag";
-import { BookForReference } from "types/book";
-import { FeatureTagForReference } from "types/featuretag";
-import {
-  MagazineFeatureForNewReference,
-  MagazineFeatureForUpdateReference,
-} from "types/magazinefeature";
-import { PhotoCollectionForUpdateReference } from "types/photocollection";
 // Oops... tripped over a deprecated name if I don't use the relative import.
 import { ReferenceTypes } from "../constants";
 import { RequestOpts, getScopeFromParams } from "utils";
 
 // A local type for use in the fix-up functions for book references.
-type BookForReferenceFixup = Omit<BookForReference, "isbn" | "seriesNumber">;
+type BookNewDataFixup = Omit<BookNewData, "isbn" | "seriesNumber">;
 type MagazineFeatureForReferenceFixup = Omit<
-  MagazineFeatureForNewReference,
+  MagazineFeatureNewData,
   "featureTags"
 >;
 
@@ -50,7 +52,7 @@ const referenceScopes = ["authors", "tags"];
 
 // Fix up the list of authors for a new reference.
 async function fixupAuthors(
-  authors: Array<AuthorForReference> | undefined,
+  authors: Array<AuthorNewData> | undefined,
   transaction: Transaction
 ) {
   if (!authors || authors.length === 0) {
@@ -59,7 +61,7 @@ async function fixupAuthors(
 
   // Create new authors if they don't exist. If the record is essentially
   // empty, ignore it.
-  const fixedAuthors: Array<AuthorForReference> = [];
+  const fixedAuthors: Array<AuthorNewData> = [];
   for (const author of authors) {
     // If the author is already in the database, don't need to create.
     if (author.id) {
@@ -77,10 +79,7 @@ async function fixupAuthors(
 }
 
 // Fix up the list of tags for the reference.
-async function fixupTags(
-  tags: Array<TagForReference>,
-  transaction: Transaction
-) {
+async function fixupTags(tags: Array<TagNewData>, transaction: Transaction) {
   if (!tags || tags.length === 0) {
     return []; // Nothing to do
   }
@@ -88,7 +87,7 @@ async function fixupTags(
   // Create new tags if they don't exist. Since these are handled in the UI a
   // little differently, there shouldn't be any empty records. So an empty
   // record is an error.
-  const fixedTags: Array<TagForReference> = [];
+  const fixedTags: Array<TagNewData> = [];
   for (const tag of tags) {
     // If the tag is already in the database, don't need to create.
     if (tag.id) {
@@ -107,9 +106,9 @@ async function fixupTags(
 // Fix up book data for a new reference. This may mean creating a new publisher
 // and/or series.
 async function fixupBookForCreate(
-  book: BookForReference,
+  book: BookNewData,
   transaction: Transaction
-): Promise<BookForReference> {
+): Promise<BookNewData> {
   const { isbn, seriesNumber, publisher, publisherId, series, seriesId } = book;
   const txn = { transaction };
 
@@ -161,7 +160,7 @@ async function fixupBookForCreate(
     publisher,
     seriesId,
     series,
-  } as BookForReferenceFixup)
+  } as BookNewDataFixup)
     .returnType<Promise<MatchResult>>()
     .with(
       {
@@ -364,7 +363,7 @@ async function fixupBookForCreate(
       throw new Error("Invalid book data");
     });
 
-  const fixed: BookForReference = { isbn, seriesNumber, ...pubAndSeries };
+  const fixed: BookNewData = { isbn, seriesNumber, ...pubAndSeries };
   return fixed;
 }
 
@@ -399,7 +398,7 @@ async function addBookReference(
 
 // Fix up the list of feature tags for a magazine feature.
 async function fixupFeatureTags(
-  featureTags: Array<FeatureTagForReference>,
+  featureTags: Array<FeatureTagNewData>,
   transaction: Transaction
 ) {
   if (!featureTags || featureTags.length === 0) {
@@ -407,7 +406,7 @@ async function fixupFeatureTags(
   }
 
   // Create new feature feature tags if they don't exist.
-  const fixedFeatureTags: Array<FeatureTagForReference> = [];
+  const fixedFeatureTags: Array<FeatureTagNewData> = [];
   for (const featureTag of featureTags) {
     // If the featureTag is already in the database, don't need to create.
     if (featureTag.id) {
@@ -432,9 +431,9 @@ async function fixupFeatureTags(
 // magazine issue and/or magazine records. Also checks and fixes up the feature
 // tags.
 async function fixupMagazineFeatureForCreate(
-  magazineFeature: MagazineFeatureForNewReference,
+  magazineFeature: MagazineFeatureNewData,
   transaction: Transaction
-): Promise<MagazineFeatureForNewReference> {
+): Promise<MagazineFeatureNewData> {
   const { magazineId, magazine, magazineIssueId, magazineIssue } =
     magazineFeature;
   const txn = { transaction };
@@ -926,7 +925,7 @@ async function updateCoreReferenceData(
 // necessary. Also checks and fixes up the feature tags.
 async function fixupBookForUpdate(
   existingBook: Book,
-  book: BookForReference,
+  book: BookUpdateData,
   transaction: Transaction
 ) {
   const {
@@ -1001,7 +1000,7 @@ async function fixupBookForUpdate(
     publisher,
     seriesId,
     series,
-  } as BookForReferenceFixup)
+  } as BookNewDataFixup)
     .returnType<Promise<MatchResult>>()
     .with(
       {
@@ -1282,7 +1281,7 @@ async function fixupBookForUpdate(
       throw new Error("Invalid book data");
     });
 
-  const updated: BookForReference = { isbn, seriesNumber, ...pubAndSeries };
+  const updated: BookNewData = { isbn, seriesNumber, ...pubAndSeries };
   return updated;
 }
 
@@ -1292,7 +1291,7 @@ async function fixupBookForUpdate(
 // validation of `book` is more strict and a new book relation is created.
 async function updateBookData(
   reference: Reference,
-  book: BookForReference | undefined,
+  book: BookUpdateData | undefined,
   transaction: Transaction
 ): Promise<void> {
   if (!book) {
@@ -1334,9 +1333,9 @@ async function updateBookData(
 // if necessary. Also checks and fixes up the feature tags.
 async function fixupMagazineFeatureForUpdate(
   existingMagazineFeature: MagazineFeature,
-  magazineFeature: MagazineFeatureForUpdateReference,
+  magazineFeature: MagazineFeatureUpdateData,
   transaction: Transaction
-): Promise<MagazineFeatureForUpdateReference> {
+): Promise<MagazineFeatureUpdateData> {
   const { magazineIssue: existingMagazineIssue } =
     existingMagazineFeature ?? {};
   const { featureTags, magazine, magazineId, magazineIssue, magazineIssueId } =
@@ -1617,7 +1616,7 @@ async function fixupMagazineFeatureForUpdate(
       throw new Error("Invalid magazine feature data");
     });
 
-  const returnMagazineFeature: MagazineFeatureForUpdateReference = {
+  const returnMagazineFeature: MagazineFeatureUpdateData = {
     ...newMagazineFeature,
   };
   // Though feature tags are optional for an update, we need to fix them up if
@@ -1640,7 +1639,7 @@ async function fixupMagazineFeatureForUpdate(
 // then the validation of `magazineFeature` is more strict.
 async function updateMagazineFeatureData(
   reference: Reference,
-  magazineFeature: MagazineFeatureForUpdateReference | undefined,
+  magazineFeature: MagazineFeatureUpdateData | undefined,
   transaction: Transaction
 ): Promise<void> {
   if (!magazineFeature) {
@@ -1715,7 +1714,7 @@ async function updateMagazineFeatureData(
 // new photo collection relation is created.
 async function updatePhotoCollectionData(
   reference: Reference,
-  photoCollection: PhotoCollectionForUpdateReference | undefined,
+  photoCollection: PhotoCollectionUpdateData | undefined,
   transaction: Transaction
 ): Promise<void> {
   if (!photoCollection) {
