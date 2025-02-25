@@ -15,3 +15,4 @@ export * from "./reference-types";
 export * from "./references";
 export * from "./series";
 export * from "./tags";
+export * from "./users";
