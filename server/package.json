@@ -17,7 +17,7 @@
     "prepare": "rm -f node_modules/@smdb-types && ln -s ../../types/src node_modules/@smdb-types"
   },
   "dependencies": {
-    "compression": "^1.7.5",
+    "compression": "^1.8.0",
     "cors": "^2.8.5",
     "csv-parse": "^5.6.0",
     "exegesis": "^4.3.0",
@@ -25,30 +25,30 @@
     "express": "^4.21.2",
     "helmet": "^7.1.0",
     "reflect-metadata": "^0.2.2",
-    "sequelize": "^6.37.5",
+    "sequelize": "^6.37.6",
     "sequelize-typescript": "^2.1.6",
-    "sqlite3": "5.1.6",
+    "sqlite3": "5.1.7",
     "ts-pattern": "^5.6.2",
     "umzug": "^3.8.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.20.0",
-    "@stoplight/spectral-cli": "^6.14.2",
+    "@eslint/js": "^9.22.0",
+    "@stoplight/spectral-cli": "^6.14.3",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
-    "@types/node": "^22.13.2",
+    "@types/node": "^22.13.10",
     "@types/supertest": "^6.0.2",
-    "@vitest/coverage-v8": "^3.0.5",
-    "eslint": "^9.18.0",
+    "@vitest/coverage-v8": "^3.0.8",
+    "eslint": "^9.22.0",
     "nodemon": "^3.1.9",
     "supertest": "^7.0.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.2"
+    "vitest": "^3.0.8"
   },
   "nodemonConfig": {
     "execMap": {
