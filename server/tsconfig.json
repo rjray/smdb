@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
+    "composite": true,
+    "paths": {
+      "@smdb-types/*": [
+        "../types/src/*"
+      ]
+    },
     "incremental": true, /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
     "target": "es2016", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "experimentalDecorators": true, /* Enable experimental support for legacy experimental decorators. */
