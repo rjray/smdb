@@ -3,5 +3,3 @@
  */
 
 export * from "./reference-type-data";
-export * from "./reference-type-new-data";
-export * from "./reference-type-update-data";

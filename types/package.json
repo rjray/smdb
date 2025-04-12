@@ -1,12 +1,17 @@
 {
-  "name": "types",
+  "name": "@smdb/types",
   "version": "0.1.0",
   "description": "Shared types for the client and server modules",
-  "main": "src/index.ts",
+  "main": "dist/index.ts",
+  "types": "dist/index.d.ts",
   "license": "MIT",
-  "dependencies": {
-    "@eslint/js": "^9.20.0",
-    "eslint": "^9.20.1",
-    "typescript-eslint": "^8.24.0"
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "eslint": "^9.24.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1"
+  },
+  "scripts": {
+    "build": "tsc"
   }
 }
