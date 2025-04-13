@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "strict": true,
+    "moduleResolution": "nodenext",
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@smdb-types/*": [
+        "types/src/*"
+      ]
+    }
+  }
+}
