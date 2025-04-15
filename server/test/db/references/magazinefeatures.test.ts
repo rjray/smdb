@@ -7,11 +7,16 @@
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../../database";
-import { Authors, Magazines, MagazineIssues, References } from "db";
+import {
+  Authors,
+  Magazines,
+  MagazineIssues,
+  References,
+} from "../../../src/db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../../src/constants";
-import { Magazine, MagazineFeature, Reference } from "models";
-import { MagazineFeatureForNewReference } from "types/magazinefeature";
+import { Magazine, MagazineFeature, Reference } from "../../../src/models";
+import { MagazineFeatureNewData } from "@smdb-types/magazine-features";
 
 beforeAll(async () => {
   await setupTestDatabase();
@@ -673,7 +678,7 @@ describe("References: Magazine Features: Update", () => {
   let magazineFeatureIdx: number = 0;
 
   async function createMagazineFeatureReference(
-    magazineFeature: MagazineFeatureForNewReference
+    magazineFeature: MagazineFeatureNewData
   ): Promise<[number, Reference]> {
     magazineFeatureIdx++;
     const magazineFeatureReference = await References.createReference({

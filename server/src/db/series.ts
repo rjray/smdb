@@ -4,9 +4,9 @@
 
 import { BaseError } from "sequelize";
 
-import { Series } from "models";
+import { Series } from "../models";
 import { SeriesUpdateData, SeriesNewData } from "@smdb-types/series";
-import { RequestOpts, getScopeFromParams } from "utils";
+import { RequestOpts, getScopeFromParams } from "../utils";
 
 /// The scopes that can be fetched for series.
 const seriesScopes = ["books", "publisher"];

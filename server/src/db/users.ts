@@ -4,7 +4,7 @@
 
 import { BaseError } from "sequelize";
 
-import { User } from "models";
+import { User } from "../models";
 import { UserNewData, UserUpdateData } from "@smdb-types/users";
 
 /**

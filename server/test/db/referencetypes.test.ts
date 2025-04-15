@@ -5,7 +5,7 @@
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../database";
-import { ReferenceTypes, References } from "db";
+import { ReferenceTypes, References } from "../../src/db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes as ReferenceTypesEnum } from "../../src/constants";
 

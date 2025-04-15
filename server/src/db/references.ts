@@ -4,20 +4,18 @@
 
 import { BaseError, Transaction } from "sequelize";
 import { match, P } from "ts-pattern";
+import { AuthorNewData } from "@smdb-types/authors";
+import { BookNewData, BookUpdateData } from "@smdb-types/books";
+import { FeatureTagNewData } from "@smdb-types/feature-tags";
 import {
-  AuthorNewData,
-  BookNewData,
-  BookUpdateData,
-  FeatureTagNewData,
   MagazineFeatureNewData,
   MagazineFeatureUpdateData,
-  PhotoCollectionUpdateData,
-  ReferenceUpdateData,
-  ReferenceNewData,
-  TagNewData,
-} from "@smdb-types";
+} from "@smdb-types/magazine-features";
+import { PhotoCollectionUpdateData } from "@smdb-types/photo-collections";
+import { ReferenceUpdateData, ReferenceNewData } from "@smdb-types/references";
+import { TagNewData } from "@smdb-types/tags";
 
-import { connection } from "database";
+import { connection } from "../database";
 import {
   Reference,
   Author,
@@ -30,10 +28,10 @@ import {
   MagazineFeature,
   Magazine,
   MagazineIssue,
-} from "models";
+} from "../models";
 // Oops... tripped over a deprecated name if I don't use the relative import.
 import { ReferenceTypes } from "../constants";
-import { RequestOpts, getScopeFromParams } from "utils";
+import { RequestOpts, getScopeFromParams } from "../utils";
 
 // A local type for use in the fix-up functions for book references.
 type BookNewDataFixup = Omit<BookNewData, "isbn" | "seriesNumber">;

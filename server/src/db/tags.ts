@@ -4,10 +4,10 @@
 
 import { BaseError, FindOptions } from "sequelize";
 
-import { Sequelize } from "database";
-import { Tag } from "models";
+import { Sequelize } from "../database";
+import { Tag } from "../models";
 import { TagNewData, TagUpdateData } from "@smdb-types/tags";
-import { RequestOpts, getScopeFromParams } from "utils";
+import { RequestOpts, getScopeFromParams } from "../utils";
 
 /// The scopes that can be fetched for tags.
 const tagScopes = ["references"];

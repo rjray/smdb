@@ -5,9 +5,9 @@
 import { BaseError, FindOptions, QueryTypes } from "sequelize";
 import { MagazineNewData, MagazineUpdateData } from "@smdb-types/magazines";
 
-import { Sequelize, connection } from "database";
-import { Magazine } from "models";
-import { RequestOpts, getScopeFromParams } from "utils";
+import { Sequelize, connection } from "../database";
+import { Magazine } from "../models";
+import { RequestOpts, getScopeFromParams } from "../utils";
 
 /// The scopes that can be fetched for magazines.
 const magazineScopes = ["issues"];

@@ -12,7 +12,7 @@ import {
   Publishers,
   References,
   Series as SeriesDB,
-} from "db";
+} from "../../src/db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
 

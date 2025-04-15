@@ -6,7 +6,7 @@
   as though it were a typical "barrel file".
  */
 
-import { connection } from "database";
+import { connection } from "../database";
 
 import Author from "./author";
 import AuthorAlias from "./authoralias";

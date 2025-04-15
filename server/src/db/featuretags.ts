@@ -4,13 +4,13 @@
 
 import { BaseError, FindOptions } from "sequelize";
 
-import { Sequelize } from "database";
-import { FeatureTag } from "models";
+import { Sequelize } from "../database";
+import { FeatureTag } from "../models";
 import {
   FeatureTagNewData,
   FeatureTagUpdateData,
 } from "@smdb-types/feature-tags";
-import { RequestOpts, getScopeFromParams } from "utils";
+import { RequestOpts, getScopeFromParams } from "../utils";
 
 /// The scopes that can be fetched for feature tags.
 const featureTagScopes = ["features"];

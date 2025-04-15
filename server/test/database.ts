@@ -4,7 +4,7 @@
 
 import fs from "fs";
 
-import setupDatabase from "database/setup";
+import setupDatabase from "../src/database/setup";
 
 /*
   The basic need, here, is this: If the test file is an actual file rather than

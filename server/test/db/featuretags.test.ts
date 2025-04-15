@@ -5,7 +5,12 @@
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../database";
-import { FeatureTags, Magazines, MagazineIssues, References } from "db";
+import {
+  FeatureTags,
+  Magazines,
+  MagazineIssues,
+  References,
+} from "../../src/db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../src/constants";
 
