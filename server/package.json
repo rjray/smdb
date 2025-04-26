@@ -1,6 +1,6 @@
 {
   "name": "@smdb/server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "SMDB Server",
   "main": "dist/server.js",
   "license": "MIT",
@@ -31,22 +31,22 @@
     "umzug": "^3.8.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.24.0",
-    "@stoplight/spectral-cli": "^6.14.3",
+    "@eslint/js": "^9.25.1",
+    "@stoplight/spectral-cli": "^6.15.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.15.2",
     "@types/supertest": "^6.0.3",
-    "@vitest/coverage-v8": "^3.1.1",
-    "eslint": "^9.24.0",
-    "nodemon": "^3.1.9",
+    "@vitest/coverage-v8": "^3.1.2",
+    "eslint": "^9.25.1",
+    "nodemon": "^3.1.10",
     "supertest": "^7.1.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.29.1",
+    "typescript-eslint": "^8.31.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.2"
   },
   "resolutions": {
     "**/@types/express": "^4"
