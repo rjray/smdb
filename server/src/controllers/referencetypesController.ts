@@ -7,9 +7,9 @@
 
 import { ExegesisContext } from "exegesis-express";
 
-import { ReferenceTypes } from "db";
-import { ReferenceType } from "models";
-import { queryToRequestOpts } from "utils";
+import { ReferenceTypes } from "../db";
+import { ReferenceType } from "../models";
+import { queryToRequestOpts } from "../utils";
 
 /**
  * GET /referencetypes

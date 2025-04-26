@@ -4,10 +4,10 @@
 
 import { ExegesisContext } from "exegesis-express";
 
-import { Tags } from "db";
-import { Tag } from "models";
+import { Tags } from "../db";
+import { Tag } from "../models";
 import { TagNewData, TagUpdateData } from "@smdb-types/tags";
-import { queryToRequestOpts } from "utils";
+import { queryToRequestOpts } from "../utils";
 
 /**
  * POST /tags

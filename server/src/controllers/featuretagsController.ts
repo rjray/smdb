@@ -4,13 +4,13 @@
 
 import { ExegesisContext } from "exegesis-express";
 
-import { FeatureTags } from "db";
-import { FeatureTag } from "models";
+import { FeatureTags } from "../db";
+import { FeatureTag } from "../models";
 import {
   FeatureTagUpdateData,
   FeatureTagNewData,
 } from "@smdb-types/feature-tags";
-import { queryToRequestOpts } from "utils";
+import { queryToRequestOpts } from "../utils";
 
 /**
   POST /featuretags

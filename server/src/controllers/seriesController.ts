@@ -4,10 +4,10 @@
 
 import { ExegesisContext } from "exegesis-express";
 
-import { Series as SeriesDB } from "db";
-import { Series } from "models";
+import { Series as SeriesDB } from "../db";
+import { Series } from "../models";
 import { SeriesUpdateData, SeriesNewData } from "@smdb-types/series";
-import { queryToRequestOpts } from "utils";
+import { queryToRequestOpts } from "../utils";
 
 /*
   POST /series

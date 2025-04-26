@@ -4,10 +4,10 @@
 
 import { ExegesisContext } from "exegesis-express";
 
-import { Publishers } from "db";
-import { Publisher } from "models";
+import { Publishers } from "../db";
+import { Publisher } from "../models";
 import { PublisherUpdateData, PublisherNewData } from "@smdb-types/publishers";
-import { queryToRequestOpts } from "utils";
+import { queryToRequestOpts } from "../utils";
 
 /**
   POST /publishers

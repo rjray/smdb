@@ -8,8 +8,8 @@ import {
   MagazineIssueUpdateData,
 } from "@smdb-types/magazine-issues";
 
-import { MagazineIssues } from "db";
-import { queryToRequestOpts } from "utils";
+import { MagazineIssues } from "../db";
+import { queryToRequestOpts } from "../utils";
 
 /**
  * POST /magazineissues
