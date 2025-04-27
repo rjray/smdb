@@ -169,7 +169,7 @@ describe("MagazineIssues: Update", () => {
       issue: "1 Updated",
     });
 
-    expect(magazineIssue.issue).toBe("1 Updated");
+    expect(magazineIssue?.issue).toBe("1 Updated");
   });
 });
 

@@ -6,7 +6,6 @@ import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../database";
 import { Magazines, MagazineIssues } from "../../src/db";
-import { Magazine } from "server/src/models";
 
 beforeAll(async () => {
   await setupTestDatabase();
@@ -76,7 +75,7 @@ describe("Magazines: Retrieve", () => {
   });
 
   test("Get magazine by ID with issues", async () => {
-    const magazine: Magazine = await Magazines.getMagazineById(1, {
+    const magazine = await Magazines.getMagazineById(1, {
       issues: true,
     });
 
@@ -133,9 +132,13 @@ describe("Magazines: Update", () => {
       language: "English",
     });
 
-    expect(magazine.id).toBe(6);
-    expect(magazine.name).toBe("Magazine 6 Updated");
-    expect(magazine.language).toBe("English");
+    if (magazine) {
+      expect(magazine.id).toBe(6);
+      expect(magazine.name).toBe("Magazine 6 Updated");
+      expect(magazine.language).toBe("English");
+    } else {
+      assert.fail("No magazine returned by update");
+    }
   });
 });
 

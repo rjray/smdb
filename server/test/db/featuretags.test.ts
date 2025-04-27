@@ -129,8 +129,12 @@ describe("FeatureTags: Update", () => {
       const result = await FeatureTags.updateFeatureTagById(1, {
         name: "color illustrations updated",
       });
-      expect(result.id).toBe(1);
-      expect(result.name).toBe("color illustrations updated");
+      if (result) {
+        expect(result.id).toBe(1);
+        expect(result.name).toBe("color illustrations updated");
+      } else {
+        assert.fail("No feature tag found for update");
+      }
     } else {
       assert.fail("No feature tag found");
     }

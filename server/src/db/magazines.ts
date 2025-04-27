@@ -146,7 +146,7 @@ export function getRecentlyUpdatedMagazines(
 export function updateMagazineById(
   id: number,
   data: MagazineUpdateData
-): Promise<Magazine> {
+): Promise<Magazine | null> {
   return Magazine.findByPk(id)
     .then((magazine) => {
       if (!magazine) {
