@@ -40,6 +40,8 @@ const createMockMagazine = (
     name,
     language,
     issues,
+    aliases: null,
+    notes: null,
     createdAt: now,
     updatedAt: now,
     clean: () => {
@@ -134,9 +136,9 @@ describe("magazinesController: getAllMagazines", () => {
 
     expect(Magazines.getAllMagazines).toHaveBeenCalledWith({});
     expect(mockContext.res.status).toHaveBeenCalledWith(200);
-    expect(mockContext.res.pureJson).toHaveBeenCalledWith([
-      mockMagazines.map((m) => m.clean()),
-    ]);
+    expect(mockContext.res.pureJson).toHaveBeenCalledWith(
+      mockMagazines.map((m) => m.clean())
+    );
   });
 
   test("should pass query parameters to the database layer", async () => {
@@ -163,7 +165,6 @@ describe("magazinesController: getAllMagazines", () => {
       magazineId: 1,
       createdAt: now,
       updatedAt: now,
-      clean: () => ({ id: 1, issue: "Issue 1" }),
     };
 
     const mockMagazines = [
@@ -183,7 +184,19 @@ describe("magazinesController: getAllMagazines", () => {
         id: 1,
         name: "Magazine 1",
         language: null,
-        issues: [{ id: 1, issue: "Issue 1" }],
+        aliases: null,
+        notes: null,
+        createdAt: mockMagazines[0].createdAt.toISOString(),
+        updatedAt: mockMagazines[0].updatedAt.toISOString(),
+        issues: [
+          {
+            id: 1,
+            issue: "Issue 1",
+            magazineId: 1,
+            createdAt: now,
+            updatedAt: now,
+          },
+        ],
       },
     ]);
   });
@@ -206,6 +219,10 @@ describe("magazinesController: getMagazineById", () => {
       id: 1,
       name: "Magazine 1",
       language: null,
+      aliases: null,
+      notes: null,
+      createdAt: mockMagazine.createdAt.toISOString(),
+      updatedAt: mockMagazine.updatedAt.toISOString(),
     });
   });
 
@@ -257,8 +274,24 @@ describe("magazinesController: getMostRecentUpdatedMagazines", () => {
     expect(Magazines.getRecentlyUpdatedMagazines).toHaveBeenCalledWith({});
     expect(mockContext.res.status).toHaveBeenCalledWith(200);
     expect(mockContext.res.pureJson).toHaveBeenCalledWith([
-      { id: 1, name: "Magazine 1", language: null },
-      { id: 2, name: "Magazine 2", language: null },
+      {
+        id: 1,
+        name: "Magazine 1",
+        language: null,
+        aliases: null,
+        notes: null,
+        createdAt: mockMagazines[0].createdAt.toISOString(),
+        updatedAt: mockMagazines[0].updatedAt.toISOString(),
+      },
+      {
+        id: 2,
+        name: "Magazine 2",
+        language: null,
+        aliases: null,
+        notes: null,
+        createdAt: mockMagazines[1].createdAt.toISOString(),
+        updatedAt: mockMagazines[1].updatedAt.toISOString(),
+      },
     ]);
   });
 
@@ -304,6 +337,10 @@ describe("magazinesController: updateMagazineById", () => {
       id: 1,
       name: "Updated Magazine",
       language: "English",
+      aliases: null,
+      notes: null,
+      createdAt: mockMagazine.createdAt.toISOString(),
+      updatedAt: mockMagazine.updatedAt.toISOString(),
     });
   });
 
