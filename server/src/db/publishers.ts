@@ -73,7 +73,7 @@ export function getPublisherById(
 export function updatePublisherById(
   id: number,
   data: PublisherUpdateData
-): Promise<Publisher> {
+): Promise<Publisher | null> {
   return Publisher.findByPk(id)
     .then((publisher) => {
       if (!publisher) {
