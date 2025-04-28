@@ -3,15 +3,9 @@
  */
 
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import {
-  createAuthor,
-  getAllAuthors,
-  getAuthorById,
-  updateAuthorById,
-  deleteAuthorById,
-} from "../../src/controllers/authorsController";
 import { ExegesisContext } from "exegesis";
 
+import * as authorsController from "../../src/controllers/authorsController";
 import { Authors } from "../../src/db";
 import { Author } from "../../src/models";
 
@@ -83,7 +77,9 @@ describe("Authors Controller", () => {
         mockAuthor as unknown as Author
       );
 
-      await createAuthor(mockContext as unknown as ExegesisContext);
+      await authorsController.createAuthor(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.createAuthor).toHaveBeenCalledWith({
         name: "Test Author",
@@ -101,7 +97,9 @@ describe("Authors Controller", () => {
       vi.mocked(Authors.createAuthor).mockRejectedValue(error);
 
       await expect(
-        createAuthor(mockContext as unknown as ExegesisContext)
+        authorsController.createAuthor(
+          mockContext as unknown as ExegesisContext
+        )
       ).rejects.toThrow("Database error");
     });
   });
@@ -119,7 +117,9 @@ describe("Authors Controller", () => {
         mockAuthors as unknown as Author[]
       );
 
-      await getAllAuthors(mockContext as unknown as ExegesisContext);
+      await authorsController.getAllAuthors(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.getAllAuthors).toHaveBeenCalled();
       expect(mockContext.res.status).toHaveBeenCalledWith(200);
@@ -138,7 +138,9 @@ describe("Authors Controller", () => {
         mockAuthors as unknown as Author[]
       );
 
-      await getAllAuthors(mockContext as unknown as ExegesisContext);
+      await authorsController.getAllAuthors(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.getAllAuthors).toHaveBeenCalledWith({
         aliases: true,
@@ -158,7 +160,9 @@ describe("Authors Controller", () => {
         mockAuthor as unknown as Author
       );
 
-      await getAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.getAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.getAuthorById).toHaveBeenCalledWith("1", {});
       expect(mockContext.res.status).toHaveBeenCalledWith(200);
@@ -172,7 +176,9 @@ describe("Authors Controller", () => {
 
       vi.mocked(Authors.getAuthorById).mockResolvedValue(null);
 
-      await getAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.getAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.getAuthorById).toHaveBeenCalledWith("999", {});
       expect(mockContext.res.status).toHaveBeenCalledWith(404);
@@ -190,7 +196,9 @@ describe("Authors Controller", () => {
         mockAuthor as unknown as Author
       );
 
-      await getAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.getAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.getAuthorById).toHaveBeenCalledWith("1", {
         aliases: true,
@@ -211,7 +219,9 @@ describe("Authors Controller", () => {
         mockAuthor as unknown as Author
       );
 
-      await updateAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.updateAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.updateAuthorById).toHaveBeenCalledWith("1", {
         name: "Updated Author",
@@ -228,7 +238,9 @@ describe("Authors Controller", () => {
 
       vi.mocked(Authors.updateAuthorById).mockResolvedValue(null);
 
-      await updateAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.updateAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.updateAuthorById).toHaveBeenCalledWith("999", {
         name: "Updated Author",
@@ -254,7 +266,9 @@ describe("Authors Controller", () => {
         mockAuthor as unknown as Author
       );
 
-      await updateAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.updateAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.updateAuthorById).toHaveBeenCalledWith("1", {
         name: "Updated Author",
@@ -271,7 +285,9 @@ describe("Authors Controller", () => {
 
       vi.mocked(Authors.deleteAuthorById).mockResolvedValue(1);
 
-      await deleteAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.deleteAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.deleteAuthorById).toHaveBeenCalledWith("1");
       expect(mockContext.res.status).toHaveBeenCalledWith(200);
@@ -285,7 +301,9 @@ describe("Authors Controller", () => {
 
       vi.mocked(Authors.deleteAuthorById).mockResolvedValue(0);
 
-      await deleteAuthorById(mockContext as unknown as ExegesisContext);
+      await authorsController.deleteAuthorById(
+        mockContext as unknown as ExegesisContext
+      );
 
       expect(Authors.deleteAuthorById).toHaveBeenCalledWith("999");
       expect(mockContext.res.status).toHaveBeenCalledWith(404);
