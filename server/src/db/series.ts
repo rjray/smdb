@@ -71,7 +71,7 @@ export function getSeriesById(
 export function updateSeriesById(
   id: number,
   data: SeriesUpdateData
-): Promise<Series> {
+): Promise<Series | null> {
   return Series.findByPk(id)
     .then((series) => {
       if (!series) {
