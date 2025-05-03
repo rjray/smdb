@@ -124,8 +124,12 @@ describe("Tags: Update", () => {
       const result = await Tags.updateTagById(1, {
         name: "aircraft updated",
       });
-      expect(result.id).toBe(1);
-      expect(result.name).toBe("aircraft updated");
+      if (result) {
+        expect(result.id).toBe(1);
+        expect(result.name).toBe("aircraft updated");
+      } else {
+        assert.fail("No tag returned from update");
+      }
     } else {
       assert.fail("No feature tag found");
     }
