@@ -100,7 +100,10 @@ export function getTagById(
  * @returns A promise that resolves to the updated tag.
  * @throws If the tag is not found.
  */
-export function updateTagById(id: number, data: TagUpdateData): Promise<Tag> {
+export function updateTagById(
+  id: number,
+  data: TagUpdateData
+): Promise<Tag | null> {
   return Tag.findByPk(id)
     .then((tag) => {
       if (!tag) {
