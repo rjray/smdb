@@ -9,6 +9,6 @@ import { MagazineIssueForReference } from "../magazine-issues";
 export type MagazineFeatureForReference = {
   referenceId: number;
   magazineIssueId: number;
-  magazineIssue: MagazineIssueForReference;
-  featureTags: Array<FeatureTagForReference>;
+  magazineIssue?: MagazineIssueForReference;
+  featureTags?: Array<FeatureTagForReference>;
 };

@@ -109,7 +109,7 @@ export function getFeatureTagById(
 export function updateFeatureTagById(
   id: number,
   data: FeatureTagUpdateData
-): Promise<FeatureTag> {
+): Promise<FeatureTag | null> {
   return FeatureTag.findByPk(id)
     .then((featureTag) => {
       if (!featureTag) {

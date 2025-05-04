@@ -109,7 +109,7 @@ export function getAuthorById(
 export function updateAuthorById(
   id: number,
   data: AuthorUpdateData
-): Promise<Author> {
+): Promise<Author | null> {
   return Author.findByPk(id)
     .then((author) => {
       if (!author) {
