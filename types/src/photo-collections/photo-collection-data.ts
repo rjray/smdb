@@ -15,7 +15,7 @@ import { ReferenceData } from "../references";
  * with the photo collection (optional).
  */
 export type PhotoCollectionData = {
-  refereceId: string;
+  referenceId: number;
   location: string;
   media: string;
   reference?: ReferenceData;
