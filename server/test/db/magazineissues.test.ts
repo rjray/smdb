@@ -57,12 +57,41 @@ describe("MagazineIssues: Create", () => {
 });
 
 describe("MagazineIssues: Retrieve", () => {
-  test("Get magazine issue by ID", async () => {
-    const issue = await MagazineIssues.getMagazineIssueById(1);
+  test("Get all magazine issues without magazine ID", async () => {
+    const issues = await MagazineIssues.getAllMagazineIssues();
+
+    if (issues) {
+      // Look for 25 or 26, in case this test is run without the previous tests
+      // having run first.
+      expect(issues.length).toBeOneOf([25, 26]);
+    } else {
+      assert.fail("No magazine issues found");
+    }
+  });
+
+  test("Get all magazine issues for one magazine ID", async () => {
+    const issues = await MagazineIssues.getAllMagazineIssues({
+      magazineId: 5,
+      referenceCount: true,
+    });
+
+    if (issues) {
+      expect(issues.length).toBe(5);
+      expect(issues[0].referenceCount).toBe(0);
+    } else {
+      assert.fail("No magazine issues found");
+    }
+  });
+
+  test("Get magazine issue by ID with refcount", async () => {
+    const issue = await MagazineIssues.getMagazineIssueById(1, {
+      referenceCount: true,
+    });
 
     if (issue) {
       expect(issue.magazineId).toBe(1);
       expect(issue.issue).toBe("1");
+      expect(issue.referenceCount).toBe(0);
     } else {
       assert.fail("No magazine issue found");
     }
@@ -116,6 +145,7 @@ describe("MagazineIssues: Retrieve", () => {
 
     const issue = await MagazineIssues.getMagazineIssueById(1, {
       features: true,
+      referenceCount: true,
     });
 
     if (issue) {
@@ -129,6 +159,7 @@ describe("MagazineIssues: Retrieve", () => {
         id: 1,
         issue: "1",
         magazineId: 1,
+        referenceCount: 1,
         createdAt,
         updatedAt,
         magazineFeatures: [
@@ -170,6 +201,15 @@ describe("MagazineIssues: Update", () => {
     });
 
     expect(magazineIssue?.issue).toBe("1 Updated");
+  });
+
+  test("Update non-existent magazine issue", async () => {
+    async function failToUpdate() {
+      return await MagazineIssues.updateMagazineIssueById(999999999, {
+        issue: "1 Updated",
+      });
+    }
+    await expect(failToUpdate).rejects.toThrow();
   });
 });
 

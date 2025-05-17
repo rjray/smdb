@@ -53,6 +53,14 @@ describe("Authors: Retrieve", () => {
     expect(authors.length).toBe(2);
   });
 
+  test("Get all authors with reference counts", async () => {
+    const authors = await Authors.getAllAuthors({ referenceCount: true });
+
+    expect(authors.length).toBe(2);
+    expect(authors[0].referenceCount).toBe(0);
+    expect(authors[1].referenceCount).toBe(0);
+  });
+
   test("Get author by ID", async () => {
     const author = await Authors.getAuthorById(1);
 
@@ -75,11 +83,15 @@ describe("Authors: Retrieve", () => {
   });
 
   test("Get author by ID with aliases", async () => {
-    const author = await Authors.getAuthorById(2, { aliases: true });
+    const author = await Authors.getAuthorById(2, {
+      aliases: true,
+      referenceCount: true,
+    });
 
     if (author) {
       expect(author.id).toBe(2);
       expect(author.name).toBe("Author 2");
+      expect(author.referenceCount).toBe(0);
       if (author.aliases) {
         expect(author.aliases.length).toBe(2);
         expect(author.aliases[0].name).toBe("Alias 1");
@@ -94,6 +106,7 @@ describe("Authors: Retrieve", () => {
       expect(cleaned).toEqual({
         id: 2,
         name: "Author 2",
+        referenceCount: 0,
         createdAt,
         updatedAt,
         aliases: [
@@ -227,6 +240,15 @@ describe("Authors: Update", () => {
     } else {
       assert.fail("No author.aliases found");
     }
+  });
+
+  test("Update non-existent author", async () => {
+    async function failToUpdate() {
+      return await Authors.updateAuthorById(999999999, {
+        name: "1 Updated",
+      });
+    }
+    await expect(failToUpdate).rejects.toThrow();
   });
 });
 

@@ -96,6 +96,20 @@ describe("Tags: Retrieve", () => {
     }
   });
 
+  test("Get tag by ID with reference count", async () => {
+    const tag = await Tags.getTagById(1, {
+      referenceCount: true,
+    });
+
+    if (tag) {
+      expect(tag.id).toBe(1);
+      expect(tag.name).toBe("aircraft");
+      expect(tag.referenceCount).toBe(5);
+    } else {
+      assert.fail("No feature tag found");
+    }
+  });
+
   test("Get tag by ID with references", async () => {
     const tag = await Tags.getTagById(1, {
       references: true,
@@ -133,6 +147,15 @@ describe("Tags: Update", () => {
     } else {
       assert.fail("No feature tag found");
     }
+  });
+
+  test("Update non-existent tag", async () => {
+    async function failToUpdate() {
+      return await Tags.updateTagById(999999999, {
+        name: "1 Updated",
+      });
+    }
+    await expect(failToUpdate).rejects.toThrow();
   });
 });
 

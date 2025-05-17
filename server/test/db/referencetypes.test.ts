@@ -57,6 +57,23 @@ describe("ReferenceTypes: Retrieve", () => {
     }
   });
 
+  test("Get reference type by ID with reference count", async () => {
+    const referenceType = await ReferenceTypes.getReferenceTypeById(
+      ReferenceTypesEnum.Book,
+      {
+        referenceCount: true,
+      }
+    );
+
+    if (referenceType) {
+      expect(referenceType.id).toBe(1);
+      expect(referenceType.name).toBe("book");
+      expect(referenceType.referenceCount).toBe(5);
+    } else {
+      assert.fail("No reference type found");
+    }
+  });
+
   test("Get reference type by ID with references", async () => {
     const referenceType = await ReferenceTypes.getReferenceTypeById(1, {
       references: true,

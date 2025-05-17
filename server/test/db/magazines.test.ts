@@ -62,12 +62,39 @@ describe("Magazines: Retrieve", () => {
     expect(magazines[0].issues).toBeUndefined();
   });
 
+  test("Get all Magazines with issueCount", async () => {
+    const magazines = await Magazines.getAllMagazines({
+      issueCount: true,
+    });
+
+    expect(magazines.length).toBe(6);
+    expect(magazines[0].id).toBe(1);
+    expect(magazines[0].name).toBe("Magazine 1");
+    expect(magazines[0].issueCount).toBe(5);
+    expect(magazines[0].issues).toBeUndefined();
+  });
+
   test("Get magazine by ID", async () => {
     const magazine = await Magazines.getMagazineById(1);
 
     if (magazine) {
       expect(magazine.id).toBe(1);
       expect(magazine.name).toBe("Magazine 1");
+      expect(magazine.issues).toBeUndefined();
+    } else {
+      assert.fail("No magazine found");
+    }
+  });
+
+  test("Get magazine by ID with issueCount", async () => {
+    const magazine = await Magazines.getMagazineById(1, {
+      issueCount: true,
+    });
+
+    if (magazine) {
+      expect(magazine.id).toBe(1);
+      expect(magazine.name).toBe("Magazine 1");
+      expect(magazine.issueCount).toBe(5);
       expect(magazine.issues).toBeUndefined();
     } else {
       assert.fail("No magazine found");
@@ -139,6 +166,15 @@ describe("Magazines: Update", () => {
     } else {
       assert.fail("No magazine returned by update");
     }
+  });
+
+  test("Update non-existent magazine", async () => {
+    async function failToUpdate() {
+      return await Magazines.updateMagazineById(999999999, {
+        name: "1 Updated",
+      });
+    }
+    await expect(failToUpdate).rejects.toThrow();
   });
 });
 
