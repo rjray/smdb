@@ -101,6 +101,20 @@ describe("FeatureTags: Retrieve", () => {
     }
   });
 
+  test("Get feature tag by ID with reference count", async () => {
+    const featureTag = await FeatureTags.getFeatureTagById(1, {
+      referenceCount: true,
+    });
+
+    if (featureTag) {
+      expect(featureTag.id).toBe(1);
+      expect(featureTag.name).toBe("color illustrations");
+      expect(featureTag.referenceCount).toBe(5);
+    } else {
+      assert.fail("No feature tag found");
+    }
+  });
+
   test("Get feature tag by ID with features", async () => {
     const featureTag = await FeatureTags.getFeatureTagById(1, {
       features: true,
@@ -138,6 +152,15 @@ describe("FeatureTags: Update", () => {
     } else {
       assert.fail("No feature tag found");
     }
+  });
+
+  test("Update non-existent feature tag", async () => {
+    async function failToUpdate() {
+      return await FeatureTags.updateFeatureTagById(999999999, {
+        name: "1 Updated",
+      });
+    }
+    await expect(failToUpdate).rejects.toThrow();
   });
 });
 
