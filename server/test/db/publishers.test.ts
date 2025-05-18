@@ -86,8 +86,12 @@ describe("Publishers: Retrieve", () => {
       books: true,
     });
     if (publisher) {
-      expect(publisher.id).toBe(1);
-      expect(publisher.name).toBe("Publisher 1");
+      expect(publisher.clean()).toEqual({
+        id: 1,
+        name: "Publisher 1",
+        notes: null,
+        books: expect.any(Array),
+      });
       if (publisher.books) {
         expect(publisher.books.length).toBe(5);
       } else {
@@ -103,8 +107,12 @@ describe("Publishers: Retrieve", () => {
       series: true,
     });
     if (publisher) {
-      expect(publisher.id).toBe(1);
-      expect(publisher.name).toBe("Publisher 1");
+      expect(publisher.clean()).toEqual({
+        id: 1,
+        name: "Publisher 1",
+        notes: null,
+        series: expect.any(Array),
+      });
       if (publisher.series) {
         expect(publisher.series.length).toBe(5);
       } else {

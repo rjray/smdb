@@ -485,3 +485,46 @@ describe("referencesController: updateReferenceById", () => {
     });
   });
 });
+
+describe("referencesController: deleteReferenceById", () => {
+  test("should delete a reference and return 200 status when found", async () => {
+    const mockContext = createMockContext({
+      path: { id: 1 },
+    });
+
+    vi.mocked(References.deleteReferenceById).mockResolvedValue(1);
+
+    await referencesController.deleteReferenceById(mockContext);
+
+    expect(References.deleteReferenceById).toHaveBeenCalledWith(1);
+    expect(mockContext.res.status).toHaveBeenCalledWith(200);
+    expect(mockContext.res.end).toHaveBeenCalled();
+  });
+
+  test("should return 404 status when reference not found for deletion", async () => {
+    const mockContext = createMockContext({
+      path: { id: 999 },
+    });
+
+    vi.mocked(References.deleteReferenceById).mockResolvedValue(0);
+
+    await referencesController.deleteReferenceById(mockContext);
+
+    expect(References.deleteReferenceById).toHaveBeenCalledWith(999);
+    expect(mockContext.res.status).toHaveBeenCalledWith(404);
+    expect(mockContext.res.end).toHaveBeenCalled();
+  });
+
+  test("should handle string IDs correctly", async () => {
+    const mockContext = createMockContext({
+      path: { id: "1" },
+    });
+
+    vi.mocked(References.deleteReferenceById).mockResolvedValue(1);
+
+    await referencesController.deleteReferenceById(mockContext);
+
+    expect(References.deleteReferenceById).toHaveBeenCalledWith("1");
+    expect(mockContext.res.status).toHaveBeenCalledWith(200);
+  });
+});

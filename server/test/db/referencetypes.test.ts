@@ -50,8 +50,12 @@ describe("ReferenceTypes: Retrieve", () => {
     const referenceType = await ReferenceTypes.getReferenceTypeById(1);
 
     if (referenceType) {
-      expect(referenceType.id).toBe(1);
-      expect(referenceType.name).toBe("book");
+      expect(referenceType.clean()).toEqual({
+        id: 1,
+        name: "book",
+        description: "Book",
+        notes: "",
+      });
     } else {
       assert.fail("No reference type found");
     }
@@ -66,9 +70,13 @@ describe("ReferenceTypes: Retrieve", () => {
     );
 
     if (referenceType) {
-      expect(referenceType.id).toBe(1);
-      expect(referenceType.name).toBe("book");
-      expect(referenceType.referenceCount).toBe(5);
+      expect(referenceType.clean()).toEqual({
+        id: 1,
+        name: "book",
+        description: "Book",
+        notes: "",
+        referenceCount: 5,
+      });
     } else {
       assert.fail("No reference type found");
     }
@@ -80,13 +88,13 @@ describe("ReferenceTypes: Retrieve", () => {
     });
 
     if (referenceType) {
-      expect(referenceType.id).toBe(1);
-      expect(referenceType.name).toBe("book");
-      if (referenceType.references) {
-        expect(referenceType.references.length).toBe(5);
-      } else {
-        assert.fail("No referenceType.references found");
-      }
+      expect(referenceType.clean()).toEqual({
+        id: 1,
+        name: "book",
+        description: "Book",
+        notes: "",
+        references: expect.any(Array),
+      });
     } else {
       assert.fail("No reference type found");
     }

@@ -47,15 +47,30 @@ describe("Users: Retrieve", () => {
 
     expect(users.length).toBe(1);
     expect(users[0].id).toBe(1);
-    expect(users[0].name).toBe("Randy J. Ray");
+    expect(users[0].clean()).toEqual({
+      id: 1,
+      name: "Randy J. Ray",
+      email: "rjray@blackperl.com",
+      username: "rjray",
+      password: "Qml0ZSBtZS4K",
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+    });
   });
 
   test("Get user by ID", async () => {
     const user = await Users.getUserById(1);
 
     if (user) {
-      expect(user.id).toBe(1);
-      expect(user.username).toBe("rjray");
+      expect(user.clean()).toEqual({
+        id: 1,
+        name: "Randy J. Ray",
+        email: "rjray@blackperl.com",
+        username: "rjray",
+        password: "Qml0ZSBtZS4K",
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
     } else {
       assert.fail("No user found");
     }

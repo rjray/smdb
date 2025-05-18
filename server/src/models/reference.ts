@@ -84,13 +84,11 @@ class Reference extends Model {
         delete result.photoCollection;
         result.magazineFeature = result.magazineFeature.clean();
         break;
-      case 3:
-        // Photo Collection
+      default:
+        // Case 3: Photo Collection
         delete result.book;
         delete result.magazineFeature;
         result.photoCollection = result.photoCollection.clean();
-        break;
-      default:
         break;
     }
 

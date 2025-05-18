@@ -107,9 +107,12 @@ describe("FeatureTags: Retrieve", () => {
     });
 
     if (featureTag) {
-      expect(featureTag.id).toBe(1);
-      expect(featureTag.name).toBe("color illustrations");
-      expect(featureTag.referenceCount).toBe(5);
+      expect(featureTag.clean()).toEqual({
+        id: 1,
+        name: "color illustrations",
+        description: "Subject illustrations (in color)",
+        referenceCount: 5,
+      });
     } else {
       assert.fail("No feature tag found");
     }
@@ -121,8 +124,12 @@ describe("FeatureTags: Retrieve", () => {
     });
 
     if (featureTag) {
-      expect(featureTag.id).toBe(1);
-      expect(featureTag.name).toBe("color illustrations");
+      expect(featureTag.clean()).toEqual({
+        id: 1,
+        name: "color illustrations",
+        description: "Subject illustrations (in color)",
+        magazineFeatures: expect.any(Array),
+      });
       if (featureTag.magazineFeatures) {
         expect(featureTag.magazineFeatures.length).toBe(5);
       } else {
