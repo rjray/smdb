@@ -12,7 +12,11 @@
  * @param key - The key to sort the objects by.
  * @returns Function that sorts objects by the given key.
  */
-export const sortBy = <T extends object, K extends keyof T>(key: K) => {
+// Create a custom sorting fn that sorts objects by the given key.
+type SortPredicate<T> = (a: T, b: T) => number;
+export const sortObjectsBy = <T extends object>(
+  key: keyof T
+): SortPredicate<T> => {
   return (a: T, b: T) => (a[key] > b[key] ? 1 : b[key] > a[key] ? -1 : 0);
 };
 
