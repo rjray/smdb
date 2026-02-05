@@ -89,7 +89,7 @@ my $attrs = {
 
 my $dbhi = DBI->connect("dbi:SQLite:$dbin", q{}, q{}, { sqlite_unicode => 1 });
 
-my $storage = $dbout || 'ismdb.db';
+my $storage = $dbout || 'smdb.db';
 my $dbho = DBI->connect("dbi:SQLite:dbname=$storage", q{}, q{}, $attrs);
 $dbho->do('PRAGMA foreign_keys = ON');
 

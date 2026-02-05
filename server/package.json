@@ -13,7 +13,8 @@
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --run --coverage"
+    "test:coverage": "vitest --run --coverage",
+    "reset": "(rm -f smdb.db; sequelize --migrations-path src/migrations db:migrate && sequelize --seeders-path src/seeders db:seed:all && ./importer/import_refs.pl ~/work/nmrdb/models.db smdb.db)"
   },
   "dependencies": {
     "compression": "^1.8.1",
