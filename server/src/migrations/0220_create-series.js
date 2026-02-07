@@ -2,9 +2,7 @@
   Database set-up/tear-down for Series table.
  */
 
-import { Sequelize } from "sequelize";
-
-async function up({ context: queryInterface }) {
+async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("Series", {
     id: {
       allowNull: false,
@@ -37,7 +35,7 @@ async function up({ context: queryInterface }) {
   });
 }
 
-async function down({ context: queryInterface }) {
+async function down(queryInterface) {
   await queryInterface.removeIndex("Series", "unique_name_publisher");
   await queryInterface.dropTable("Series");
 }

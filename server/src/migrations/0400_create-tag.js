@@ -2,9 +2,7 @@
   Database set-up/tear-down for Tags table.
  */
 
-import { Sequelize } from "sequelize";
-
-async function up({ context: queryInterface }) {
+async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("Tags", {
     id: {
       allowNull: false,
@@ -26,7 +24,7 @@ async function up({ context: queryInterface }) {
   });
 }
 
-async function down({ context: queryInterface }) {
+async function down(queryInterface) {
   await queryInterface.dropTable("Tags");
 }
 

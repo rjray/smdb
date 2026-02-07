@@ -2,9 +2,7 @@
   Database set-up/tear-down for AuthorsReferences table.
  */
 
-import { Sequelize } from "sequelize";
-
-async function up({ context: queryInterface }) {
+async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("AuthorsReferences", {
     authorId: {
       primaryKey: true,
@@ -37,7 +35,7 @@ async function up({ context: queryInterface }) {
   });
 }
 
-async function down({ context: queryInterface }) {
+async function down(queryInterface) {
   await queryInterface.removeIndex(
     "AuthorsReferences",
     "authors_references_author"

@@ -2,9 +2,7 @@
   Database set-up/tear-down for References table.
  */
 
-import { Sequelize } from "sequelize";
-
-async function up({ context: queryInterface }) {
+async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("References", {
     id: {
       allowNull: false,
@@ -38,7 +36,7 @@ async function up({ context: queryInterface }) {
   });
 }
 
-async function down({ context: queryInterface }) {
+async function down(queryInterface) {
   await queryInterface.dropTable("References");
 }
 

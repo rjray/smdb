@@ -2,9 +2,7 @@
   Database set-up/tear-down for PhotoCollections table.
  */
 
-import { Sequelize } from "sequelize";
-
-async function up({ context: queryInterface }) {
+async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("PhotoCollections", {
     referenceId: {
       allowNull: false,
@@ -28,7 +26,7 @@ async function up({ context: queryInterface }) {
   });
 }
 
-async function down({ context: queryInterface }) {
+async function down(queryInterface) {
   await queryInterface.dropTable("PhotoCollections");
 }
 

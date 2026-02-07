@@ -2,9 +2,7 @@
   Database set-up/tear-down for Publishers table.
  */
 
-import { Sequelize } from "sequelize";
-
-async function up({ context: queryInterface }) {
+async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("Publishers", {
     id: {
       allowNull: false,
@@ -23,7 +21,7 @@ async function up({ context: queryInterface }) {
   });
 }
 
-async function down({ context: queryInterface }) {
+async function down(queryInterface) {
   await queryInterface.dropTable("Publishers");
 }
 
