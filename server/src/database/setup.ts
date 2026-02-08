@@ -3,8 +3,7 @@
   single exported function that will initialize a database using the existing
   connection object. Initialization consists of:
 
-  1. Running the schema via `sequelize.query()`. The schema is defined in the
-     `schema` directory, in the file `schema.sql`.
+  1. Loading the schema migrations and applying them to the database (Umzug).
   2. Add the seed data for the database. The seed data is defined in a series
      of CSV files in the `schema` directory.
   3. Do minor sanity-checking of the seeded data.
