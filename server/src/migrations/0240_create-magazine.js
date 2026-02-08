@@ -2,7 +2,9 @@
   Database set-up/tear-down for Magazines table.
  */
 
-async function up(queryInterface, Sequelize) {
+import { Sequelize } from "sequelize";
+
+async function up({ context: queryInterface }) {
   await queryInterface.createTable("Magazines", {
     id: {
       allowNull: false,
@@ -35,7 +37,7 @@ async function up(queryInterface, Sequelize) {
   });
 }
 
-async function down(queryInterface) {
+async function down({ context: queryInterface }) {
   await queryInterface.dropTable("Magazines");
 }
 
