@@ -944,6 +944,36 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
+"@turbo/darwin-64@2.9.12":
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/@turbo/darwin-64/-/darwin-64-2.9.12.tgz#2f1c242113ec0ed6d68640e1601b763235d6731e"
+  integrity sha512-eu3eFRmE9NjgZ0wPdRJ44l+LGSeIky+tz5ZQd8zQkw/Yqi+BM7wq+8nbabeoiVUcICi/IZweMOKl/MCmkrd1+g==
+
+"@turbo/darwin-arm64@2.9.12":
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/@turbo/darwin-arm64/-/darwin-arm64-2.9.12.tgz#0c452e6fc7d2642bc8aa0a01ff1bebbda01b37e4"
+  integrity sha512-RUkAE404z/J8NsyrUosMcBaXT6M4bRFxTQrmkDQBLQVXaC8Jl0e9bMvYDSX0GW7Ffm2m3j9y7RXgR1foeUAM9w==
+
+"@turbo/linux-64@2.9.12":
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/@turbo/linux-64/-/linux-64-2.9.12.tgz#0db0cff14dcc63db9c7135aa29f1b6d21d596ded"
+  integrity sha512-InIUtH7cw/vqXNX1Gr7QgWfmw3ct08pV5CpfdEOR48z2u2rzdmpIuk00B/Q2xCb0PMWtKgiMQynfuphmEuUyTQ==
+
+"@turbo/linux-arm64@2.9.12":
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/@turbo/linux-arm64/-/linux-arm64-2.9.12.tgz#7f335e3572e884f4bab9059ed6bcf155fc6de4ed"
+  integrity sha512-lC6nD//Xh67fmJM0LKaLsg74Wry0aYrgMklpiNgCbUaMdPIOqj0A00iri3NU7Lb7pZHx8ViisgpeDKlpSgFUCA==
+
+"@turbo/windows-64@2.9.12":
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/@turbo/windows-64/-/windows-64-2.9.12.tgz#1960e314f252cb444c57303f805d402930017a65"
+  integrity sha512-conYri8VUl72JOdYnLDPYwzqbPcY5ECoHmo9FWoKznemhaAIilj4maHqs9Uar0aKfNoZIULniy+6iWaLtLO34A==
+
+"@turbo/windows-arm64@2.9.12":
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/@turbo/windows-arm64/-/windows-arm64-2.9.12.tgz#89ac1759369644d3bfbd02808e1653402b5b3b3e"
+  integrity sha512-XoR4bsg62/L/esRVcmoMESEiNZ36+YmyjYGLpoqk8nwMgXzzVjNOgX0lRSz5w/U/ajLGv3nhMsS0Q2QOdvp2AQ==
+
 "@types/argparse@1.0.38":
   version "1.0.38"
   resolved "https://registry.yarnpkg.com/@types/argparse/-/argparse-1.0.38.tgz#a81fd8606d481f873a3800c6ebae4f1d768a56a9"
@@ -5499,6 +5529,18 @@ tunnel-agent@^0.6.0:
   dependencies:
     safe-buffer "^5.0.1"
 
+turbo@^2.9.12:
+  version "2.9.12"
+  resolved "https://registry.yarnpkg.com/turbo/-/turbo-2.9.12.tgz#0e3c9bff7ac482e3624b4b26ef804634e1206254"
+  integrity sha512-lCPgus1NuTiBdaITWqzSH/Ff6HVL8HHGBtOXHg1dHRfcshN79XkygSdh0M6g8b0td91ILLG5MTkLOkp5UvyPJw==
+  optionalDependencies:
+    "@turbo/darwin-64" "2.9.12"
+    "@turbo/darwin-arm64" "2.9.12"
+    "@turbo/linux-64" "2.9.12"
+    "@turbo/linux-arm64" "2.9.12"
+    "@turbo/windows-64" "2.9.12"
+    "@turbo/windows-arm64" "2.9.12"
+
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.4.0.tgz#07b8203bfa7056c0657050e3ccd2c37730bab8f1"
@@ -5736,7 +5778,7 @@ vite-tsconfig-paths@^5.1.4:
     globrex "^0.1.2"
     tsconfck "^3.0.3"
 
-"vite@^5.0.0 || ^6.0.0 || ^7.0.0-0":
+vite@7.3.3, "vite@^5.0.0 || ^6.0.0 || ^7.0.0-0":
   version "7.3.3"
   resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.3.tgz#d7e07a52b5873fb86f902a3f4b3d17410337450f"
   integrity sha512-/4XH147Ui7OGTjg3HbdWe5arnZQSbfuRzdr9Ec7TQi5I7R+ir0Rlc9GIvD4v0XZurELqA035KVXJXpR61xhiTA==
