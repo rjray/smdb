@@ -1,5 +1,8 @@
 {
   "extends": "../tsconfig.json",
+  "references": [
+    { "path": "../types" }
+  ],
   "compilerOptions": {
     "incremental": true, /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
     "experimentalDecorators": true, /* Enable experimental support for legacy experimental decorators. */
@@ -16,5 +19,6 @@
     "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
     "noImplicitAny": true, /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
-  }
+  },
+  "exclude": ["src/example.ts"]
 }

@@ -12,7 +12,7 @@ import {
   ForeignKey,
   PrimaryKey,
 } from "sequelize-typescript";
-import { BookData } from "@smdb-types/books";
+import { BookData } from "@smdb/types";
 
 import Publisher from "./publisher";
 import Reference from "./reference";

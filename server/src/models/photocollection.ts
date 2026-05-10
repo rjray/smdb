@@ -11,7 +11,7 @@ import {
   ForeignKey,
   PrimaryKey,
 } from "sequelize-typescript";
-import { PhotoCollectionData } from "@smdb-types/photo-collections";
+import { PhotoCollectionData } from "@smdb/types";
 
 import Reference from "./reference";
 

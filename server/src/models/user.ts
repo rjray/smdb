@@ -2,7 +2,7 @@
   User model definition.
  */
 
-import { UserData } from "@smdb-types/users";
+import { UserData } from "@smdb/types";
 
 import {
   PrimaryKey,

@@ -13,8 +13,8 @@ import {
   BelongsTo,
   BelongsToMany,
 } from "sequelize-typescript";
-import { MagazineFeatureData } from "@smdb-types/magazine-features";
-import { FeatureTagNewData } from "@smdb-types/feature-tags";
+import { MagazineFeatureData } from "@smdb/types";
+import { FeatureTagNewData } from "@smdb/types";
 
 import FeatureTag from "./featuretag";
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";

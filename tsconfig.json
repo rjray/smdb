@@ -2,5 +2,9 @@
   "compilerOptions": {
     "target": "ES2020",
     "strict": true
-  }
+  },
+  "references": [
+    { "path": "./types" },
+    { "path": "./server" }
+  ]
 }

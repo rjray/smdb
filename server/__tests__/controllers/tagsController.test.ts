@@ -4,7 +4,7 @@
 
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
-import { TagData } from "@smdb-types/tags";
+import { TagData } from "@smdb/types";
 
 import { Tag, Reference } from "../../src/models";
 import { Tags } from "../../src/db";

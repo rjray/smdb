@@ -15,9 +15,9 @@ import {
   HasOne,
   ForeignKey,
 } from "sequelize-typescript";
-import { ReferenceData } from "@smdb-types/references";
-import { AuthorNewData } from "@smdb-types/authors";
-import { TagNewData } from "@smdb-types/tags";
+import { ReferenceData } from "@smdb/types";
+import { AuthorNewData } from "@smdb/types";
+import { TagNewData } from "@smdb/types";
 
 import Author from "./author";
 import AuthorsReferences from "./authorsreferences";

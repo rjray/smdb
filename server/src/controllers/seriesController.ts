@@ -6,7 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Series as SeriesDB } from "../db";
 import { Series } from "../models";
-import { SeriesUpdateData, SeriesNewData } from "@smdb-types/series";
+import { SeriesUpdateData, SeriesNewData } from "@smdb/types";
 import { queryToRequestOpts } from "../utils";
 
 /*

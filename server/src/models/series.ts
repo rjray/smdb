@@ -16,7 +16,7 @@ import {
 
 import Book from "./book";
 import Publisher from "./publisher";
-import { SeriesData } from "@smdb-types/series";
+import { SeriesData } from "@smdb/types";
 
 @Scopes(() => ({
   books: { include: [Book] },

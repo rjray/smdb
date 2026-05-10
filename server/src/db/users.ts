@@ -5,7 +5,7 @@
 import { BaseError } from "sequelize";
 
 import { User } from "../models";
-import { UserNewData, UserUpdateData } from "@smdb-types/users";
+import { UserNewData, UserUpdateData } from "@smdb/types";
 
 /**
  * Create a new user in the database.

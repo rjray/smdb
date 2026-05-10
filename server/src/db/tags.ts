@@ -6,7 +6,7 @@ import { BaseError, FindOptions } from "sequelize";
 
 import { Sequelize } from "../database";
 import { Tag } from "../models";
-import { TagNewData, TagUpdateData } from "@smdb-types/tags";
+import { TagNewData, TagUpdateData } from "@smdb/types";
 import { RequestOpts, getScopeFromParams } from "../utils";
 
 /// The scopes that can be fetched for tags.

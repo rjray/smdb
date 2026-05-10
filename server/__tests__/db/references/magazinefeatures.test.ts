@@ -16,7 +16,7 @@ import {
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../../src/constants";
 import { Magazine, MagazineFeature, Reference } from "../../../src/models";
-import { MagazineFeatureNewData } from "@smdb-types/magazine-features";
+import { MagazineFeatureNewData } from "@smdb/types";
 
 beforeAll(async () => {
   await setupTestDatabase();

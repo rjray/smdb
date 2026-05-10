@@ -4,16 +4,13 @@
 
 import { BaseError, Transaction } from "sequelize";
 import { match, P } from "ts-pattern";
-import { AuthorNewData } from "@smdb-types/authors";
-import { BookNewData, BookUpdateData } from "@smdb-types/books";
-import { FeatureTagNewData } from "@smdb-types/feature-tags";
-import {
-  MagazineFeatureNewData,
-  MagazineFeatureUpdateData,
-} from "@smdb-types/magazine-features";
-import { PhotoCollectionUpdateData } from "@smdb-types/photo-collections";
-import { ReferenceUpdateData, ReferenceNewData } from "@smdb-types/references";
-import { TagNewData } from "@smdb-types/tags";
+import { AuthorNewData } from "@smdb/types";
+import { BookNewData, BookUpdateData } from "@smdb/types";
+import { FeatureTagNewData } from "@smdb/types";
+import { MagazineFeatureNewData, MagazineFeatureUpdateData } from "@smdb/types";
+import { PhotoCollectionUpdateData } from "@smdb/types";
+import { ReferenceUpdateData, ReferenceNewData } from "@smdb/types";
+import { TagNewData } from "@smdb/types";
 
 import { connection } from "../database";
 import {

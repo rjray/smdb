@@ -4,7 +4,7 @@
 
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
-import { SeriesData } from "@smdb-types/series";
+import { SeriesData } from "@smdb/types";
 
 import { Series, Publisher, Book } from "../../src/models";
 import { Series as SeriesDB } from "../../src/db";
