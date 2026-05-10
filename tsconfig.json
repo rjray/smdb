@@ -5,6 +5,7 @@
   },
   "references": [
     { "path": "./types" },
-    { "path": "./server" }
+    { "path": "./server" },
+    { "path": "./client" }
   ]
 }

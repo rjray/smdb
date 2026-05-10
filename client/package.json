@@ -1,0 +1,17 @@
+{
+  "name": "@smdb/client",
+  "version": "0.1.0",
+  "description": "SMDB web client",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "echo 'client build not yet configured'",
+    "dev": "echo 'client dev not yet configured'",
+    "lint": "eslint src",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@smdb/types": "*"
+  }
+}
