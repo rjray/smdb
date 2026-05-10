@@ -1,5 +1,9 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true

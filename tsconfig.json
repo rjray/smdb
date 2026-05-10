@@ -1,15 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ES2020",
-    "strict": true,
-    "moduleResolution": "nodenext",
-    "baseUrl": ".",
-    "rootDir": ".",
-    "paths": {
-      "@smdb-types/*": [
-        "types/src/*"
-      ]
-    }
+    "strict": true
   }
 }
