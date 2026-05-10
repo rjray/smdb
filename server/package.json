@@ -18,7 +18,7 @@
     "test:coverage": "vitest --run --coverage"
   },
   "dependencies": {
-    "@smdb/types": "*",
+    "@smdb/types": "workspace:*",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
     "csv-parse": "^5.6.0",

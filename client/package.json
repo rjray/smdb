@@ -12,6 +12,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@smdb/types": "*"
+    "@smdb/types": "workspace:*"
   }
 }
