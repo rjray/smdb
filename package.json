@@ -23,6 +23,10 @@
     "typescript": "^5.5.4",
     "typescript-eslint": "^7.17.0"
   },
+  "workspaces": [
+    "types",
+    "server"
+  ],
   "scripts": {
     "prepare": "husky"
   },
