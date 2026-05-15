@@ -24,11 +24,6 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.3"
   },
-  "workspaces": [
-    "types",
-    "server",
-    "client"
-  ],
   "scripts": {
     "build": "turbo build",
     "test": "turbo test",
@@ -37,8 +32,14 @@
     "clean": "turbo clean",
     "prepare": "husky"
   },
-  "resolutions": {
-    "vite": "7.3.3"
+  "pnpm": {
+    "overrides": {
+      "vite": "7.3.3"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sqlite3"
+    ]
   },
-  "packageManager": "yarn@4.14.1"
+  "packageManager": "pnpm@10.33.4"
 }
