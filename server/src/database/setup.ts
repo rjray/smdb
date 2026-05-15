@@ -96,6 +96,8 @@ export default async function setupDatabase(directory: string) {
     await seedFeatureTags(directory);
   } catch (err) {
     // Something went wrong with the schema or the CSV files.
-    throw new Error(`Failed to initialize the database: ${err}`);
+    throw new Error(`Failed to initialize the database: ${err}`, {
+      cause: err,
+    });
   }
 }

@@ -15,8 +15,8 @@
   },
   "homepage": "https://github.com/rjray/smdb",
   "devDependencies": {
-    "@eslint/js": "^9.8.0",
-    "eslint": "^9.7.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.8.3",
