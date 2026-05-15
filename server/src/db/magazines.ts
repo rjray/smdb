@@ -3,7 +3,7 @@
  */
 
 import { BaseError, FindOptions, QueryTypes } from "sequelize";
-import { MagazineNewData, MagazineUpdateData } from "@smdb-types/magazines";
+import { MagazineNewData, MagazineUpdateData } from "@smdb/types";
 
 import { Sequelize, connection } from "../database";
 import { Magazine } from "../models";

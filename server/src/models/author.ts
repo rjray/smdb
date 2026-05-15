@@ -16,7 +16,7 @@ import {
 import AuthorAlias from "./authoralias";
 import AuthorsReferences from "./authorsreferences";
 import Reference from "./reference";
-import { AuthorData } from "@smdb-types/authors";
+import { AuthorData } from "@smdb/types";
 
 @Scopes(() => ({
   references: { include: [Reference] },

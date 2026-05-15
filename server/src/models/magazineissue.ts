@@ -13,7 +13,7 @@ import {
   HasMany,
   AllowNull,
 } from "sequelize-typescript";
-import { MagazineIssueData } from "@smdb-types/magazine-issues";
+import { MagazineIssueData } from "@smdb/types";
 
 import Magazine from "./magazine";
 import MagazineFeature from "./magazinefeature";

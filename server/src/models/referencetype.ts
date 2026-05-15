@@ -12,7 +12,7 @@ import {
   AllowNull,
   Unique,
 } from "sequelize-typescript";
-import { ReferenceTypeData } from "@smdb-types/reference-types";
+import { ReferenceTypeData } from "@smdb/types";
 
 import Reference from "./reference";
 

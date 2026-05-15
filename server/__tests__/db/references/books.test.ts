@@ -16,7 +16,7 @@ import {
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../../src/constants";
 import { Book, Reference } from "../../../src/models";
-import { BookNewData } from "@smdb-types/books";
+import { BookNewData } from "@smdb/types";
 
 beforeAll(async () => {
   await setupTestDatabase();

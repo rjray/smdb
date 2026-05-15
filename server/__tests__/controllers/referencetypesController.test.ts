@@ -4,7 +4,7 @@
 
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
-import { ReferenceTypeData } from "@smdb-types/reference-types";
+import { ReferenceTypeData } from "@smdb/types";
 
 import { Reference, ReferenceType } from "../../src/models";
 import { ReferenceTypes } from "../../src/db";

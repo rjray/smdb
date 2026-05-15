@@ -20,11 +20,25 @@
     "husky": "^9.1.3",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.3",
+    "turbo": "^2.9.12",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^7.17.0"
+    "typescript-eslint": "^8.0.0"
   },
+  "workspaces": [
+    "types",
+    "server",
+    "client"
+  ],
   "scripts": {
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "dev": "turbo dev",
+    "clean": "turbo clean",
     "prepare": "husky"
   },
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  "resolutions": {
+    "vite": "7.3.3"
+  },
+  "packageManager": "yarn@4.14.1"
 }

@@ -4,7 +4,7 @@
 
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
-import { PublisherData } from "@smdb-types/publishers";
+import { PublisherData } from "@smdb/types";
 
 import { Publisher, Book, Series } from "../../src/models";
 import { Publishers } from "../../src/db";

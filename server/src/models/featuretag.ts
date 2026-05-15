@@ -13,7 +13,7 @@ import {
 } from "sequelize-typescript";
 
 import FeatureTagsMagazineFeatures from "./featuretagsmagazinefeatures";
-import { FeatureTagData } from "@smdb-types/feature-tags";
+import { FeatureTagData } from "@smdb/types";
 import MagazineFeature from "./magazinefeature";
 
 @Scopes(() => ({ features: { include: [MagazineFeature] } }))

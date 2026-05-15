@@ -14,7 +14,7 @@ import {
 
 import Reference from "./reference";
 import TagsReferences from "./tagsreferences";
-import { TagData } from "@smdb-types/tags";
+import { TagData } from "@smdb/types";
 
 @Scopes(() => ({ references: { include: [Reference] } }))
 @Table({ timestamps: false })

@@ -3,7 +3,7 @@
  */
 
 import { ExegesisContext } from "exegesis-express";
-import { MagazineNewData, MagazineUpdateData } from "@smdb-types/magazines";
+import { MagazineNewData, MagazineUpdateData } from "@smdb/types";
 
 import { Magazines } from "../db";
 import { Magazine } from "../models";

@@ -6,7 +6,7 @@ import { ExegesisContext } from "exegesis-express";
 
 import { Tags } from "../db";
 import { Tag } from "../models";
-import { TagNewData, TagUpdateData } from "@smdb-types/tags";
+import { TagNewData, TagUpdateData } from "@smdb/types";
 import { queryToRequestOpts } from "../utils";
 
 /**

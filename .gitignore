@@ -117,3 +117,9 @@ dist
 
 # Vim tmp files
 .*.swp
+
+# Turborepo cache
+.turbo
+
+# Claude local files
+.claude

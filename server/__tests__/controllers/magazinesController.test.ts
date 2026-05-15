@@ -8,8 +8,8 @@ import { ExegesisContext } from "exegesis-express";
 import { Magazine } from "../../src/models";
 import { Magazines } from "../../src/db";
 import * as magazinesController from "../../src/controllers/magazinesController";
-import { MagazineData } from "@smdb-types/magazines";
-import { MagazineIssueForReference } from "@smdb-types/magazine-issues";
+import { MagazineData } from "@smdb/types";
+import { MagazineIssueForReference } from "@smdb/types";
 
 // Mock the Magazines database module
 vi.mock("../../src/db", () => ({

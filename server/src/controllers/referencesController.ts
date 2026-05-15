@@ -3,7 +3,7 @@
  */
 
 import { ExegesisContext } from "exegesis-express";
-import { ReferenceUpdateData, ReferenceNewData } from "@smdb-types/references";
+import { ReferenceUpdateData, ReferenceNewData } from "@smdb/types";
 
 import { References } from "../db";
 import { Reference } from "../models";

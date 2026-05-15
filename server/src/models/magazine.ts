@@ -11,7 +11,7 @@ import {
   HasMany,
   AllowNull,
 } from "sequelize-typescript";
-import { MagazineData } from "@smdb-types/magazines";
+import { MagazineData } from "@smdb/types";
 
 import MagazineIssue from "./magazineissue";
 
