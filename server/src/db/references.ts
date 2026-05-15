@@ -827,7 +827,8 @@ export async function createReference(
   } catch (error) {
     if (error instanceof BaseError) {
       throw new Error(
-        `addReference: Error in create transaction: ${error.message}`
+        `addReference: Error in create transaction: ${error.message}`,
+        { cause: error }
       );
     } else {
       throw error;
@@ -1855,7 +1856,9 @@ export async function updateReferenceById(
         return Reference.findByPk(id);
       } catch (error) {
         if (error instanceof BaseError) {
-          throw new Error(`Error in update transaction: ${error.message}`);
+          throw new Error(`Error in update transaction: ${error.message}`, {
+            cause: error,
+          });
         } else {
           throw error;
         }
