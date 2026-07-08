@@ -16,13 +16,13 @@
   "homepage": "https://github.com/rjray/smdb",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.4.0",
+    "eslint": "^10.6.0",
     "husky": "^9.1.7",
-    "lint-staged": "^15.5.2",
-    "prettier": "^3.8.3",
-    "turbo": "^2.9.14",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.59.3"
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.4",
+    "turbo": "^2.10.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0"
   },
   "scripts": {
     "build": "turbo build",
@@ -32,14 +32,10 @@
     "clean": "turbo clean",
     "prepare": "husky"
   },
-  "pnpm": {
-    "overrides": {
-      "vite": "7.3.3"
-    },
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sqlite3"
-    ]
-  },
-  "packageManager": "pnpm@10.33.4"
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.10.0"
+    }
+  }
 }

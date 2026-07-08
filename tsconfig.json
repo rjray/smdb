@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "strict": true
   },
   "references": [
-    { "path": "./types" },
-    { "path": "./server" },
-    { "path": "./client" }
+    {
+      "path": "./types"
+    },
+    {
+      "path": "./server"
+    },
+    {
+      "path": "./client"
+    }
   ]
 }
