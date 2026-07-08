@@ -13,7 +13,7 @@ import {
 } from "sequelize-typescript";
 
 import Author from "./author";
-import { AuthorAliasData } from "../../../types/src/author-aliases";
+import { AuthorAliasData } from "@smdb/types";
 
 @Table({ timestamps: false })
 class AuthorAlias extends Model {

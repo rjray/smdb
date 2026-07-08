@@ -3,11 +3,12 @@
  */
 
 import { ExegesisContext } from "exegesis-express";
+
 import { MagazineNewData, MagazineUpdateData } from "@smdb/types";
 
-import { Magazines } from "../db";
-import { Magazine } from "../models";
-import { queryToRequestOpts } from "../utils";
+import { Magazines } from "@/db";
+import { Magazine } from "@/models";
+import { queryToRequestOpts } from "@/utils";
 
 /**
  * POST /magazines

@@ -1,13 +1,14 @@
 /*
-  Exegesis controller for all operations under /api/featurefeaturetags.
+  Exegesis controller for all operations under /api/featuretags.
  */
 
 import { ExegesisContext } from "exegesis-express";
 
-import { FeatureTags } from "../db";
-import { FeatureTag } from "../models";
 import { FeatureTagUpdateData, FeatureTagNewData } from "@smdb/types";
-import { queryToRequestOpts } from "../utils";
+
+import { FeatureTags } from "@/db";
+import { FeatureTag } from "@/models";
+import { queryToRequestOpts } from "@/utils";
 
 /**
   POST /featuretags

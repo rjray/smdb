@@ -4,6 +4,7 @@
 
 import { BaseError, Transaction } from "sequelize";
 import { match, P } from "ts-pattern";
+
 import { AuthorNewData } from "@smdb/types";
 import { BookNewData, BookUpdateData } from "@smdb/types";
 import { FeatureTagNewData } from "@smdb/types";
@@ -12,7 +13,7 @@ import { PhotoCollectionUpdateData } from "@smdb/types";
 import { ReferenceUpdateData, ReferenceNewData } from "@smdb/types";
 import { TagNewData } from "@smdb/types";
 
-import { connection } from "../database";
+import { connection } from "@/database";
 import {
   Reference,
   Author,
@@ -25,10 +26,9 @@ import {
   MagazineFeature,
   Magazine,
   MagazineIssue,
-} from "../models";
-// Oops... tripped over a deprecated name if I don't use the relative import.
-import { ReferenceTypes } from "../constants";
-import { RequestOpts, getScopeFromParams } from "../utils";
+} from "@/models";
+import { ReferenceTypes } from "@/constants";
+import { RequestOpts, getScopeFromParams } from "@/utils";
 
 // A local type for use in the fix-up functions for book references.
 type BookNewDataFixup = Omit<BookNewData, "isbn" | "seriesNumber">;
