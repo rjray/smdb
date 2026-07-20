@@ -1,0 +1,86 @@
+#+title: List of Tasks for SMDB
+#+author: Randy J. Ray
+#+created: [2026-07-12 16:07:41]
+#+updated: [2026-07-20 10:54:14]
+
+* List of Tasks for the SMDB Project [0%]
+
+** Types Component [0/4]
+
+The =types= component of the repository provides the TypeScript declarations
+for all types in the application. This is the only part that is shared among
+other parts (used by both =server= and =client=).
+
+1. [ ] Prove correctness with regards to =openapi.yaml=
+2. [ ] Find gaps (request/response types, etc.) and add them
+3. [ ] Boost (or just add) documentation
+4. [ ] Identify any types that are not used and remove them
+
+** Server Component [0/8]
+
+The server is node-based, using Express for the HTTP server layer and Exegesis
+for the OpenAPI glue.
+
+1. [ ] Prove correctness with regards to =openapi.yaml=
+2. [ ] Integrate same HTTPS support as was in =ismbd=
+3. [ ] Proper CORS configuration
+4. [ ] Check all 3rd-party packages for latest versions, adapting as necessary
+5. [ ] Remaining database primitives [0%]
+   1. [ ] Tag grouping/related tags
+   2. [ ] Tag name similarity
+   3. [ ] Spell-checking [0%]
+      1. [ ] Word indexing over =name= field of =References= table
+      2. [ ] Levenshtein-distance or similar algorithm for finding similarities
+6. [ ] SQLite adjustments and optimizations
+7. [ ] Web-link reference type [0%]
+   1. [ ] Design schema
+   2. [ ] Write model
+   3. [ ] Write migration file
+   4. [ ] Write controller
+   5. [ ] Write tests
+8. [ ] User-model and permissions layer
+
+** Client Component [0/9]
+
+The client component refers to the web UI client. This will be more vague at
+first until a specific UI toolkit is selected.
+
+1. [ ] Select a toolkit
+2. [ ] Home/landing page
+3. [ ] References view/advanced search page [0%]
+   1. [ ] Exclusion of non-relevant matches
+   2. [ ] Export to different formats (CSV, PDF, plain-text)
+   3. [ ] Save/retrieve search configurations
+4. [ ] Authors view/management page
+5. [ ] Magazines view/management pages [0%]
+   1. [ ] Magazine primary view/management
+   2. [ ] Magazine issue view/management
+   3. [ ] Feature tags view/management
+6. [ ] Book publisher/series view/management page [0%]
+   1. [ ] Publisher view/management
+   2. [ ] Series view/management
+7. [ ] Tags view/management page [0%]
+   1. [ ] Tag cloud
+   2. [ ] Related tags grouping
+   3. [ ] Suggest tag redundancy/merging
+8. [ ] Photo collections view/management page
+9. [ ] Web resources view/management page [0%]
+   1. [ ] Easy way to add from browsing session (i.e. like Bookmark OS)
+   2. [ ] Automatic import from cloud bookmark services
+
+** Importer Component [0/5]
+
+The Perl-based import tool for bringing in the old NMRDB data into the new
+schema.
+
+1. [ ] Create the folder
+2. [ ] Bring in the =import_refs.pl= file, as well as the =publishers.yml= and
+   =series.yml= files
+3. [ ] Determine if CSV files of starting tags are needed
+4. [ ] Port over the NPM build-action for regenerating the database
+5. [ ] Develop tests for imported DB integrity
+
+# Local Variables:
+# time-stamp-pattern: "^#\\+updated:[ 	]+\\[%%]$"
+# jinx-local-words: "Levenshtein OpenAPI"
+# End:
