@@ -19,7 +19,7 @@ other parts (used by both =server= and =client=).
 ** Server Component [0/8]
 
 The server is node-based, using Express for the HTTP server layer and Exegesis
-for the OpenAPI blue.
+for the OpenAPI glue.
 
 1. [ ] Prove correctness with regards to =openapi.yaml=
 2. [ ] Integrate same HTTPS support as was in =ismbd=
