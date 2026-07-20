@@ -2,9 +2,6 @@
 #+author: Randy J. Ray
 #+created: [2026-07-12 16:07:41]
 #+updated: [2026-07-19 14:25:57]
-:PROPERTIES:
-#+OPTIONS:
-:END:
 
 * List of Tasks for the SMDB Project [0%]
 
