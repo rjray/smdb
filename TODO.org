@@ -1,7 +1,7 @@
 #+title: List of Tasks for SMDB
 #+author: Randy J. Ray
 #+created: [2026-07-12 16:07:41]
-#+updated: [2026-07-19 14:25:57]
+#+updated: [2026-07-20 10:54:14]
 
 * List of Tasks for the SMDB Project [0%]
 
@@ -18,7 +18,7 @@ other parts (used by both =server= and =client=).
 
 ** Server Component [0/8]
 
-The server is node-based, using Express for the HTTP server layer and Exegsis
+The server is node-based, using Express for the HTTP server layer and Exegesis
 for the OpenAPI blue.
 
 1. [ ] Prove correctness with regards to =openapi.yaml=
@@ -82,5 +82,5 @@ schema.
 
 # Local Variables:
 # time-stamp-pattern: "^#\\+updated:[ 	]+\\[%%]$"
-# jinx-local-words: "Exegsis Levenshtein OpenAPI"
+# jinx-local-words: "Levenshtein OpenAPI"
 # End:
