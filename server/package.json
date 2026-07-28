@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "start": "nodemon --delay 2 --ext yaml,js,ts -w src src/server.ts",
+    "reset": "rm -f smdb.db; tsx src/bootstrap.ts && ./importer/import_refs.pl ~/work/nmrdb/models.db",
     "clean": "rm -rf dist coverage",
     "gen-keys": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj \"/C=US/ST=California/CN=localhost\"",
     "lint:openapi": "spectral lint src/openapi.yaml",
