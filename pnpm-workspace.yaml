@@ -3,6 +3,7 @@ packages:
   - "server"
   - "client"
 allowBuilds:
+  '@scarf/scarf': true
   esbuild: true
   sqlite3: true
 minimumReleaseAgeExclude:
