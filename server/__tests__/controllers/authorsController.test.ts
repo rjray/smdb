@@ -5,12 +5,12 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis";
 
-import * as authorsController from "../../src/controllers/authorsController";
-import { Authors } from "../../src/db";
-import { Author } from "../../src/models";
+import * as authorsController from "controllers/authorsController";
+import { Authors } from "db";
+import { Author } from "models";
 
 // Mock the Authors module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   Authors: {
     createAuthor: vi.fn(),
     getAllAuthors: vi.fn(),

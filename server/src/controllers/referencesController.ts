@@ -6,9 +6,9 @@ import { ExegesisContext } from "exegesis-express";
 
 import { ReferenceUpdateData, ReferenceNewData } from "@smdb/types";
 
-import { References } from "@/db";
-import { Reference } from "@/models";
-import { queryToRequestOpts } from "@/utils";
+import { References } from "db";
+import { Reference } from "models";
+import { queryToRequestOpts } from "utils";
 
 /**
  * POST /references

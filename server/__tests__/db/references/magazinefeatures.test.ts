@@ -7,15 +7,10 @@
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../../database";
-import {
-  Authors,
-  Magazines,
-  MagazineIssues,
-  References,
-} from "../../../src/db";
+import { Authors, Magazines, MagazineIssues, References } from "db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../../src/constants";
-import { Magazine, MagazineFeature, Reference } from "../../../src/models";
+import { Magazine, MagazineFeature, Reference } from "models";
 import { MagazineFeatureNewData } from "@smdb/types";
 
 beforeAll(async () => {

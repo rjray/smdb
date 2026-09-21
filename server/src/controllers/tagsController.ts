@@ -6,9 +6,9 @@ import { ExegesisContext } from "exegesis-express";
 
 import { TagNewData, TagUpdateData } from "@smdb/types";
 
-import { Tags } from "@/db";
-import { Tag } from "@/models";
-import { queryToRequestOpts } from "@/utils";
+import { Tags } from "db";
+import { Tag } from "models";
+import { queryToRequestOpts } from "utils";
 
 /**
  * POST /tags

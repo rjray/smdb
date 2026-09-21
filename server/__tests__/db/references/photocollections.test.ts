@@ -15,10 +15,10 @@ import {
 } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../../database";
-import { Authors, References } from "../../../src/db";
+import { Authors, References } from "db";
 // Need a full relative path due to deprecated "constants" module in Node.
 import { ReferenceTypes } from "../../../src/constants";
-import { PhotoCollection } from "../../../src/models";
+import { PhotoCollection } from "models";
 
 beforeAll(async () => {
   await setupTestDatabase();

@@ -13,12 +13,12 @@ import {
   Book,
   MagazineFeature,
   PhotoCollection,
-} from "../../src/models";
-import { References } from "../../src/db";
-import * as referencesController from "../../src/controllers/referencesController";
+} from "models";
+import { References } from "db";
+import * as referencesController from "controllers/referencesController";
 
 // Mock the References database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   References: {
     createReference: vi.fn(),
     getAllReferences: vi.fn(),

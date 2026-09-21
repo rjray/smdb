@@ -1,7 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "references": [
-    { "path": "../types" }
+    {
+      "path": "../types"
+    }
   ],
   "compilerOptions": {
     "incremental": true, /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
@@ -11,8 +13,10 @@
     "module": "preserve", /* Preserve module syntax for bundler/tsx consumption. */
     "moduleResolution": "Bundler", /* Specify how TypeScript looks up a file from a given module specifier. */
     "paths": {
-      "@/*": ["./src/*"]
-    }, /* Alias for non-relative imports within the src tree (e.g. @/database/setup). */
+      "*": [
+        "./src/*"
+      ]
+    }, /* Alias for non-relative imports within the src tree (e.g. database/setup). */
     "resolveJsonModule": true, /* Enable importing .json files. */
     "allowJs": true, /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */
     "outDir": "./dist", /* Specify an output folder for all emitted files. */
@@ -23,5 +27,7 @@
     "noImplicitAny": true, /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["src/example.ts"]
+  "exclude": [
+    "src/example.ts"
+  ]
 }

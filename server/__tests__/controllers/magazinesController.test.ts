@@ -5,14 +5,14 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
 
-import { Magazine } from "../../src/models";
-import { Magazines } from "../../src/db";
-import * as magazinesController from "../../src/controllers/magazinesController";
+import { Magazine } from "models";
+import { Magazines } from "db";
+import * as magazinesController from "controllers/magazinesController";
 import { MagazineData } from "@smdb/types";
 import { MagazineIssueForReference } from "@smdb/types";
 
 // Mock the Magazines database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   Magazines: {
     createMagazine: vi.fn(),
     getAllMagazines: vi.fn(),

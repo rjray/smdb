@@ -5,7 +5,7 @@
 import { afterAll, beforeAll, describe, expect, test, assert } from "vitest";
 
 import { setupTestDatabase, tearDownTestDatabase } from "../database";
-import { Magazines, MagazineIssues } from "../../src/db";
+import { Magazines, MagazineIssues } from "db";
 
 beforeAll(async () => {
   await setupTestDatabase();
