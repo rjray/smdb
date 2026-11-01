@@ -13,7 +13,7 @@ import fs from "fs";
 import { parse } from "csv-parse";
 import { Umzug, SequelizeStorage } from "umzug";
 
-import { ReferenceType, Tag, FeatureTag } from "@/models";
+import { ReferenceType, Tag, FeatureTag } from "models";
 import { connection } from "./index";
 
 // Helper function to process CSV files.

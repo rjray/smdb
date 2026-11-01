@@ -6,12 +6,12 @@ import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
 import { TagData } from "@smdb/types";
 
-import { Tag, Reference } from "../../src/models";
-import { Tags } from "../../src/db";
-import * as tagsController from "../../src/controllers/tagsController";
+import { Tag, Reference } from "models";
+import { Tags } from "db";
+import * as tagsController from "controllers/tagsController";
 
 // Mock the Tags database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   Tags: {
     createTag: vi.fn(),
     getAllTags: vi.fn(),

@@ -6,12 +6,12 @@ import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
 import { PublisherData } from "@smdb/types";
 
-import { Publisher, Book, Series } from "../../src/models";
-import { Publishers } from "../../src/db";
-import * as publishersController from "../../src/controllers/publishersController";
+import { Publisher, Book, Series } from "models";
+import { Publishers } from "db";
+import * as publishersController from "controllers/publishersController";
 
 // Mock the Publishers database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   Publishers: {
     createPublisher: vi.fn(),
     getAllPublishers: vi.fn(),

@@ -6,12 +6,12 @@ import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
 import { SeriesData } from "@smdb/types";
 
-import { Series, Publisher, Book } from "../../src/models";
-import { Series as SeriesDB } from "../../src/db";
-import * as seriesController from "../../src/controllers/seriesController";
+import { Series, Publisher, Book } from "models";
+import { Series as SeriesDB } from "db";
+import * as seriesController from "controllers/seriesController";
 
 // Mock the Series database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   Series: {
     createSeries: vi.fn(),
     getAllSeries: vi.fn(),

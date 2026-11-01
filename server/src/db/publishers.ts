@@ -6,8 +6,8 @@ import { BaseError } from "sequelize";
 
 import { PublisherUpdateData, PublisherNewData } from "@smdb/types";
 
-import { Publisher } from "@/models";
-import { RequestOpts, getScopeFromParams } from "@/utils";
+import { Publisher } from "models";
+import { RequestOpts, getScopeFromParams } from "utils";
 
 /// The scopes that can be fetched for publishers.
 const publisherScopes = ["books", "series"];

@@ -6,12 +6,12 @@ import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
 import { ReferenceTypeData } from "@smdb/types";
 
-import { Reference, ReferenceType } from "../../src/models";
-import { ReferenceTypes } from "../../src/db";
-import * as referencetypesController from "../../src/controllers/referencetypesController";
+import { Reference, ReferenceType } from "models";
+import { ReferenceTypes } from "db";
+import * as referencetypesController from "controllers/referencetypesController";
 
 // Mock the ReferenceTypes database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   ReferenceTypes: {
     getAllReferenceTypes: vi.fn(),
     getReferenceTypeById: vi.fn(),

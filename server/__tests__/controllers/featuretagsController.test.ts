@@ -5,12 +5,12 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { ExegesisContext } from "exegesis-express";
 
-import { FeatureTag } from "../../src/models";
-import { FeatureTags } from "../../src/db";
-import * as featuretagsController from "../../src/controllers/featuretagsController";
+import { FeatureTag } from "models";
+import { FeatureTags } from "db";
+import * as featuretagsController from "controllers/featuretagsController";
 
 // Mock the FeatureTags database module
-vi.mock("../../src/db", () => ({
+vi.mock("db", () => ({
   FeatureTags: {
     createFeatureTag: vi.fn(),
     getAllFeatureTags: vi.fn(),
